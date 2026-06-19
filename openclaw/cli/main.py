@@ -4,11 +4,15 @@ from __future__ import annotations
 
 import typer
 
+from openclaw.cli.gateway import gateway_app
+
 app = typer.Typer(
     name="openclaw-py",
     help="OpenClaw Python — multi-channel AI gateway",
     no_args_is_help=True,
 )
+
+app.add_typer(gateway_app, name="gateway")
 
 
 @app.command()
