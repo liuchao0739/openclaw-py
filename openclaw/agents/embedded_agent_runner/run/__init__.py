@@ -37,6 +37,14 @@ from openclaw.agents.embedded_agent_runner.run.params import (
     EmbeddedRunTrigger,
     RunEmbeddedAgentParams,
 )
+from openclaw.agents.embedded_agent_runner.run.preemptive_compaction import (
+    PREEMPTIVE_OVERFLOW_ERROR_TEXT,
+    build_pre_prompt_context_budget_status,
+    estimate_llm_boundary_token_pressure,
+    estimate_rendered_llm_boundary_token_pressure,
+    format_pre_prompt_precheck_log,
+    should_preemptively_compact_before_prompt,
+)
 from openclaw.agents.embedded_agent_runner.run.preemptive_compaction_types import (
     PreemptiveCompactionRoute,
 )
@@ -52,13 +60,18 @@ __all__ = [
     "EMPTY_RESPONSE_RETRY_INSTRUCTION",
     "EmbeddedRunLivenessState",
     "EmbeddedRunTrigger",
+    "PREEMPTIVE_OVERFLOW_ERROR_TEXT",
     "PreemptiveCompactionRoute",
     "REASONING_ONLY_RETRY_INSTRUCTION",
     "RunEmbeddedAgentParams",
     "abortable",
     "build_attempt_replay_metadata",
+    "build_pre_prompt_context_budget_status",
     "create_compaction_diag_id",
     "create_idle_timeout_breaker_state",
+    "estimate_llm_boundary_token_pressure",
+    "estimate_rendered_llm_boundary_token_pressure",
+    "format_pre_prompt_precheck_log",
     "handle_retry_limit_exhaustion",
     "has_attempt_terminal_state",
     "is_incomplete_terminal_assistant_turn",
@@ -74,6 +87,7 @@ __all__ = [
     "resolve_same_model_rate_limit_backoff_ms",
     "scrub_anthropic_refusal_magic",
     "should_inject_heartbeat_prompt_for_trigger",
+    "should_preemptively_compact_before_prompt",
     "should_retry_missing_assistant_turn",
     "step_idle_timeout_breaker",
 ]
