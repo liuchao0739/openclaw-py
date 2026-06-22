@@ -25,6 +25,14 @@ class TextContent(BaseModel):
     text: str
 
 
+class ImageContent(BaseModel):
+    type: Literal["image"] = "image"
+    data: str = ""
+    mime_type: str = Field(default="image/png", alias="mimeType")
+
+    model_config = {"populate_by_name": True}
+
+
 class ToolCall(BaseModel):
     type: Literal["toolCall"] = "toolCall"
     id: str
@@ -77,7 +85,7 @@ class ToolResultMessage(BaseModel):
     role: Literal["toolResult"] = "toolResult"
     tool_call_id: str = Field(alias="toolCallId")
     tool_name: str = Field(alias="toolName")
-    content: list[TextContent] = Field(default_factory=list)
+    content: list[TextContent | ImageContent] = Field(default_factory=list)
     is_error: bool = Field(default=False, alias="isError")
     timestamp: int
 
