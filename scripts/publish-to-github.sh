@@ -12,8 +12,13 @@ fi
 
 if ! gh repo view liuchao0739/openclaw-py &>/dev/null; then
   echo ">>> 创建远程仓库 liuchao0739/openclaw-py"
-  gh repo create liuchao0739/openclaw-py --private --description "Python port of OpenClaw — multi-channel AI gateway" --source=. --remote=origin --push
+  if git remote get-url origin &>/dev/null; then
+    gh repo create liuchao0739/openclaw-py --private --description "Python port of OpenClaw — multi-channel AI gateway" --source=. --push
+  else
+    gh repo create liuchao0739/openclaw-py --private --description "Python port of OpenClaw — multi-channel AI gateway" --source=. --remote=origin --push
+  fi
 else
+  echo ">>> 远程仓库已存在，推送 main"
   git remote get-url origin &>/dev/null || git remote add origin "$REMOTE"
   git push -u origin main
 fi
