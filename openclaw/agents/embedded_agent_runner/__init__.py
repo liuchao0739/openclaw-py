@@ -1,0 +1,1 @@
+"""Embedded agent runner (orchestration)."""
