@@ -1,6 +1,13 @@
 """Embedded agent run orchestration (ported from embedded-agent-runner/run)."""
 
 from openclaw.agents.embedded_agent_runner.run.abortable import abortable
+from openclaw.agents.embedded_agent_runner.run.auth_profile_failure_policy import (
+    resolve_auth_profile_failure_reason,
+)
+from openclaw.agents.embedded_agent_runner.run.failover_observation import (
+    create_failover_decision_logger,
+    normalize_failover_decision_observation_base,
+)
 from openclaw.agents.embedded_agent_runner.run.failover_policy import (
     merge_retry_failover_reason,
     resolve_run_failover_decision,
@@ -68,6 +75,7 @@ __all__ = [
     "build_attempt_replay_metadata",
     "build_pre_prompt_context_budget_status",
     "create_compaction_diag_id",
+    "create_failover_decision_logger",
     "create_idle_timeout_breaker_state",
     "estimate_llm_boundary_token_pressure",
     "estimate_rendered_llm_boundary_token_pressure",
@@ -76,7 +84,9 @@ __all__ = [
     "has_attempt_terminal_state",
     "is_incomplete_terminal_assistant_turn",
     "merge_retry_failover_reason",
+    "normalize_failover_decision_observation_base",
     "resolve_attempt_replay_metadata",
+    "resolve_auth_profile_failure_reason",
     "resolve_empty_response_retry_instruction",
     "resolve_incomplete_turn_payload_text",
     "resolve_max_run_retry_iterations",
