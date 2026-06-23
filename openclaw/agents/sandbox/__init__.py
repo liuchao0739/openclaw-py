@@ -13,6 +13,16 @@ from openclaw.agents.sandbox.path_utils import (
     normalize_container_path,
     relative_path_escapes_container_root,
 )
+from openclaw.agents.sandbox.network_mode import (
+    get_blocked_network_mode_reason,
+    is_dangerous_network_mode,
+    normalize_network_mode,
+)
+from openclaw.agents.sandbox.tool_policy import (
+    classify_tool_against_sandbox_tool_policy,
+    is_tool_allowed,
+    resolve_sandbox_tool_policy_for_agent,
+)
 from openclaw.agents.sandbox.sanitize_env_vars import (
     sanitize_env_vars,
     sanitize_explicit_sandbox_env_vars,
@@ -32,4 +42,10 @@ __all__ = [
     "sanitize_env_vars",
     "sanitize_explicit_sandbox_env_vars",
     "validate_env_var_value",
+    "get_blocked_network_mode_reason",
+    "is_dangerous_network_mode",
+    "normalize_network_mode",
+    "classify_tool_against_sandbox_tool_policy",
+    "is_tool_allowed",
+    "resolve_sandbox_tool_policy_for_agent",
 ]

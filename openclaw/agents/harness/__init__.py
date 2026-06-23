@@ -4,6 +4,7 @@ from openclaw.agents.harness.errors import (
     MissingAgentHarnessError,
     is_missing_agent_harness_error,
 )
+from openclaw.agents.harness.policy import AgentHarnessPolicy, resolve_agent_harness_policy
 from openclaw.agents.harness.registry import (
     get_registered_agent_harness,
     list_registered_agent_harnesses,
@@ -39,6 +40,8 @@ __all__ = [
     "AgentHarnessSideQuestionResult",
     "AgentHarnessSupport",
     "AgentHarnessSupportContext",
+    "AgentHarnessPolicy",
+    "resolve_agent_harness_policy",
     "MissingAgentHarnessError",
     "RegisteredAgentHarness",
     "get_registered_agent_harness",
