@@ -1,0 +1,1 @@
+"""Shared helpers ported from openclaw/src/shared."""
