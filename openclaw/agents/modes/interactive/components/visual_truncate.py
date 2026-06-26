@@ -1,29 +1,29 @@
-"""Truncate text to a maximum number of visual lines (word-wrap aware)."""
+"""Shared utility for truncating text to visual lines (accounting for line wrapping).
+
+Mirrors src/agents/modes/interactive/components/visual-truncate.ts.
+"""
 
 from __future__ import annotations
 
-import textwrap
 from dataclasses import dataclass
 
 
-@dataclass(frozen=True)
+@dataclass
 class VisualTruncateResult:
     visual_lines: list[str]
     skipped_count: int
 
 
-def _wrap_line(line: str, width: int, padding_x: int) -> list[str]:
-    effective = max(1, width - 2 * padding_x)
-    if not line:
-        return [""]
-    segments = line.split("\n")
-    out: list[str] = []
-    for segment in segments:
-        if len(segment) <= effective:
-            out.append(segment)
-        else:
-            out.extend(textwrap.wrap(segment, width=effective, break_long_words=True, break_on_hyphens=False) or [""])
-    return out
+def _wrap_line(line: str, width: int) -> list[str]:
+    """Wrap a single line to the given width."""
+    if width <= 0:
+        return [line]
+    if len(line) <= width:
+        return [line]
+    result: list[str] = []
+    for i in range(0, len(line), width):
+        result.append(line[i : i + width])
+    return result
 
 
 def truncate_to_visual_lines(
@@ -32,16 +32,25 @@ def truncate_to_visual_lines(
     width: int,
     padding_x: int = 0,
 ) -> VisualTruncateResult:
+    """Truncate text to a maximum number of visual lines (from the end).
+
+    Args:
+        text: The text content (may contain newlines)
+        max_visual_lines: Maximum number of visual lines to show
+        width: Terminal/render width
+        padding_x: Horizontal padding (default 0)
+    """
     if not text:
         return VisualTruncateResult(visual_lines=[], skipped_count=0)
 
-    all_visual: list[str] = []
-    for raw_line in text.split("\n"):
-        all_visual.extend(_wrap_line(raw_line, width, padding_x))
+    effective_width = max(1, width - padding_x * 2)
+    all_visual_lines: list[str] = []
+    for line in text.split("\n"):
+        all_visual_lines.extend(_wrap_line(line, effective_width))
 
-    if len(all_visual) <= max_visual_lines:
-        return VisualTruncateResult(visual_lines=all_visual, skipped_count=0)
+    if len(all_visual_lines) <= max_visual_lines:
+        return VisualTruncateResult(visual_lines=all_visual_lines, skipped_count=0)
 
-    truncated = all_visual[-max_visual_lines:]
-    skipped = len(all_visual) - max_visual_lines
+    truncated = all_visual_lines[-max_visual_lines:]
+    skipped = len(all_visual_lines) - max_visual_lines
     return VisualTruncateResult(visual_lines=truncated, skipped_count=skipped)

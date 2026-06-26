@@ -1,8 +1,5 @@
-"""Agent interaction modes (interactive UI helpers)."""
+"""Agents modes package — interactive components."""
 
-from openclaw.agents.modes.interactive.components.visual_truncate import (
-    VisualTruncateResult,
-    truncate_to_visual_lines,
-)
+from .interactive.components.visual_truncate import truncate_to_visual_lines, VisualTruncateResult
 
-__all__ = ["VisualTruncateResult", "truncate_to_visual_lines"]
+__all__ = ["truncate_to_visual_lines", "VisualTruncateResult"]

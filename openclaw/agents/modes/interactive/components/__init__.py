@@ -1,1 +1,1 @@
-"""Interactive UI building blocks."""
+"""Interactive components package."""

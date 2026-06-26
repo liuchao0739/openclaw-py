@@ -1,1 +1,1 @@
-"""Interactive mode UI components."""
+"""Interactive mode package."""
