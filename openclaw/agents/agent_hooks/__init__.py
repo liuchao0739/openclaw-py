@@ -5,10 +5,11 @@ Mirrors src/agents/agent-hooks/.
 
 from __future__ import annotations
 
-import weakref
-from typing import Any, Callable, Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 T = TypeVar("T")
+
+# --- Compaction instructions ---
 
 DEFAULT_COMPACTION_INSTRUCTIONS = (
     "Write the summary body in the primary language used in the conversation.\n"
@@ -54,60 +55,25 @@ def compose_split_turn_instructions(
     return f"{turn_prefix_instructions}\n\nAdditional requirements:\n{resolved_instructions}"
 
 
-# --- Context pruning settings ---
+# --- Context pruning (re-export from subpackage) ---
 
-DEFAULT_CONTEXT_PRUNING_SETTINGS = {
-    "enabled": False,
-    "maxMessages": 0,
-    "preserveSystemMessages": True,
-    "preserveToolCalls": True,
-}
+from .context_pruning.settings import (  # noqa: E402
+    DEFAULT_CONTEXT_PRUNING_SETTINGS,
+    compute_effective_settings,
+)
+from .context_pruning.pruner import prune_context_messages  # noqa: E402
 
-
-def compute_effective_settings(
-    config_settings: dict[str, Any] | None = None,
-    session_override: dict[str, Any] | None = None,
-) -> dict[str, Any]:
-    """Compute effective context pruning settings."""
-    result = dict(DEFAULT_CONTEXT_PRUNING_SETTINGS)
-    if config_settings:
-        result.update(config_settings)
-    if session_override:
-        result.update(session_override)
-    return result
-
-
-def prune_context_messages(
-    messages: list[dict[str, Any]],
-    settings: dict[str, Any] | None = None,
-) -> list[dict[str, Any]]:
-    """Prune context messages (microcompact-style) — in-memory only."""
-    settings = settings or DEFAULT_CONTEXT_PRUNING_SETTINGS
-    if not settings.get("enabled"):
-        return list(messages)
-    max_messages = settings.get("maxMessages", 0)
-    if max_messages <= 0:
-        return list(messages)
-    preserve_system = settings.get("preserveSystemMessages", True)
-    preserve_tools = settings.get("preserveToolCalls", True)
-
-    result: list[dict[str, Any]] = []
-    preserved: list[dict[str, Any]] = []
-
-    for msg in messages:
-        role = msg.get("role", "")
-        if preserve_system and role == "system":
-            preserved.append(msg)
-            continue
-        if preserve_tools and role == "tool":
-            preserved.append(msg)
-            continue
-        result.append(msg)
-
-    if len(result) > max_messages:
-        result = result[-max_messages:]
-
-    return [*preserved, *result]
+__all__ = [
+    "DEFAULT_COMPACTION_INSTRUCTIONS",
+    "MAX_INSTRUCTION_LENGTH",
+    "resolve_compaction_instructions",
+    "compose_split_turn_instructions",
+    "DEFAULT_CONTEXT_PRUNING_SETTINGS",
+    "compute_effective_settings",
+    "prune_context_messages",
+    "SessionManagerRuntimeRegistry",
+    "create_session_manager_runtime_registry",
+]
 
 
 # --- Session manager runtime registry ---

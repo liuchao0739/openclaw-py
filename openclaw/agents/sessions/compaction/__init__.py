@@ -1,12 +1,5 @@
-"""Session compaction and summarization utilities."""
+"""Session compaction (agent-core compaction.ts parity, pure functions)."""
 
-from openclaw.agents.sessions.compaction.branch_summarization import (
-    BranchSummaryResult,
-    CollectEntriesResult,
-    GenerateBranchSummaryOptions,
-    collect_entries_for_branch_summary,
-    generate_branch_summary,
-)
 from openclaw.agents.sessions.compaction.compaction import (
     DEFAULT_COMPACTION_SETTINGS,
     CompactionSettings,
@@ -19,17 +12,12 @@ from openclaw.agents.sessions.compaction.compaction import (
 )
 
 __all__ = [
-    "BranchSummaryResult",
-    "CollectEntriesResult",
     "DEFAULT_COMPACTION_SETTINGS",
     "CompactionSettings",
     "ContextUsageEstimate",
-    "GenerateBranchSummaryOptions",
     "calculate_context_tokens",
-    "collect_entries_for_branch_summary",
     "estimate_context_tokens",
     "estimate_tokens",
-    "generate_branch_summary",
     "get_last_assistant_usage",
     "should_compact",
 ]
