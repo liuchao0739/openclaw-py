@@ -1,7 +1,6 @@
 """Agent hook history window helpers.
 
-Hook contexts include recent conversation history plus current-turn messages;
-these helpers bound history size before plugin hooks receive it.
+Mirrors src/agents/harness/hook-history.ts.
 """
 
 from __future__ import annotations
@@ -18,11 +17,10 @@ def limit_agent_hook_history_messages(
     """Return the tail of hook history capped at the configured maximum."""
     if max_messages <= 0:
         return []
-    return list(messages[-max_messages:])
+    return messages[-max_messages:]
 
 
 def build_agent_hook_conversation_messages(
-    *,
     history_messages: list[Any] | None = None,
     current_turn_messages: list[Any] | None = None,
 ) -> list[Any]:

@@ -24,6 +24,11 @@ from openclaw.agents.embedded_agent_helpers.thinking import (
     pick_fallback_thinking_level,
 )
 from openclaw.agents.embedded_agent_helpers.types import EmbeddedContextFile, FailoverReason
+from openclaw.agents.embedded_agent_helpers.messaging_dedupe import (
+    normalize_text_for_comparison,
+    is_messaging_tool_duplicate_normalized,
+    is_messaging_tool_duplicate,
+)
 
 __all__ = [
     "EmbeddedContextFile",
@@ -45,4 +50,7 @@ __all__ = [
     "is_timeout_error_message",
     "matches_format_error_pattern",
     "pick_fallback_thinking_level",
+    "normalize_text_for_comparison",
+    "is_messaging_tool_duplicate_normalized",
+    "is_messaging_tool_duplicate",
 ]

@@ -16,6 +16,11 @@ from openclaw.agents.cli_runner.toml_inline import (
     format_toml_config_override,
     serialize_toml_inline_value,
 )
+from openclaw.agents.cli_runner.log import (
+    CLI_BACKEND_LOG_OUTPUT_ENV,
+    LEGACY_CLAUDE_CLI_LOG_OUTPUT_ENV,
+    format_cli_backend_output_digest,
+)
 
 __all__ = [
     "attach_cli_messaging_delivery_evidence",
@@ -28,4 +33,7 @@ __all__ = [
     "resolve_cli_run_queue_key",
     "resolve_cli_run_timeout_override_ms",
     "serialize_toml_inline_value",
+    "CLI_BACKEND_LOG_OUTPUT_ENV",
+    "LEGACY_CLAUDE_CLI_LOG_OUTPUT_ENV",
+    "format_cli_backend_output_digest",
 ]
