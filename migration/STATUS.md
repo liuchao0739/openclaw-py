@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 18:17:46 UTC
+Updated: 2026-07-26 18:21:40 UTC
 
-- **Done:** 42 / 231
-- **Pending:** 188
+- **Done:** 43 / 231
+- **Pending:** 187
 - **Partial:** 1
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,226,619
+- **Remaining TypeScript lines:** 1,226,332
 
 ## Current
 
-- `P2-0221` extensions/feishu (287 lines)
+- `P2-0181` packages/web-content-core (307 lines)
 
 ## Up next
 
-- `P2-0221` extensions/feishu (287 lines)
 - `P2-0181` packages/web-content-core (307 lines)
 - `P2-0209` extensions/deepseek (324 lines)
 - `P2-0190` extensions/arcee (355 lines)
 - `P2-0207` extensions/deepgram (393 lines)
+- `P2-0182` extensions/acpx (419 lines)
 
 ## Recently completed
 
