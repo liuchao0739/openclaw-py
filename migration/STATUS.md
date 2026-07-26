@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 18:40:49 UTC
+Updated: 2026-07-26 18:42:26 UTC
 
-- **Done:** 51 / 231
-- **Pending:** 179
+- **Done:** 52 / 231
+- **Pending:** 178
 - **Partial:** 1
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,223,162
+- **Remaining TypeScript lines:** 1,222,641
 
 ## Current
 
-- `P2-0170` packages/media-understanding-common (521 lines)
+- `P2-0200` extensions/cloudflare-ai-gateway (553 lines)
 
 ## Up next
 
-- `P2-0170` packages/media-understanding-common (521 lines)
 - `P2-0200` extensions/cloudflare-ai-gateway (553 lines)
 - `P2-0194` extensions/browser (572 lines)
 - `P2-0191` extensions/azure-speech (584 lines)
 - `P2-0173` packages/net-policy (602 lines)
+- `P2-0195` extensions/byteplus (625 lines)
 
 ## Recently completed
 
