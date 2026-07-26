@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 18:55:45 UTC
+Updated: 2026-07-26 18:59:21 UTC
 
-- **Done:** 55 / 231
-- **Pending:** 175
+- **Done:** 56 / 231
+- **Pending:** 174
 - **Partial:** 1
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,220,932
+- **Remaining TypeScript lines:** 1,220,330
 
 ## Current
 
-- `P2-0173` packages/net-policy (602 lines)
+- `P2-0195` extensions/byteplus (625 lines)
 
 ## Up next
 
-- `P2-0173` packages/net-policy (602 lines)
 - `P2-0195` extensions/byteplus (625 lines)
 - `P2-0174` packages/normalization-core (669 lines)
 - `P2-0215` extensions/discord (712 lines)
 - `P2-0187` extensions/amazon-bedrock-mantle (731 lines)
+- `P2-0189` extensions/anthropic-vertex (844 lines)
 
 ## Recently completed
 
