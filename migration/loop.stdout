@@ -1628,3 +1628,18 @@ and the repository exists.
 [2026-07-26 20:38:58] P2-0097 src/infra/net/proxy (1408 ts lines, 23 exported symbols)
 [2026-07-26 20:38:58]   attempt 1: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
 [2026-07-26 20:38:59]   attempt 2: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-26 20:38:59]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-26 20:38:59]   keeping partial work at 17%
+[2026-07-26 20:38:59]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-26 20:38:59]   -> partial. 67 done, 71 pending
+[2026-07-26 20:38:59] P2-0157 src/video-generation (1756 ts lines, 33 exported symbols)
+[2026-07-26 20:39:00]   attempt 1: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-26 20:39:00]   attempt 2: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
