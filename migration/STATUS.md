@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:38:06 UTC
+Updated: 2026-07-26 20:38:08 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 115
-- **Partial:** 49
+- **Pending:** 114
+- **Partial:** 50
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 450,372
+- **Remaining TypeScript lines:** 436,161
 
 ## Current
 
-- `P2-0132` src/secrets (14211 lines)
+- `P2-0010` src/agents/embedded-agent-runner (26959 lines)
 
 ## Up next
 
-- `P2-0132` src/secrets (14211 lines)
 - `P2-0010` src/agents/embedded-agent-runner (26959 lines)
 - `P2-0111` src/media (6055 lines)
 - `P2-0133` src/security (9080 lines)
 - `P2-0146` src/state (2789 lines)
+- `P2-0021` src/agents/tools (23886 lines)
 
 ## Recently completed
 
