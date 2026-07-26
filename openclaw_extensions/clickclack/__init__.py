@@ -1,0 +1,1 @@
+"""ClickClack channel extension package."""
