@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 18:23:25 UTC
+Updated: 2026-07-26 18:26:53 UTC
 
-- **Done:** 44 / 231
-- **Pending:** 186
+- **Done:** 45 / 231
+- **Pending:** 185
 - **Partial:** 1
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,226,025
+- **Remaining TypeScript lines:** 1,225,701
 
 ## Current
 
-- `P2-0209` extensions/deepseek (324 lines)
+- `P2-0190` extensions/arcee (355 lines)
 
 ## Up next
 
-- `P2-0209` extensions/deepseek (324 lines)
 - `P2-0190` extensions/arcee (355 lines)
 - `P2-0207` extensions/deepgram (393 lines)
 - `P2-0182` extensions/acpx (419 lines)
 - `P2-0178` packages/speech-core (430 lines)
+- `P2-0096` src/infra/format-time (445 lines)
 
 ## Recently completed
 
