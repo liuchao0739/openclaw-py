@@ -217,3 +217,8 @@ FAILED tests/openclaw_extensions/test_anthropic_vertex_api.py::test_reuses_runti
 ERROR tests/plugins/compat/test_registry.py
 !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
 1 warning, 1 error in 0.49s
+[2026-07-26 19:32:14]   pushed to origin
+[2026-07-26 19:32:14]   attempt 2: PASS at 100% in 74s
+[2026-07-26 19:32:18]   pushed to origin
+[2026-07-26 19:32:18]   -> done. 62 done, 168 pending
+[2026-07-26 19:32:18] P2-0201 extensions/codex (1173 ts lines, 22 exported symbols)
