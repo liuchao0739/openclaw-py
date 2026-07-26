@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:39:11 UTC
+Updated: 2026-07-26 20:39:12 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 61
-- **Partial:** 103
+- **Pending:** 60
+- **Partial:** 104
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 128,521
+- **Remaining TypeScript lines:** 126,303
 
 ## Current
 
-- `P2-0104` src/llm/providers/stream-wrappers (2218 lines)
+- `P2-0129` src/proxy-capture (2279 lines)
 
 ## Up next
 
-- `P2-0104` src/llm/providers/stream-wrappers (2218 lines)
 - `P2-0129` src/proxy-capture (2279 lines)
 - `P2-0147` src/status (2592 lines)
 - `P2-0151` src/trajectory (2695 lines)
 - `P2-0079` src/cron/service (5991 lines)
+- `P2-0006` src/agents/cli-runner (6289 lines)
 
 ## Recently completed
 
