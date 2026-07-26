@@ -222,3 +222,8 @@ ERROR tests/plugins/compat/test_registry.py
 [2026-07-26 19:32:18]   pushed to origin
 [2026-07-26 19:32:18]   -> done. 62 done, 168 pending
 [2026-07-26 19:32:18] P2-0201 extensions/codex (1173 ts lines, 22 exported symbols)
+[2026-07-26 19:38:02]   pushed to origin
+[2026-07-26 19:38:02]   attempt 1: PASS at 100% in 334s
+[2026-07-26 19:38:06]   pushed to origin
+[2026-07-26 19:38:06]   -> done. 63 done, 167 pending
+[2026-07-26 19:38:06] P2-0198 extensions/chutes (1179 ts lines, 14 exported symbols)

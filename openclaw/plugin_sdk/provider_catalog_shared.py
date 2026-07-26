@@ -2,18 +2,84 @@
 
 from __future__ import annotations
 
-from typing import Any
+import asyncio
+import hashlib
+import json
+from collections.abc import Awaitable, Callable
+from typing import Any, TypeVar
 
-from openclaw.packages.normalization_core import is_record
+from openclaw.packages.normalization_core import (
+    is_future_date_timestamp_ms,
+    is_record,
+    resolve_expires_at_ms_from_duration_ms,
+)
 
 ModelDefinitionConfig = dict[str, Any]
 ModelProviderConfig = dict[str, Any]
+
+T = TypeVar("T")
+
+_LIVE_CATALOG_CACHE_MAX_ENTRIES = 100
+_live_catalog_cache: dict[str, dict[str, Any]] = {}
 
 __all__ = [
     "ModelDefinitionConfig",
     "ModelProviderConfig",
     "build_manifest_model_provider_config",
+    "clear_live_catalog_cache_for_tests",
+    "get_cached_live_catalog_value",
 ]
+
+
+def _build_live_catalog_cache_key(parts: tuple[Any, ...] | list[Any]) -> str:
+    return hashlib.sha256(json.dumps(parts, default=str).encode("utf-8")).hexdigest()
+
+
+async def get_cached_live_catalog_value(
+    *,
+    key_parts: tuple[Any, ...] | list[Any],
+    load: Callable[[], Awaitable[T]],
+    should_cache: Callable[[T], bool] | None = None,
+    ttl_ms: int | None = None,
+    now: Callable[[], int] | None = None,
+) -> T:
+    """Cache one live catalog load promise by stable key parts for a short TTL."""
+    raw_now = now() if now else int(__import__("time").time() * 1000)
+    resolved_ttl_ms = ttl_ms if ttl_ms is not None else 30_000
+    key = _build_live_catalog_cache_key(key_parts)
+    existing = _live_catalog_cache.get(key)
+    if existing is not None:
+        if is_future_date_timestamp_ms(existing["expiresAt"], now_ms=raw_now):
+            return await existing["value"]
+        _live_catalog_cache.pop(key, None)
+
+    value = load()
+    if asyncio.iscoroutine(value):
+        value = asyncio.create_task(value)
+    expires_at = resolve_expires_at_ms_from_duration_ms(resolved_ttl_ms, now_ms=raw_now)
+    if expires_at is not None:
+        if len(_live_catalog_cache) >= _LIVE_CATALOG_CACHE_MAX_ENTRIES:
+            oldest_key = next(iter(_live_catalog_cache), None)
+            if oldest_key is not None:
+                _live_catalog_cache.pop(oldest_key, None)
+        _live_catalog_cache[key] = {
+            "expiresAt": expires_at,
+            "value": value,
+        }
+
+    try:
+        resolved = await value
+        if should_cache is not None and not should_cache(resolved):
+            _live_catalog_cache.pop(key, None)
+        return resolved
+    except Exception:
+        _live_catalog_cache.pop(key, None)
+        raise
+
+
+def clear_live_catalog_cache_for_tests() -> None:
+    """Clear the process-local live catalog cache for tests and isolated probes."""
+    _live_catalog_cache.clear()
 
 
 def _count_raw_manifest_catalog_models(catalog: Any) -> int | None:
