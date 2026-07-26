@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:37:30 UTC
+Updated: 2026-07-26 20:37:31 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 144
-- **Partial:** 20
+- **Pending:** 143
+- **Partial:** 21
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,160,894
+- **Remaining TypeScript lines:** 1,159,440
 
 ## Current
 
-- `P2-0161` packages/acp-core (1454 lines)
+- `P2-0135` src/shared/text (2053 lines)
 
 ## Up next
 
-- `P2-0161` packages/acp-core (1454 lines)
 - `P2-0135` src/shared/text (2053 lines)
 - `P2-0163` packages/gateway-client (2074 lines)
 - `P2-0162` packages/agent-core (8160 lines)
 - `P2-0177` packages/sdk (1912 lines)
+- `P2-0171` packages/memory-host-sdk (9277 lines)
 
 ## Recently completed
 
