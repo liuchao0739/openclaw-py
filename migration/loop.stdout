@@ -168,3 +168,9 @@ FAILED tests/openclaw_extensions/test_alibaba_video_generation_provider.py::test
 [2026-07-26 18:55:48]   pushed to origin
 [2026-07-26 18:55:48]   -> done. 55 done, 175 pending
 [2026-07-26 18:55:48] P2-0173 packages/net-policy (602 ts lines, 27 exported symbols)
+[2026-07-26 18:59:21]   pushed to origin
+[2026-07-26 18:59:21]   attempt 1: PASS at 89% in 205s
+[2026-07-26 18:59:25]   pushed to origin
+[2026-07-26 18:59:25]   -> done. 56 done, 174 pending
+[2026-07-26 18:59:25] P2-0195 extensions/byteplus (625 ts lines, 8 exported symbols)
+[2026-07-26 19:02:33]   attempt 1: coverage 50% (4/8), below 85%
