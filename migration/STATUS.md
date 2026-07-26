@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:39:26 UTC
+Updated: 2026-07-26 20:39:27 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 48
-- **Partial:** 116
+- **Pending:** 47
+- **Partial:** 117
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 92,678
+- **Remaining TypeScript lines:** 91,170
 
 ## Current
 
-- `P2-0022` src/agents/utils (1508 lines)
+- `P2-0071` src/commitments (1508 lines)
 
 ## Up next
 
-- `P2-0022` src/agents/utils (1508 lines)
 - `P2-0071` src/commitments (1508 lines)
 - `P2-0095` src/infra/command-explainer (1679 lines)
 - `P2-0027` src/auto-reply/reply/queue (1842 lines)
 - `P2-0088` src/gateway/server (2526 lines)
+- `P2-0037` src/channels/message-access (2965 lines)
 
 ## Recently completed
 
