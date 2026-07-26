@@ -1,0 +1,1 @@
+"""Alibaba Model Studio extension."""

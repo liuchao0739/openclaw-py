@@ -1,6 +1,8 @@
-"""Video generation helpers."""
+"""Public video-generation helpers and types for provider plugins.
 
-from openclaw.video_generation.capabilities import list_supported_video_generation_modes
+Mirrors src/plugin-sdk/video-generation.ts exports used by bundled providers.
+"""
+
 from openclaw.video_generation.dashscope_compatible import (
     DASHSCOPE_WAN_VIDEO_CAPABILITIES,
     DASHSCOPE_WAN_VIDEO_MODELS,
@@ -16,7 +18,6 @@ from openclaw.video_generation.dashscope_compatible import (
     resolve_video_generation_reference_urls,
     run_dashscope_video_generation_task,
 )
-from openclaw.video_generation.model_ref import parse_video_generation_model_ref
 
 __all__ = [
     "DASHSCOPE_WAN_VIDEO_CAPABILITIES",
@@ -29,8 +30,6 @@ __all__ = [
     "build_dashscope_video_generation_parameters",
     "download_dashscope_generated_videos",
     "extract_dashscope_video_urls",
-    "list_supported_video_generation_modes",
-    "parse_video_generation_model_ref",
     "poll_dashscope_video_task_until_complete",
     "resolve_video_generation_reference_urls",
     "run_dashscope_video_generation_task",
