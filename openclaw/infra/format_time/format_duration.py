@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import math
 import re
-from typing import Any, Literal
+from typing import Any
 
 
 def _is_finite(value: Any) -> bool:

@@ -124,3 +124,8 @@ FAILED tests/openclaw_extensions/test_brave_web_search_provider_merge.py::test_k
 [2026-07-26 18:35:36]   pushed to origin
 [2026-07-26 18:35:36]   -> done. 48 done, 182 pending
 [2026-07-26 18:35:36] P2-0178 packages/speech-core (430 ts lines, 11 exported symbols)
+[2026-07-26 18:37:03]   pushed to origin
+[2026-07-26 18:37:03]   attempt 1: PASS at 100% in 79s
+[2026-07-26 18:37:07]   pushed to origin
+[2026-07-26 18:37:07]   -> done. 49 done, 181 pending
+[2026-07-26 18:37:07] P2-0096 src/infra/format-time (445 ts lines, 11 exported symbols)
