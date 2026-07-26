@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 17:21:41 UTC
+Updated: 2026-07-26 17:23:50 UTC
 
-- **Done:** 28 / 231
-- **Pending:** 203
+- **Done:** 29 / 231
+- **Pending:** 202
 - **Partial:** 0
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,229,182
+- **Remaining TypeScript lines:** 1,229,068
 
 ## Current
 
-- `P2-0175` packages/plugin-package-contract (114 lines)
+- `P2-0231` extensions/groq (121 lines)
 
 ## Up next
 
-- `P2-0175` packages/plugin-package-contract (114 lines)
 - `P2-0231` extensions/groq (121 lines)
 - `P2-0222` extensions/file-transfer (122 lines)
 - `P2-0203` extensions/cohere (128 lines)
 - `P2-0193` extensions/brave (130 lines)
+- `P2-0197` extensions/cerebras (136 lines)
 
 ## Recently completed
 
