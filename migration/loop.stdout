@@ -203,3 +203,17 @@ FAILED tests/openclaw_extensions/test_alibaba_video_generation_provider.py::test
 FAILED tests/openclaw_extensions/test_anthropic_vertex_api.py::test_reuses_runtime_stream_factory_across_direct_stream_calls
 !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
 1 failed, 805 passed, 3 warnings in 1.69s
+[2026-07-26 19:29:04]   pushed to origin
+[2026-07-26 19:29:04]   attempt 2: PASS at 100% in 275s
+[2026-07-26 19:29:08]   pushed to origin
+[2026-07-26 19:29:08]   -> done. 61 done, 169 pending
+[2026-07-26 19:29:08] P2-0123 src/plugins/compat (1143 ts lines, 5 exported symbols)
+[2026-07-26 19:30:51]   attempt 1: tests failed, discarding
+  /Users/liuchao/openclaw-py/openclaw/agents/utils/ansi.py:19: FutureWarning: Possible nested set at position 66
+    _ANSI_REGEX = re.compile(f"{_OSC}|{_CSI}")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR tests/plugins/compat/test_registry.py
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 warning, 1 error in 0.49s
