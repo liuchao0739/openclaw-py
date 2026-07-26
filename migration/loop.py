@@ -184,6 +184,14 @@ def discard_changes() -> None:
     run(["git", "clean", "-fd", "openclaw", "tests"])
 
 
+def push() -> None:
+    completed = run(["git", "push", "origin", "HEAD"])
+    if completed.returncode != 0:
+        log(f"  push failed: {(completed.stderr or completed.stdout).strip()[:300]}")
+    else:
+        log("  pushed to origin")
+
+
 def commit(task: dict, result: dict, partial: bool) -> None:
     label = "partial" if partial else "done"
     coverage = round(result["coverage"] * 100)
@@ -197,6 +205,7 @@ def commit(task: dict, result: dict, partial: bool) -> None:
         body += f"\nStill missing: {preview}"
     run(["git", "add", "-A"])
     run(["git", "commit", "-q", "-m", subject, "-m", body])
+    push()
 
 
 def process_task(task: dict, model: str, attempts: int, dry_run: bool) -> str:
@@ -294,6 +303,7 @@ def main() -> int:
         save_plan(plan)
         run(["git", "add", "migration/plan.json"])
         run(["git", "commit", "-q", "-m", f"migration: record {task['id']} as {status}"])
+        push()
 
         processed += 1
         done = sum(1 for t in plan if t.get("status") == "done")
