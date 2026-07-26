@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:39:18 UTC
+Updated: 2026-07-26 20:39:19 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 55
-- **Partial:** 109
+- **Pending:** 54
+- **Partial:** 110
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 106,457
+- **Remaining TypeScript lines:** 97,227
 
 ## Current
 
-- `P2-0105` src/llm/providers (9230 lines)
+- `P2-0032` src/bindings (52 lines)
 
 ## Up next
 
-- `P2-0105` src/llm/providers (9230 lines)
 - `P2-0032` src/bindings (52 lines)
 - `P2-0128` src/provider-runtime (271 lines)
 - `P2-0039` src/channels/plugins/outbound (823 lines)
 - `P2-0059` src/commands/channel-setup (847 lines)
+- `P2-0143` src/skills/security (1188 lines)
 
 ## Recently completed
 
