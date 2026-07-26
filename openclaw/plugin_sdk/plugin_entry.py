@@ -75,6 +75,8 @@ class OpenClawPluginApi(Protocol):
 
     def register_service(self, service: OpenClawPluginService) -> None: ...
 
+    def register_gateway_discovery_service(self, service: Mapping[str, Any]) -> None: ...
+
 
 def _config_error(message: str) -> dict[str, Any]:
     return {"success": False, "error": {"issues": [{"path": [], "message": message}]}}
