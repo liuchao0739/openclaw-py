@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 19:17:18 UTC
+Updated: 2026-07-26 19:29:04 UTC
 
-- **Done:** 60 / 231
-- **Pending:** 170
+- **Done:** 61 / 231
+- **Pending:** 169
 - **Partial:** 1
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,217,593
+- **Remaining TypeScript lines:** 1,216,749
 
 ## Current
 
-- `P2-0189` extensions/anthropic-vertex (844 lines)
+- `P2-0123` src/plugins/compat (1143 lines)
 
 ## Up next
 
-- `P2-0189` extensions/anthropic-vertex (844 lines)
 - `P2-0123` src/plugins/compat (1143 lines)
 - `P2-0201` extensions/codex (1173 lines)
 - `P2-0198` extensions/chutes (1179 lines)
 - `P2-0228` extensions/google-meet (1235 lines)
+- `P2-0205` extensions/copilot (1238 lines)
 
 ## Recently completed
 
