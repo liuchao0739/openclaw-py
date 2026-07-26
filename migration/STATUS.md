@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:39:10 UTC
+Updated: 2026-07-26 20:39:11 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 62
-- **Partial:** 102
+- **Pending:** 61
+- **Partial:** 103
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 130,509
+- **Remaining TypeScript lines:** 128,521
 
 ## Current
 
-- `P2-0145` src/skills/workshop (1988 lines)
+- `P2-0104` src/llm/providers/stream-wrappers (2218 lines)
 
 ## Up next
 
-- `P2-0145` src/skills/workshop (1988 lines)
 - `P2-0104` src/llm/providers/stream-wrappers (2218 lines)
 - `P2-0129` src/proxy-capture (2279 lines)
 - `P2-0147` src/status (2592 lines)
 - `P2-0151` src/trajectory (2695 lines)
+- `P2-0079` src/cron/service (5991 lines)
 
 ## Recently completed
 
