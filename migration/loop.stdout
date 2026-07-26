@@ -46,3 +46,8 @@ FAILED tests/test_agents_schema.py::TestStringEnum::test_optional - TypeError...
 FAILED tests/openclaw_extensions/test_brave_web_search_provider_merge.py::test_keeps_plugin_web_search_runtime_only_after_merging_it_for_tool
 !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
 1 failed, 788 passed, 3 warnings in 3.18s
+[2026-07-26 17:47:48]   pushed to origin
+[2026-07-26 17:47:48]   attempt 2: PASS at 100% in 273s
+[2026-07-26 17:47:51]   pushed to origin
+[2026-07-26 17:47:51]   -> done. 32 done, 198 pending
+[2026-07-26 17:47:51] P2-0197 extensions/cerebras (136 ts lines, 7 exported symbols)
