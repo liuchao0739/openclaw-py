@@ -9,8 +9,10 @@ from openclaw.llm.providers.stream_wrappers.stream_payload_utils import stream_w
 from openclaw.packages.normalization_core import is_record
 
 __all__ = [
+    "create_anthropic_thinking_prefill_payload_wrapper",
     "create_deep_seek_v4_openai_compatible_thinking_wrapper",
     "create_payload_patch_stream_wrapper",
+    "strip_trailing_anthropic_assistant_prefill_when_thinking",
 ]
 
 
@@ -80,6 +82,64 @@ def _ensure_deep_seek_v4_assistant_reasoning_content(
             continue
         if "reasoning_content" not in message:
             message["reasoning_content"] = ""
+
+
+def _is_anthropic_thinking_enabled(payload: dict[str, Any]) -> bool:
+    thinking = payload.get("thinking")
+    if not is_record(thinking):
+        return False
+    return thinking.get("type") != "disabled"
+
+
+def _assistant_message_has_anthropic_tool_use(message: dict[str, Any]) -> bool:
+    tool_calls = message.get("tool_calls")
+    if isinstance(tool_calls, list) and len(tool_calls) > 0:
+        return True
+    content = message.get("content")
+    if not isinstance(content, list):
+        return False
+    return any(
+        is_record(block) and block.get("type") in ("tool_use", "toolCall") for block in content
+    )
+
+
+def _strip_trailing_assistant_prefill_messages(payload: dict[str, Any]) -> int:
+    messages = payload.get("messages")
+    if not isinstance(messages, list):
+        return 0
+
+    stripped = 0
+    while messages:
+        final_message = messages[-1]
+        if not is_record(final_message):
+            break
+        if final_message.get("role") != "assistant" or _assistant_message_has_anthropic_tool_use(
+            final_message
+        ):
+            break
+        messages.pop()
+        stripped += 1
+    return stripped
+
+
+def strip_trailing_anthropic_assistant_prefill_when_thinking(payload: dict[str, Any]) -> int:
+    if not _is_anthropic_thinking_enabled(payload):
+        return 0
+    return _strip_trailing_assistant_prefill_messages(payload)
+
+
+def create_anthropic_thinking_prefill_payload_wrapper(
+    base_stream_fn: Callable[..., Any] | None,
+    on_stripped: Callable[[int], None] | None = None,
+    wrapper_options: dict[str, Any] | None = None,
+) -> Callable[..., Any]:
+    def patch_payload(params: dict[str, Any]) -> None:
+        payload = params["payload"]
+        stripped = strip_trailing_anthropic_assistant_prefill_when_thinking(payload)
+        if stripped > 0 and on_stripped is not None:
+            on_stripped(stripped)
+
+    return create_payload_patch_stream_wrapper(base_stream_fn, patch_payload, wrapper_options)
 
 
 def create_deep_seek_v4_openai_compatible_thinking_wrapper(

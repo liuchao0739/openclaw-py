@@ -139,3 +139,17 @@ FAILED tests/openclaw_extensions/test_brave_web_search_provider_merge.py::test_k
 [2026-07-26 18:40:53]   pushed to origin
 [2026-07-26 18:40:53]   -> done. 51 done, 179 pending
 [2026-07-26 18:40:53] P2-0170 packages/media-understanding-common (521 ts lines, 23 exported symbols)
+[2026-07-26 18:42:26]   pushed to origin
+[2026-07-26 18:42:26]   attempt 1: PASS at 100% in 86s
+[2026-07-26 18:42:30]   pushed to origin
+[2026-07-26 18:42:30]   -> done. 52 done, 178 pending
+[2026-07-26 18:42:30] P2-0200 extensions/cloudflare-ai-gateway (553 ts lines, 12 exported symbols)
+[2026-07-26 18:45:57]   attempt 1: tests failed, discarding
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/openclaw_extensions/test_alibaba_video_generation_provider.py::test_submits_async_wan_generation_polls_and_downloads
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 764 passed, 3 warnings in 1.60s
