@@ -2625,3 +2625,18 @@ and the repository exists.
 [2026-07-26 20:40:16] P2-0122 src/plugins/capability-runtime-vitest-shims (55 ts lines, 2 exported symbols)
 [2026-07-26 20:40:17]   attempt 1: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
 [2026-07-26 20:40:17]   attempt 2: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-26 20:40:17]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-26 20:40:17]   keeping partial work at 0%
+[2026-07-26 20:40:18]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-26 20:40:18]   -> partial. 68 done, 4 pending
+[2026-07-26 20:40:18] P2-0141 src/skills/research (283 ts lines, 4 exported symbols)
+[2026-07-26 20:40:18]   attempt 1: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-26 20:40:19]   attempt 2: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
