@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:39:34 UTC
+Updated: 2026-07-26 20:39:35 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 41
-- **Partial:** 123
+- **Pending:** 40
+- **Partial:** 124
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 76,560
+- **Remaining TypeScript lines:** 72,056
 
 ## Current
 
-- `P2-0019` src/agents/sessions/tools (4504 lines)
+- `P2-0066` src/commands/models (7864 lines)
 
 ## Up next
 
-- `P2-0019` src/agents/sessions/tools (4504 lines)
 - `P2-0066` src/commands/models (7864 lines)
 - `P2-0137` src/skills/config (72 lines)
 - `P2-0042` src/channels/status (144 lines)
 - `P2-0100` src/infra/tls (181 lines)
+- `P2-0017` src/agents/sessions/compaction (203 lines)
 
 ## Recently completed
 
