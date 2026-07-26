@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 18:07:01 UTC
+Updated: 2026-07-26 18:11:16 UTC
 
-- **Done:** 38 / 231
-- **Pending:** 192
+- **Done:** 39 / 231
+- **Pending:** 191
 - **Partial:** 1
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,227,609
+- **Remaining TypeScript lines:** 1,227,381
 
 ## Current
 
-- `P2-0230` extensions/gradium (228 lines)
+- `P2-0196` extensions/canvas (240 lines)
 
 ## Up next
 
-- `P2-0230` extensions/gradium (228 lines)
 - `P2-0196` extensions/canvas (240 lines)
 - `P2-0224` extensions/fireworks (260 lines)
 - `P2-0169` packages/media-generation-core (262 lines)
 - `P2-0221` extensions/feishu (287 lines)
+- `P2-0181` packages/web-content-core (307 lines)
 
 ## Recently completed
 
