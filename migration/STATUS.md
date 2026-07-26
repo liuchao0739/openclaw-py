@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:39:38 UTC
+Updated: 2026-07-26 20:39:39 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 38
-- **Partial:** 126
+- **Pending:** 37
+- **Partial:** 127
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 64,120
+- **Remaining TypeScript lines:** 63,976
 
 ## Current
 
-- `P2-0042` src/channels/status (144 lines)
+- `P2-0100` src/infra/tls (181 lines)
 
 ## Up next
 
-- `P2-0042` src/channels/status (144 lines)
 - `P2-0100` src/infra/tls (181 lines)
 - `P2-0017` src/agents/sessions/compaction (203 lines)
 - `P2-0086` src/gateway/server/plugins-http (253 lines)
 - `P2-0158` src/web-fetch (289 lines)
+- `P2-0063` src/commands/doctor (499 lines)
 
 ## Recently completed
 
