@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:40:04 UTC
+Updated: 2026-07-26 20:40:06 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 16
-- **Partial:** 148
+- **Pending:** 15
+- **Partial:** 149
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 24,782
+- **Remaining TypeScript lines:** 23,300
 
 ## Current
 
-- `P2-0110` src/mcp (1482 lines)
+- `P2-0004` src/agents/agent-hooks (1810 lines)
 
 ## Up next
 
-- `P2-0110` src/mcp (1482 lines)
 - `P2-0004` src/agents/agent-hooks (1810 lines)
 - `P2-0124` src/plugins/contracts (1875 lines)
 - `P2-0051` src/cli/nodes-cli (2067 lines)
 - `P2-0047` src/cli/cron-cli (2090 lines)
+- `P2-0024` src/auto-reply/reply/commands-acp (2300 lines)
 
 ## Recently completed
 
