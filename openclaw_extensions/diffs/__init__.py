@@ -1,0 +1,1 @@
+"""Diffs extension package."""
