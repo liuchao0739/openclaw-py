@@ -22,8 +22,11 @@ __all__ = [
     "OpenClawConfig",
     "apply_agent_default_model_primary",
     "apply_onboard_auth_agent_models_and_providers",
+    "apply_provider_config_with_default_models",
+    "apply_provider_config_with_default_models_preset",
     "apply_provider_config_with_model_catalog",
     "apply_provider_config_with_model_catalog_preset",
+    "create_default_models_preset_appliers",
     "create_model_catalog_preset_appliers",
     "resolve_agent_model_fallback_values",
     "resolve_agent_model_primary_value",
@@ -295,6 +298,77 @@ def _apply_provider_config_with_merged_models(
     )
 
 
+def apply_provider_config_with_default_models(
+    cfg: OpenClawConfig,
+    *,
+    agent_models: dict[str, Any],
+    provider_id: str,
+    api: str,
+    base_url: str,
+    default_models: list[ModelDefinitionConfig],
+    default_model_id: str | None = None,
+) -> OpenClawConfig:
+    """Merge a provider config with default models using default-model merge semantics."""
+    provider_state = _resolve_provider_model_merge_state(cfg, provider_id)
+    existing_models = provider_state["existing_models"]
+    resolved_default_model_id = default_model_id or (
+        default_models[0].get("id") if default_models else None
+    )
+    has_default_model = (
+        any(model.get("id") == resolved_default_model_id for model in existing_models)
+        if resolved_default_model_id
+        else True
+    )
+    if existing_models:
+        merged_models = (
+            existing_models
+            if has_default_model or not default_models
+            else [*existing_models, *default_models]
+        )
+    else:
+        merged_models = default_models
+    return _apply_provider_config_with_merged_models(
+        cfg,
+        agent_models=agent_models,
+        provider_id=provider_id,
+        provider_state=provider_state,
+        api=api,
+        base_url=base_url,
+        merged_models=merged_models,
+        fallback_models=default_models,
+    )
+
+
+def apply_provider_config_with_default_models_preset(
+    cfg: OpenClawConfig,
+    *,
+    provider_id: str,
+    api: str,
+    base_url: str,
+    default_models: list[ModelDefinitionConfig],
+    default_model_id: str | None = None,
+    aliases: list[AgentModelAliasEntry] | None = None,
+    primary_model_ref: str | None = None,
+) -> OpenClawConfig:
+    """Apply a default-models provider preset and set primary only when the user has none."""
+    defaults_models = cfg.get("agents", {}).get("defaults", {}).get("models")
+    next_cfg = apply_provider_config_with_default_models(
+        cfg,
+        agent_models=with_agent_model_aliases(
+            defaults_models if is_record(defaults_models) else None,
+            aliases or [],
+        ),
+        provider_id=provider_id,
+        api=api,
+        base_url=base_url,
+        default_models=default_models,
+        default_model_id=default_model_id,
+    )
+    if primary_model_ref and not _has_agent_default_model_primary(cfg):
+        return apply_agent_default_model_primary(next_cfg, primary_model_ref)
+    return next_cfg
+
+
 def apply_provider_config_with_model_catalog(
     cfg: OpenClawConfig,
     *,
@@ -356,6 +430,37 @@ def apply_provider_config_with_model_catalog_preset(
     if primary_model_ref and not _has_agent_default_model_primary(cfg):
         return apply_agent_default_model_primary(next_cfg, primary_model_ref)
     return next_cfg
+
+
+def create_default_models_preset_appliers(
+    *,
+    resolve_params: Callable[..., dict[str, Any] | None],
+    primary_model_ref: str,
+) -> dict[str, Callable[..., OpenClawConfig]]:
+    """Build setup appliers for presets that resolve to multiple default provider models."""
+
+    def apply_provider_config(cfg: OpenClawConfig, *args: Any) -> OpenClawConfig:
+        resolved = resolve_params(cfg, *args)
+        if not resolved:
+            return cfg
+        return apply_provider_config_with_default_models_preset(cfg, **resolved)
+
+    def apply_config(cfg: OpenClawConfig, *args: Any) -> OpenClawConfig:
+        resolved = resolve_params(cfg, *args)
+        if not resolved:
+            return cfg
+        return apply_provider_config_with_default_models_preset(
+            cfg,
+            **resolved,
+            primary_model_ref=primary_model_ref,
+        )
+
+    return {
+        "applyProviderConfig": apply_provider_config,
+        "applyConfig": apply_config,
+        "apply_provider_config": apply_provider_config,
+        "apply_config": apply_config,
+    }
 
 
 def create_model_catalog_preset_appliers(
