@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:21:19 UTC
+Updated: 2026-07-26 20:27:27 UTC
 
-- **Done:** 66 / 231
-- **Pending:** 163
+- **Done:** 67 / 231
+- **Pending:** 162
 - **Partial:** 2
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,209,537
+- **Remaining TypeScript lines:** 1,208,210
 
 ## Current
 
-- `P2-0204` extensions/comfy (1327 lines)
+- `P2-0218` extensions/elevenlabs (1474 lines)
 
 ## Up next
 
-- `P2-0204` extensions/comfy (1327 lines)
 - `P2-0218` extensions/elevenlabs (1474 lines)
 - `P2-0172` packages/model-catalog-core (1533 lines)
 - `P2-0208` extensions/deepinfra (1567 lines)
 - `P2-0179` packages/terminal-core (1708 lines)
+- `P2-0220` extensions/fal (1769 lines)
 
 ## Recently completed
 
