@@ -1,13 +1,15 @@
-"""Realtime transcription package — provider types."""
+"""Realtime transcription package — provider types and websocket sessions."""
 
 from .provider_types import (
     RealtimeTranscriptionProviderId,
-    RealtimeTranscriptionSessionCallbacks,
     RealtimeTranscriptionSession,
+    RealtimeTranscriptionSessionCallbacks,
 )
+from .websocket_session import create_realtime_transcription_websocket_session
 
 __all__ = [
     "RealtimeTranscriptionProviderId",
-    "RealtimeTranscriptionSessionCallbacks",
     "RealtimeTranscriptionSession",
+    "RealtimeTranscriptionSessionCallbacks",
+    "create_realtime_transcription_websocket_session",
 ]
