@@ -34,7 +34,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["openclaw", "openclaw_extensions"]
+packages = ["openclaw", "openclaw_extensions", "openclaw_packages"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
