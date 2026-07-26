@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 17:37:40 UTC
+Updated: 2026-07-26 17:47:48 UTC
 
-- **Done:** 31 / 231
-- **Pending:** 199
+- **Done:** 32 / 231
+- **Pending:** 198
 - **Partial:** 1
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,228,697
+- **Remaining TypeScript lines:** 1,228,567
 
 ## Current
 
-- `P2-0193` extensions/brave (130 lines)
+- `P2-0197` extensions/cerebras (136 lines)
 
 ## Up next
 
-- `P2-0193` extensions/brave (130 lines)
 - `P2-0197` extensions/cerebras (136 lines)
 - `P2-0229` extensions/googlechat (140 lines)
 - `P2-0216` extensions/document-extract (149 lines)
 - `P2-0206` extensions/copilot-proxy (159 lines)
+- `P2-0166` packages/llm-runtime (187 lines)
 
 ## Recently completed
 
