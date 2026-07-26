@@ -227,3 +227,26 @@ ERROR tests/plugins/compat/test_registry.py
 [2026-07-26 19:38:06]   pushed to origin
 [2026-07-26 19:38:06]   -> done. 63 done, 167 pending
 [2026-07-26 19:38:06] P2-0198 extensions/chutes (1179 ts lines, 14 exported symbols)
+[2026-07-26 19:41:40]   pushed to origin
+[2026-07-26 19:41:40]   attempt 1: PASS at 100% in 202s
+[2026-07-26 19:41:44]   pushed to origin
+[2026-07-26 19:41:44]   -> done. 64 done, 166 pending
+[2026-07-26 19:41:44] P2-0228 extensions/google-meet (1235 ts lines, 1 exported symbols)
+[2026-07-26 19:55:13]   attempt 1: tests failed, discarding
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_agents_schema.py::TestStringEnum::test_basic - TypeError: '...
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 1580 passed, 3 warnings in 7.97s
+[2026-07-26 20:09:41]   attempt 2: tests failed, discarding
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_agents_schema.py::TestStringEnum::test_basic - TypeError: '...
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 1568 passed, 3 warnings in 3.77s
