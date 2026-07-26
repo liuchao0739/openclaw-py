@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:39:49 UTC
+Updated: 2026-07-26 20:39:51 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 28
-- **Partial:** 136
+- **Pending:** 27
+- **Partial:** 137
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 48,558
+- **Remaining TypeScript lines:** 40,153
 
 ## Current
 
-- `P2-0154` src/tui (8405 lines)
+- `P2-0083` src/flows (9048 lines)
 
 ## Up next
 
-- `P2-0154` src/tui (8405 lines)
 - `P2-0083` src/flows (9048 lines)
 - `P2-0040` src/channels/plugins/status-issues (87 lines)
 - `P2-0034` src/channels/allowlists (179 lines)
 - `P2-0144` src/skills/test-support (232 lines)
+- `P2-0078` src/cron/run-log (398 lines)
 
 ## Recently completed
 
