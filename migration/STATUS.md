@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 19:03:52 UTC
+Updated: 2026-07-26 19:08:36 UTC
 
-- **Done:** 57 / 231
-- **Pending:** 173
+- **Done:** 58 / 231
+- **Pending:** 172
 - **Partial:** 1
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,219,705
+- **Remaining TypeScript lines:** 1,219,036
 
 ## Current
 
-- `P2-0174` packages/normalization-core (669 lines)
+- `P2-0215` extensions/discord (712 lines)
 
 ## Up next
 
-- `P2-0174` packages/normalization-core (669 lines)
 - `P2-0215` extensions/discord (712 lines)
 - `P2-0187` extensions/amazon-bedrock-mantle (731 lines)
 - `P2-0189` extensions/anthropic-vertex (844 lines)
 - `P2-0123` src/plugins/compat (1143 lines)
+- `P2-0201` extensions/codex (1173 lines)
 
 ## Recently completed
 
