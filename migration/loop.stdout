@@ -174,3 +174,8 @@ FAILED tests/openclaw_extensions/test_alibaba_video_generation_provider.py::test
 [2026-07-26 18:59:25]   -> done. 56 done, 174 pending
 [2026-07-26 18:59:25] P2-0195 extensions/byteplus (625 ts lines, 8 exported symbols)
 [2026-07-26 19:02:33]   attempt 1: coverage 50% (4/8), below 85%
+[2026-07-26 19:03:52]   pushed to origin
+[2026-07-26 19:03:52]   attempt 2: PASS at 100% in 72s
+[2026-07-26 19:03:58]   pushed to origin
+[2026-07-26 19:03:58]   -> done. 57 done, 173 pending
+[2026-07-26 19:03:59] P2-0174 packages/normalization-core (669 ts lines, 73 exported symbols)
