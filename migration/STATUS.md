@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:38:03 UTC
+Updated: 2026-07-26 20:38:04 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 118
-- **Partial:** 46
+- **Pending:** 117
+- **Partial:** 47
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 505,877
+- **Remaining TypeScript lines:** 505,443
 
 ## Current
 
-- `P2-0013` src/agents/runtime (434 lines)
+- `P2-0005` src/agents/auth-profiles (9386 lines)
 
 ## Up next
 
-- `P2-0013` src/agents/runtime (434 lines)
 - `P2-0005` src/agents/auth-profiles (9386 lines)
 - `P2-0070` src/commands (45685 lines)
 - `P2-0132` src/secrets (14211 lines)
 - `P2-0010` src/agents/embedded-agent-runner (26959 lines)
+- `P2-0111` src/media (6055 lines)
 
 ## Recently completed
 
