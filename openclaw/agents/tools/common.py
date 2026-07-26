@@ -40,9 +40,7 @@ def _read_param_raw(params: dict[str, Any], key: str) -> Any:
     if key in params:
         return params[key]
     # Try snake_case conversion of camelCase key
-    snake_key = "".join(
-        ("_" + c.lower()) if c.isupper() else c for c in key
-    )
+    snake_key = "".join(("_" + c.lower()) if c.isupper() else c for c in key)
     return params.get(snake_key)
 
 
@@ -113,6 +111,39 @@ def read_number_param(
         raise ToolInputError(f"{label} must be >= {min_value}")
     if max_value is not None and value > max_value:
         raise ToolInputError(f"{label} must be <= {max_value}")
+    return value
+
+
+def read_positive_integer_param(
+    params: dict[str, Any],
+    key: str,
+    *,
+    max_value: int | None = None,
+    message: str | None = None,
+) -> int | None:
+    """Read a positive integer parameter, rejecting invalid or out-of-range values."""
+    raw = _read_param_raw(params, key)
+    value: int | None = None
+    if isinstance(raw, bool):
+        value = None
+    elif isinstance(raw, int) and raw > 0:
+        value = raw
+    elif isinstance(raw, float) and raw > 0 and raw == int(raw):
+        value = int(raw)
+    elif isinstance(raw, str):
+        trimmed = raw.strip()
+        if trimmed:
+            try:
+                parsed = float(trimmed)
+            except ValueError:
+                parsed = float("nan")
+            if parsed == int(parsed) and parsed > 0:
+                value = int(parsed)
+
+    if value is None and raw is not None:
+        raise ToolInputError(message or f"{key} must be a positive integer")
+    if value is not None and max_value is not None and value > max_value:
+        raise ToolInputError(message or f"{key} must be a positive integer")
     return value
 
 

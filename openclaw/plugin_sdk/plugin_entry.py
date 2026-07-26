@@ -44,6 +44,8 @@ class OpenClawPluginApi(Protocol):
 
     def register_http_route(self, params: Mapping[str, Any]) -> None: ...
 
+    def register_web_search_provider(self, provider: Mapping[str, Any]) -> None: ...
+
 
 def _config_error(message: str) -> dict[str, Any]:
     return {"success": False, "error": {"issues": [{"path": [], "message": message}]}}
