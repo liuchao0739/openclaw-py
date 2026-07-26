@@ -160,16 +160,23 @@ def tests_pass() -> tuple[bool, str]:
     return completed.returncode == 0, "\n".join(tail)
 
 
-def lint_clean() -> tuple[bool, str]:
-    completed = run([str(RUFF), "check", "openclaw", "tests", "migration", "scripts"])
-    if completed.returncode == 0:
-        return True, ""
-    return False, (completed.stdout or completed.stderr).strip().splitlines()[-1]
-
-
 def changed_files() -> list[str]:
     completed = run(["git", "status", "--porcelain"])
     return [line[3:] for line in completed.stdout.splitlines() if line.strip()]
+
+
+def lint_changed() -> tuple[bool, str]:
+    """Lint only what this task touched; the repo carries pre-existing violations."""
+    targets = [name for name in changed_files() if name.endswith(".py")]
+    if not targets:
+        return True, ""
+    run([str(RUFF), "check", "--fix", *targets])
+    run([str(RUFF), "format", *targets])
+    completed = run([str(RUFF), "check", *targets])
+    if completed.returncode == 0:
+        return True, ""
+    tail = (completed.stdout or completed.stderr).strip().splitlines()
+    return False, tail[-1] if tail else "ruff reported errors"
 
 
 def discard_changes() -> None:
@@ -220,15 +227,15 @@ def process_task(task: dict, model: str, attempts: int, dry_run: bool) -> str:
             log(f"  attempt {attempt}: agent made no changes after {elapsed}s")
             continue
 
+        clean, lint_tail = lint_changed()
+        if not clean:
+            log(f"  attempt {attempt}: lint still failing after autofix ({lint_tail})")
+
         passed, tail = tests_pass()
         if not passed:
             log(f"  attempt {attempt}: tests failed, discarding\n{tail}")
             discard_changes()
             continue
-
-        clean, lint_tail = lint_clean()
-        if not clean:
-            log(f"  attempt {attempt}: lint failed ({lint_tail})")
 
         result = verify_task(task)
         coverage = round(result["coverage"] * 100)
