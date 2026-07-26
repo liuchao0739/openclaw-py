@@ -4,16 +4,23 @@ Python port of [OpenClaw](https://github.com/openclaw/openclaw).
 
 ## Status
 
-Migration in progress. See `/Users/liuchao/openclaw/migration/` for specs and progress.
+Migration in progress. Specs and task lists live in the TypeScript repo under
+`migration/`. Set `OPENCLAW_TS_REPO` to point at that checkout (defaults to
+`/Users/liuchao/openclaw-ts`); tests that read from it skip when it is absent.
 
 ## Quick start
 
 ```bash
-cd /Users/liuchao/openclaw-py
 pip install -e ".[dev]"
 openclaw-py --help
+pytest
 ```
 
 ## Migration loop
 
-Agent reads `migration/progress.json`, executes next pending task, commits, repeats.
+Agent reads the next pending task from the phase progress file, ports the
+module with tests, marks it done, commits, repeats.
+
+```bash
+python scripts/migration_next_task.py --phase 3 --count 5
+```

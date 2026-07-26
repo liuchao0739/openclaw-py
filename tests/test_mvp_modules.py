@@ -22,30 +22,30 @@ from openclaw.storage.agent_db import agent_db_path, init_agent_db
 from openclaw.storage.state_db import init_state_db, state_db_path
 
 
-def test_load_telegram_manifest() -> None:
-    manifest = load_plugin_manifest("/Users/liuchao/openclaw/extensions/telegram")
+def test_load_telegram_manifest(ts_repo: Path) -> None:
+    manifest = load_plugin_manifest(str(ts_repo / "extensions/telegram"))
     assert manifest.id == "telegram"
     assert "telegram" in manifest.channels
 
 
-def test_discover_plugins_from_openclaw_repo() -> None:
-    plugins = discover_plugins("/Users/liuchao/openclaw/extensions")
+def test_discover_plugins_from_openclaw_repo(ts_repo: Path) -> None:
+    plugins = discover_plugins(str(ts_repo / "extensions"))
     assert any(plugin.id == "telegram" for plugin in plugins)
 
 
-def test_load_weather_skill() -> None:
-    skill = load_skill("/Users/liuchao/openclaw/skills/weather/SKILL.md")
+def test_load_weather_skill(ts_repo: Path) -> None:
+    skill = load_skill(str(ts_repo / "skills/weather/SKILL.md"))
     assert skill.name == "weather"
     assert "weather" in skill.description.lower()
 
 
-def test_discover_skills_from_openclaw_repo() -> None:
-    skills = discover_skills("/Users/liuchao/openclaw/skills")
+def test_discover_skills_from_openclaw_repo(ts_repo: Path) -> None:
+    skills = discover_skills(str(ts_repo / "skills"))
     assert any(skill.name == "weather" for skill in skills)
 
 
-def test_skill_executor() -> None:
-    skill = load_skill("/Users/liuchao/openclaw/skills/weather/SKILL.md")
+def test_skill_executor(ts_repo: Path) -> None:
+    skill = load_skill(str(ts_repo / "skills/weather/SKILL.md"))
     executor = SkillExecutor()
     executor.register(skill.name, lambda s, prompt: f"{s.name}:{prompt}")
     assert executor.execute(skill, "forecast") == "weather:forecast"
