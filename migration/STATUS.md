@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:37:15 UTC
+Updated: 2026-07-26 20:37:16 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 157
-- **Partial:** 7
+- **Pending:** 156
+- **Partial:** 8
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,200,159
+- **Remaining TypeScript lines:** 1,198,317
 
 ## Current
 
-- `P2-0210` extensions/device-pair (1842 lines)
+- `P2-0225` extensions/github-copilot (2169 lines)
 
 ## Up next
 
-- `P2-0210` extensions/device-pair (1842 lines)
 - `P2-0225` extensions/github-copilot (2169 lines)
 - `P2-0180` packages/tool-call-repair (2325 lines)
 - `P2-0167` packages/markdown-core (2398 lines)
 - `P2-0188` extensions/anthropic (2909 lines)
+- `P2-0186` extensions/amazon-bedrock (3520 lines)
 
 ## Recently completed
 
