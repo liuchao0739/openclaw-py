@@ -25,6 +25,11 @@ PY_ROOT = Path(__file__).resolve().parent.parent
 PACKAGE_PREFIX = "@openclaw/"
 
 
+def python_target(raw: str) -> str:
+    """Make a generated target path importable (extensions/foo-bar -> foo_bar)."""
+    return "/".join(segment.replace("-", "_") for segment in raw.split("/"))
+
+
 def load_tasks() -> list[dict]:
     path = ts_repo() / "migration" / "progress-phase2.json"
     tasks = json.loads(path.read_text(encoding="utf-8"))["tasks"]
@@ -78,7 +83,7 @@ def build_graph(tasks: list[dict]) -> tuple[dict[str, set[str]], dict[str, dict]
             "id": task["id"],
             "title": task.get("title", ""),
             "source": source_rel,
-            "target": task["target_paths"][0],
+            "target": python_target(task["target_paths"][0]),
             "ts_source_lines": facts.source_lines,
             "ts_api_count": len(facts.api),
             "file_count": facts.file_count,
@@ -224,9 +229,7 @@ def main() -> int:
             entry["depends_on"] = sorted(edges[task_id])
             entry["grade"] = grades.get(task_id, "unknown")
             nothing_to_port = entry["ts_source_lines"] == 0 and entry["ts_api_count"] == 0
-            entry["status"] = (
-                "done" if entry["grade"] == "ported" or nothing_to_port else "pending"
-            )
+            entry["status"] = "done" if entry["grade"] == "ported" or nothing_to_port else "pending"
             plan.append(entry)
 
     cycles = [c for c in ordered if len(c) > 1]
