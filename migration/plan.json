@@ -4856,7 +4856,8 @@
       "P2-0181"
     ],
     "grade": "missing",
-    "status": "pending"
+    "status": "partial",
+    "verified_at": "2026-07-26T20:39:44.059995+00:00"
   },
   {
     "id": "P2-0063",
