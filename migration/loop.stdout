@@ -27,3 +27,8 @@ FAILED tests/test_agents_schema.py::TestStringEnum::test_optional - TypeError...
 FAILED tests/test_agents_schema.py::TestStringEnum::test_optional - TypeError...
 !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
 1 failed, 1006 passed, 3 warnings in 2.08s
+[2026-07-26 17:34:22]   pushed to origin
+[2026-07-26 17:34:22]   keeping partial work at 100%
+[2026-07-26 17:34:26]   pushed to origin
+[2026-07-26 17:34:26]   -> partial. 30 done, 200 pending
+[2026-07-26 17:34:26] P2-0203 extensions/cohere (128 ts lines, 9 exported symbols)
