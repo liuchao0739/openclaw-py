@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:37:45 UTC
+Updated: 2026-07-26 20:37:46 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 132
-- **Partial:** 32
+- **Pending:** 131
+- **Partial:** 33
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 783,393
+- **Remaining TypeScript lines:** 781,587
 
 ## Current
 
-- `P2-0131` src/routing (1806 lines)
+- `P2-0156` src/utils (2851 lines)
 
 ## Up next
 
-- `P2-0131` src/routing (1806 lines)
 - `P2-0156` src/utils (2851 lines)
 - `P2-0057` src/cli (34918 lines)
 - `P2-0091` src/gateway (73408 lines)
 - `P2-0041` src/channels/plugins (16868 lines)
+- `P2-0031` src/auto-reply (10155 lines)
 
 ## Recently completed
 
