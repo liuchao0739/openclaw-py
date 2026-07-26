@@ -184,3 +184,8 @@ FAILED tests/openclaw_extensions/test_alibaba_video_generation_provider.py::test
 [2026-07-26 19:08:40]   pushed to origin
 [2026-07-26 19:08:40]   -> done. 58 done, 172 pending
 [2026-07-26 19:08:40] P2-0215 extensions/discord (712 ts lines, 6 exported symbols)
+[2026-07-26 19:13:39]   pushed to origin
+[2026-07-26 19:13:39]   attempt 1: PASS at 100% in 292s
+[2026-07-26 19:13:43]   pushed to origin
+[2026-07-26 19:13:43]   -> done. 59 done, 171 pending
+[2026-07-26 19:13:43] P2-0187 extensions/amazon-bedrock-mantle (731 ts lines, 13 exported symbols)
