@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:38:42 UTC
+Updated: 2026-07-26 20:38:43 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 85
-- **Partial:** 79
+- **Pending:** 84
+- **Partial:** 80
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 204,275
+- **Remaining TypeScript lines:** 203,174
 
 ## Current
 
-- `P2-0014` src/agents/runtime-plan (1101 lines)
+- `P2-0003` src/acp (5874 lines)
 
 ## Up next
 
-- `P2-0014` src/agents/runtime-plan (1101 lines)
 - `P2-0003` src/acp (5874 lines)
 - `P2-0107` src/llm/utils (399 lines)
 - `P2-0115` src/memory-host-sdk (888 lines)
 - `P2-0119` src/pairing (1654 lines)
+- `P2-0001` src/acp/control-plane (5058 lines)
 
 ## Recently completed
 

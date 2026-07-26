@@ -3511,7 +3511,8 @@
       "P2-0126"
     ],
     "grade": "stub",
-    "status": "pending"
+    "status": "partial",
+    "verified_at": "2026-07-26T20:38:43.567863+00:00"
   },
   {
     "id": "P2-0003",
