@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:39:25 UTC
+Updated: 2026-07-26 20:39:26 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 49
-- **Partial:** 115
+- **Pending:** 48
+- **Partial:** 116
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 94,046
+- **Remaining TypeScript lines:** 92,678
 
 ## Current
 
-- `P2-0106` src/llm/utils/oauth (1368 lines)
+- `P2-0022` src/agents/utils (1508 lines)
 
 ## Up next
 
-- `P2-0106` src/llm/utils/oauth (1368 lines)
 - `P2-0022` src/agents/utils (1508 lines)
 - `P2-0071` src/commitments (1508 lines)
 - `P2-0095` src/infra/command-explainer (1679 lines)
 - `P2-0027` src/auto-reply/reply/queue (1842 lines)
+- `P2-0088` src/gateway/server (2526 lines)
 
 ## Recently completed
 
