@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:37:38 UTC
+Updated: 2026-07-26 20:37:40 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 137
-- **Partial:** 27
+- **Pending:** 136
+- **Partial:** 28
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,094,650
+- **Remaining TypeScript lines:** 1,021,296
 
 ## Current
 
-- `P2-0101` src/infra (73354 lines)
+- `P2-0023` src/agents (134294 lines)
 
 ## Up next
 
-- `P2-0101` src/infra (73354 lines)
 - `P2-0023` src/agents (134294 lines)
 - `P2-0126` src/plugins (86085 lines)
 - `P2-0136` src/shared (6176 lines)
 - `P2-0109` src/logging (11348 lines)
+- `P2-0131` src/routing (1806 lines)
 
 ## Recently completed
 
