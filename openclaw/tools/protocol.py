@@ -5,8 +5,9 @@ Mirrors src/tools/protocol.ts.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Any, Mapping
+from typing import Any
 
 
 @dataclass
@@ -24,7 +25,7 @@ def to_tool_protocol_descriptor(entry: Mapping[str, Any]) -> ToolProtocolDescrip
     return ToolProtocolDescriptor(
         name=descriptor.get("name", ""),
         description=descriptor.get("description", ""),
-        input_schema=descriptor.get("inputSchema", {}),
+        input_schema=descriptor.get("input_schema", {}),
     )
 
 

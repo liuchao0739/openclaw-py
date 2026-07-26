@@ -1,9 +1,9 @@
 """Tests for tools, state, and status modules."""
 
-from openclaw.tools.diagnostics import ToolPlanContractError
-from openclaw.tools.protocol import to_tool_protocol_descriptor, to_tool_protocol_descriptors
 from openclaw.state import resolve_openclaw_agent_sqlite_path
 from openclaw.status import resolve_active_fallback_state
+from openclaw.tools.diagnostics import ToolPlanContractError
+from openclaw.tools.protocol import to_tool_protocol_descriptor, to_tool_protocol_descriptors
 
 
 class TestToolPlanContractError:
@@ -20,7 +20,13 @@ class TestToolPlanContractError:
 
 class TestToolProtocol:
     def test_to_descriptor(self):
-        entry = {"descriptor": {"name": "search", "description": "Search tool", "inputSchema": {"type": "object"}}}
+        entry = {
+            "descriptor": {
+                "name": "search",
+                "description": "Search tool",
+                "input_schema": {"type": "object"},
+            }
+        }
         result = to_tool_protocol_descriptor(entry)
         assert result.name == "search"
         assert result.description == "Search tool"
@@ -28,8 +34,8 @@ class TestToolProtocol:
 
     def test_to_descriptors(self):
         entries = [
-            {"descriptor": {"name": "a", "description": "A", "inputSchema": {}}},
-            {"descriptor": {"name": "b", "description": "B", "inputSchema": {}}},
+            {"descriptor": {"name": "a", "description": "A", "input_schema": {}}},
+            {"descriptor": {"name": "b", "description": "B", "input_schema": {}}},
         ]
         result = to_tool_protocol_descriptors(entries)
         assert len(result) == 2
