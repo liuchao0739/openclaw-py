@@ -13,6 +13,7 @@ from typing import Any
 _PROVIDER_ENV_VARS: dict[str, list[str]] = {
     "alibaba": ["MODELSTUDIO_API_KEY", "DASHSCOPE_API_KEY", "QWEN_API_KEY"],
     "qwen": ["QWEN_API_KEY", "MODELSTUDIO_API_KEY", "DASHSCOPE_API_KEY"],
+    "comfy": ["COMFY_API_KEY", "COMFY_CLOUD_API_KEY"],
 }
 
 

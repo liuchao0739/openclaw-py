@@ -261,3 +261,8 @@ FAILED tests/test_agents_schema.py::TestStringEnum::test_basic - TypeError: '...
 [2026-07-26 20:19:14]   pushed to origin
 [2026-07-26 20:19:14]   -> done. 65 done, 164 pending
 [2026-07-26 20:19:14] P2-0165 packages/llm-core (1244 ts lines, 16 exported symbols)
+[2026-07-26 20:21:19]   pushed to origin
+[2026-07-26 20:21:19]   attempt 1: PASS at 100% in 114s
+[2026-07-26 20:21:23]   pushed to origin
+[2026-07-26 20:21:23]   -> done. 66 done, 163 pending
+[2026-07-26 20:21:23] P2-0204 extensions/comfy (1327 ts lines, 13 exported symbols)
