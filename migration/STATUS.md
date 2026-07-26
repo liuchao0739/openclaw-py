@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:37:22 UTC
+Updated: 2026-07-26 20:37:23 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 151
-- **Partial:** 13
+- **Pending:** 150
+- **Partial:** 14
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,184,996
+- **Remaining TypeScript lines:** 1,181,070
 
 ## Current
 
-- `P2-0183` extensions/active-memory (3926 lines)
+- `P2-0164` packages/gateway-protocol (8545 lines)
 
 ## Up next
 
-- `P2-0183` extensions/active-memory (3926 lines)
 - `P2-0164` packages/gateway-protocol (8545 lines)
 - `P2-0227` extensions/google (9140 lines)
 - `P2-0046` src/chat (312 lines)
 - `P2-0116` src/model-catalog (420 lines)
+- `P2-0102` src/interactive (624 lines)
 
 ## Recently completed
 
