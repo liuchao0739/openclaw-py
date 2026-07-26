@@ -1283,3 +1283,18 @@ and the repository exists.
 [2026-07-26 20:38:30] P2-0008 src/agents/embedded-agent-helpers (4553 ts lines, 76 exported symbols)
 [2026-07-26 20:38:31]   attempt 1: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
 [2026-07-26 20:38:31]   attempt 2: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-26 20:38:31]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-26 20:38:31]   keeping partial work at 59%
+[2026-07-26 20:38:31]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-26 20:38:31]   -> partial. 67 done, 94 pending
+[2026-07-26 20:38:31] P2-0160 src/wizard (4007 ts lines, 23 exported symbols)
+[2026-07-26 20:38:32]   attempt 1: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-26 20:38:32]   attempt 2: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
