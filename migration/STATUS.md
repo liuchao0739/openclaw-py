@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:37:36 UTC
+Updated: 2026-07-26 20:37:37 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 139
-- **Partial:** 25
+- **Pending:** 138
+- **Partial:** 26
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,145,241
+- **Remaining TypeScript lines:** 1,135,964
 
 ## Current
 
-- `P2-0171` packages/memory-host-sdk (9277 lines)
+- `P2-0074` src/config (41314 lines)
 
 ## Up next
 
-- `P2-0171` packages/memory-host-sdk (9277 lines)
 - `P2-0074` src/config (41314 lines)
 - `P2-0101` src/infra (73354 lines)
 - `P2-0023` src/agents (134294 lines)
 - `P2-0126` src/plugins (86085 lines)
+- `P2-0136` src/shared (6176 lines)
 
 ## Recently completed
 
