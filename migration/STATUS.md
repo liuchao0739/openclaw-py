@@ -1,20 +1,19 @@
 # Migration status
 
-Updated: 2026-07-26 20:40:20 UTC
+Updated: 2026-07-26 20:40:21 UTC
 
 - **Done:** 68 / 231
-- **Pending:** 2
-- **Partial:** 161
+- **Pending:** 1
+- **Partial:** 162
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 3,208
+- **Remaining TypeScript lines:** 2,510
 
 ## Current
 
-- `P2-0090` src/gateway/test (698 lines)
+- `P2-0061` src/commands/doctor/cron (2510 lines)
 
 ## Up next
 
-- `P2-0090` src/gateway/test (698 lines)
 - `P2-0061` src/commands/doctor/cron (2510 lines)
 
 ## Recently completed
