@@ -1,0 +1,1 @@
+"""Copilot extension internal modules."""

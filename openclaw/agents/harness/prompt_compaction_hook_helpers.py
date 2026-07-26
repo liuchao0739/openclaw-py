@@ -30,12 +30,14 @@ def _wrap_plugin_system_context_section(value: Any) -> str | None:
     return value
 
 
-async def resolve_agent_harness_before_prompt_build_result(params: dict[str, Any]) -> dict[str, str]:
+async def resolve_agent_harness_before_prompt_build_result(
+    params: dict[str, Any],
+) -> dict[str, str]:
     """Run before-prompt hooks and return the adjusted prompt fields."""
     hook_runner = _get_global_hook_runner()
-    if (
-        hook_runner is None
-        or (not hook_runner.has_hooks("before_prompt_build") and not hook_runner.has_hooks("before_agent_start"))
+    if hook_runner is None or (
+        not hook_runner.has_hooks("before_prompt_build")
+        and not hook_runner.has_hooks("before_agent_start")
     ):
         return {
             "prompt": params["prompt"],
@@ -55,7 +57,9 @@ async def resolve_agent_harness_before_prompt_build_result(params: dict[str, Any
     before_agent_start_result = None
     if hook_runner.has_hooks("before_agent_start"):
         try:
-            before_agent_start_result = await hook_runner.run_before_agent_start(prompt_event, hook_ctx)
+            before_agent_start_result = await hook_runner.run_before_agent_start(
+                prompt_event, hook_ctx
+            )
         except Exception:
             before_agent_start_result = None
 
@@ -76,21 +80,27 @@ async def resolve_agent_harness_before_prompt_build_result(params: dict[str, Any
                 prompt_build_result.get("prependSystemContext") if prompt_build_result else None
             ),
             _wrap_plugin_system_context_section(
-                before_agent_start_result.get("prependSystemContext") if before_agent_start_result else None
+                before_agent_start_result.get("prependSystemContext")
+                if before_agent_start_result
+                else None
             ),
             system_prompt,
             _wrap_plugin_system_context_section(
                 prompt_build_result.get("appendSystemContext") if prompt_build_result else None
             ),
             _wrap_plugin_system_context_section(
-                before_agent_start_result.get("appendSystemContext") if before_agent_start_result else None
+                before_agent_start_result.get("appendSystemContext")
+                if before_agent_start_result
+                else None
             ),
         ]
     )
 
     return {
         "prompt": prepend_context if prepend_context else params["prompt"],
-        "developerInstructions": developer_instructions if developer_instructions else system_prompt,
+        "developerInstructions": developer_instructions
+        if developer_instructions
+        else system_prompt,
     }
 
 
@@ -112,10 +122,11 @@ async def run_agent_harness_before_compaction_hook(params: dict[str, Any]) -> No
     if hook_runner is None or not hook_runner.has_hooks("before_compaction"):
         return
     try:
+        messages = params.get("messages")
         await hook_runner.run_before_compaction(
             {
-                "messageCount": len(params.get("messages", [])),
-                "messages": params.get("messages", []),
+                "messageCount": len(messages) if messages is not None else -1,
+                **({"messages": messages} if messages is not None else {}),
                 "sessionFile": params["sessionFile"],
             },
             build_agent_hook_context(params["ctx"]),
@@ -130,9 +141,10 @@ async def run_agent_harness_after_compaction_hook(params: dict[str, Any]) -> Non
     if hook_runner is None or not hook_runner.has_hooks("after_compaction"):
         return
     try:
+        messages = params.get("messages")
         await hook_runner.run_after_compaction(
             {
-                "messageCount": len(params.get("messages", [])),
+                "messageCount": len(messages) if messages is not None else -1,
                 "compactedCount": params.get("compactedCount", 0),
                 "sessionFile": params["sessionFile"],
             },
