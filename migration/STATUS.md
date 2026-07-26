@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:38:22 UTC
+Updated: 2026-07-26 20:38:23 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 102
-- **Partial:** 62
+- **Pending:** 101
+- **Partial:** 63
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 337,608
+- **Remaining TypeScript lines:** 322,089
 
 ## Current
 
-- `P2-0020` src/agents/sessions (15519 lines)
+- `P2-0015` src/agents/sandbox (9483 lines)
 
 ## Up next
 
-- `P2-0020` src/agents/sessions (15519 lines)
 - `P2-0015` src/agents/sandbox (9483 lines)
 - `P2-0035` src/channels/inbound-event (729 lines)
 - `P2-0092` src/hooks (5481 lines)
 - `P2-0138` src/skills/discovery (1075 lines)
+- `P2-0075` src/context-engine (2091 lines)
 
 ## Recently completed
 
