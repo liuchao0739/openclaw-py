@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:38:32 UTC
+Updated: 2026-07-26 20:38:34 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 93
-- **Partial:** 71
+- **Pending:** 92
+- **Partial:** 72
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 290,718
+- **Remaining TypeScript lines:** 286,149
 
 ## Current
 
-- `P2-0125` src/plugins/runtime (4569 lines)
+- `P2-0082` src/daemon (9399 lines)
 
 ## Up next
 
-- `P2-0125` src/plugins/runtime (4569 lines)
 - `P2-0082` src/daemon (9399 lines)
 - `P2-0009` src/agents/embedded-agent-runner/run (22652 lines)
 - `P2-0089` src/gateway/server-methods (34431 lines)
 - `P2-0153` src/tts (2002 lines)
+- `P2-0113` src/media-understanding (7216 lines)
 
 ## Recently completed
 
