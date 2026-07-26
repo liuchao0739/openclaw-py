@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:39:00 UTC
+Updated: 2026-07-26 20:39:01 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 70
-- **Partial:** 94
+- **Pending:** 69
+- **Partial:** 95
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 159,348
+- **Remaining TypeScript lines:** 154,832
 
 ## Current
 
-- `P2-0148` src/talk (4516 lines)
+- `P2-0048` src/cli/daemon-cli (4607 lines)
 
 ## Up next
 
-- `P2-0148` src/talk (4516 lines)
 - `P2-0048` src/cli/daemon-cli (4607 lines)
 - `P2-0139` src/skills/lifecycle (4885 lines)
 - `P2-0053` src/cli/program (5845 lines)
 - `P2-0077` src/cron/isolated-agent (6837 lines)
+- `P2-0130` src/realtime-transcription (613 lines)
 
 ## Recently completed
 
