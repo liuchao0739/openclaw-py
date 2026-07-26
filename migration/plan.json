@@ -800,7 +800,8 @@
     "cycle_size": 1,
     "depends_on": [],
     "grade": "stub",
-    "status": "pending"
+    "status": "done",
+    "verified_at": "2026-07-26T19:32:14.246000+00:00"
   },
   {
     "id": "P2-0201",
