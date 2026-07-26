@@ -76,3 +76,9 @@ FAILED tests/openclaw_extensions/test_brave_web_search_provider_merge.py::test_k
 [2026-07-26 18:00:40]   pushed to origin
 [2026-07-26 18:00:40]   -> done. 37 done, 193 pending
 [2026-07-26 18:00:40] P2-0223 extensions/firecrawl (187 ts lines, 7 exported symbols)
+[2026-07-26 18:07:01]   pushed to origin
+[2026-07-26 18:07:01]   attempt 1: PASS at 100% in 374s
+[2026-07-26 18:07:05]   pushed to origin
+[2026-07-26 18:07:05]   -> done. 38 done, 192 pending
+[2026-07-26 18:07:05] P2-0230 extensions/gradium (228 ts lines, 5 exported symbols)
+[2026-07-26 18:09:20]   attempt 1: coverage 80% (4/5), below 85%
