@@ -163,3 +163,8 @@ FAILED tests/openclaw_extensions/test_alibaba_video_generation_provider.py::test
 [2026-07-26 18:53:47]   pushed to origin
 [2026-07-26 18:53:47]   -> done. 54 done, 176 pending
 [2026-07-26 18:53:47] P2-0191 extensions/azure-speech (584 ts lines, 12 exported symbols)
+[2026-07-26 18:55:45]   pushed to origin
+[2026-07-26 18:55:45]   attempt 1: PASS at 100% in 110s
+[2026-07-26 18:55:48]   pushed to origin
+[2026-07-26 18:55:48]   -> done. 55 done, 175 pending
+[2026-07-26 18:55:48] P2-0173 packages/net-policy (602 ts lines, 27 exported symbols)
