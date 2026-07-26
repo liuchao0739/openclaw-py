@@ -189,3 +189,17 @@ FAILED tests/openclaw_extensions/test_alibaba_video_generation_provider.py::test
 [2026-07-26 19:13:43]   pushed to origin
 [2026-07-26 19:13:43]   -> done. 59 done, 171 pending
 [2026-07-26 19:13:43] P2-0187 extensions/amazon-bedrock-mantle (731 ts lines, 13 exported symbols)
+[2026-07-26 19:17:18]   pushed to origin
+[2026-07-26 19:17:18]   attempt 1: PASS at 100% in 207s
+[2026-07-26 19:17:22]   pushed to origin
+[2026-07-26 19:17:22]   -> done. 60 done, 170 pending
+[2026-07-26 19:17:22] P2-0189 extensions/anthropic-vertex (844 ts lines, 16 exported symbols)
+[2026-07-26 19:24:17]   attempt 1: tests failed, discarding
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/openclaw_extensions/test_anthropic_vertex_api.py::test_reuses_runtime_stream_factory_across_direct_stream_calls
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 805 passed, 3 warnings in 1.69s
