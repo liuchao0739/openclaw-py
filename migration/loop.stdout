@@ -97,3 +97,8 @@ FAILED tests/openclaw_extensions/test_brave_web_search_provider_merge.py::test_k
 [2026-07-26 18:16:37]   pushed to origin
 [2026-07-26 18:16:37]   -> done. 41 done, 189 pending
 [2026-07-26 18:16:37] P2-0169 packages/media-generation-core (262 ts lines, 9 exported symbols)
+[2026-07-26 18:17:45]   pushed to origin
+[2026-07-26 18:17:45]   attempt 1: PASS at 89% in 61s
+[2026-07-26 18:17:50]   pushed to origin
+[2026-07-26 18:17:50]   -> done. 42 done, 188 pending
+[2026-07-26 18:17:50] P2-0221 extensions/feishu (287 ts lines, 2 exported symbols)
