@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 18:28:54 UTC
+Updated: 2026-07-26 18:32:13 UTC
 
-- **Done:** 46 / 231
-- **Pending:** 184
+- **Done:** 47 / 231
+- **Pending:** 183
 - **Partial:** 1
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,225,346
+- **Remaining TypeScript lines:** 1,224,953
 
 ## Current
 
-- `P2-0207` extensions/deepgram (393 lines)
+- `P2-0182` extensions/acpx (419 lines)
 
 ## Up next
 
-- `P2-0207` extensions/deepgram (393 lines)
 - `P2-0182` extensions/acpx (419 lines)
 - `P2-0178` packages/speech-core (430 lines)
 - `P2-0096` src/infra/format-time (445 lines)
 - `P2-0150` src/tools (497 lines)
+- `P2-0170` packages/media-understanding-common (521 lines)
 
 ## Recently completed
 
