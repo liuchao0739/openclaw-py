@@ -14,8 +14,7 @@ from openclaw.auto_reply.reply.commands_acp.diagnostics import (
     to_acp_runtime_error,
 )
 from openclaw.auto_reply.reply.commands_acp.install_hints import (
-    check_acp_runtime_available,
-    format_acp_install_hints,
+    resolve_acp_install_command_hint,
 )
 from openclaw.auto_reply.reply.commands_acp.lifecycle import (
     format_lifecycle_status,
@@ -40,8 +39,6 @@ from openclaw.auto_reply.reply.commands_acp.targets import (
 )
 
 __all__ = [
-    "check_acp_runtime_available",
-    "format_acp_install_hints",
     "format_acp_runtime_error_text",
     "format_acp_session_diagnostics",
     "format_acp_target_display",
@@ -61,6 +58,7 @@ __all__ = [
     "resolve_acp_command_conversation_id",
     "resolve_acp_command_parent_conversation_id",
     "resolve_acp_command_thread_id",
+    "resolve_acp_install_command_hint",
     "resolve_acp_runtime_options",
     "resolve_acp_target",
     "to_acp_runtime_error",

@@ -19,6 +19,7 @@ class PluginActivation(BaseModel):
 
 class PluginManifest(BaseModel):
     id: str
+    version: str | None = None
     activation: PluginActivation | None = None
     channels: list[str] = Field(default_factory=list)
     channel_env_vars: dict[str, list[str]] = Field(default_factory=dict, alias="channelEnvVars")

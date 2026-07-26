@@ -6,7 +6,36 @@ Mirrors packages/normalization-core/src/string-coerce.ts.
 from __future__ import annotations
 
 import math
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
+
+from openclaw.packages.normalization_core.record_coerce import (
+    as_nullable_record,
+    as_optional_record,
+    as_record,
+    is_record,
+    read_string_field,
+)
+
+__all__ = [
+    "as_nullable_record",
+    "as_optional_record",
+    "as_record",
+    "has_non_empty_string",
+    "is_record",
+    "normalize_fast_mode",
+    "normalize_lowercase_string_or_empty",
+    "normalize_nullable_string",
+    "normalize_optional_lowercase_string",
+    "normalize_optional_string",
+    "normalize_optional_stringified_id",
+    "normalize_optional_thread_value",
+    "normalize_stringified_entries",
+    "normalize_stringified_optional_string",
+    "read_string_field",
+    "read_string_value",
+    "resolve_primary_string_value",
+]
 
 
 def read_string_value(value: Any) -> str | None:
@@ -44,10 +73,7 @@ def normalize_stringified_optional_string(value: Any) -> str | None:
 
 def normalize_stringified_entries(values: list[Any] | None) -> list[str]:
     """Normalize an optional array of primitive-ish values into non-empty strings."""
-    return [
-        s for s in (normalize_stringified_optional_string(v) for v in (values or []))
-        if s
-    ]
+    return [s for s in (normalize_stringified_optional_string(v) for v in (values or [])) if s]
 
 
 def normalize_optional_lowercase_string(value: Any) -> str | None:

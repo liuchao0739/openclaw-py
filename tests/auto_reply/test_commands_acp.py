@@ -15,10 +15,6 @@ from openclaw.auto_reply.reply.commands_acp.diagnostics import (
     format_acp_session_diagnostics,
     to_acp_runtime_error,
 )
-from openclaw.auto_reply.reply.commands_acp.install_hints import (
-    check_acp_runtime_available,
-    format_acp_install_hints,
-)
 from openclaw.auto_reply.reply.commands_acp.lifecycle import (
     format_lifecycle_status,
     get_acp_lifecycle_phase,
@@ -173,19 +169,3 @@ class TestTargets:
 
     def test_format_display_empty(self):
         assert format_acp_target_display({}) == "default"
-
-
-class TestInstallHints:
-    def test_format_hints(self):
-        hints = format_acp_install_hints()
-        assert "ACP" in hints
-        assert "openclaw.json" in hints
-
-    def test_format_hints_with_provider(self):
-        hints = format_acp_install_hints("claude")
-        assert "claude" in hints.lower()
-
-    def test_check_runtime_available(self):
-        # This depends on the system, just check it doesn't crash
-        result = check_acp_runtime_available()
-        assert isinstance(result, bool)

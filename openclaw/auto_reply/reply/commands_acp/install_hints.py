@@ -1,65 +1,57 @@
-"""ACP installation hints for command replies."""
+"""Builds install hints for ACP runtimes missing local prerequisites."""
 
 from __future__ import annotations
 
-from typing import Any
+import os
+from pathlib import Path
+
+from openclaw.config.models import OpenClawConfig
+from openclaw.packages.normalization_core import (
+    normalize_optional_lowercase_string,
+    normalize_optional_string,
+)
+from openclaw.plugins.bundled_sources import resolve_bundled_plugin_install_command_hint
+
+_INSTALL_PREFIX = "openclaw plugins install "
 
 
-def format_acp_install_hints(provider: str | None = None) -> str:
-    """Format installation hints for ACP providers."""
-    hints: list[str] = [
-        "ACP (Agent Communication Protocol) setup:",
-        "",
-        "1. Install an ACP-compatible runtime (e.g., Claude CLI, Gemini CLI)",
-        "2. Configure the provider in your openclaw.json:",
-        '   {"agents": {"defaults": {"runtime": {"id": "claude"}}}}',
-        "3. Ensure API keys are set in environment variables",
-    ]
+def resolve_acp_install_command_hint(cfg: OpenClawConfig) -> str:
+    """Resolve the install command hint shown when the ACP backend is missing."""
+    acp = cfg.acp
+    runtime = acp.runtime if acp else None
+    configured = normalize_optional_string(runtime.install_command if runtime else None)
+    if configured:
+        return configured
 
-    if provider:
-        provider_hints = _get_provider_install_hint(provider)
-        if provider_hints:
-            hints.append("")
-            hints.append(f"Provider-specific ({provider}):")
-            hints.extend(provider_hints)
+    workspace_dir = Path(os.getcwd())
+    backend_id = normalize_optional_lowercase_string(acp.backend if acp else None) or "acpx"
+    if backend_id != "acpx":
+        return f'Install and enable the plugin that provides ACP backend "{backend_id}".'
 
-    return "\n".join(hints)
+    workspace_local_path = workspace_dir / "extensions" / "acpx"
+    if workspace_local_path.exists():
+        return f"{_INSTALL_PREFIX}{workspace_local_path}"
 
+    bundled_install_hint = resolve_bundled_plugin_install_command_hint(
+        plugin_id=backend_id,
+        workspace_dir=workspace_dir,
+    )
+    if bundled_install_hint:
+        local_path = bundled_install_hint.removeprefix(_INSTALL_PREFIX)
+        resolved_local_path = Path(local_path).resolve()
+        # Only surface local path hints that belong to the current workspace.
+        if (
+            _belongs_to_workspace(resolved_local_path, workspace_dir)
+            and resolved_local_path.exists()
+        ):
+            return bundled_install_hint
 
-def _get_provider_install_hint(provider: str) -> list[str]:
-    """Get provider-specific installation hints."""
-    hints: dict[str, list[str]] = {
-        "claude": [
-            "- Install: npm install -g @anthropic-ai/claude-cli",
-            "- Set ANTHROPIC_API_KEY environment variable",
-        ],
-        "gemini": [
-            "- Install: npm install -g @anthropic-ai/gemini-cli",
-            "- Set GOOGLE_API_KEY environment variable",
-        ],
-        "codex": [
-            "- Install: npm install -g @openai/codex",
-            "- Set OPENAI_API_KEY environment variable",
-        ],
-    }
-    return hints.get(provider.lower(), [])
+    return "openclaw plugins install acpx"
 
 
-def check_acp_runtime_available(provider: str | None = None) -> bool:
-    """Check if an ACP runtime is available for the given provider."""
-    import shutil
-
-    runtimes: dict[str, list[str]] = {
-        "claude": ["claude"],
-        "gemini": ["gemini"],
-        "codex": ["codex"],
-    }
-
-    if provider:
-        commands = runtimes.get(provider.lower(), [])
-        return any(shutil.which(cmd) is not None for cmd in commands)
-
-    for commands in runtimes.values():
-        if any(shutil.which(cmd) is not None for cmd in commands):
-            return True
-    return False
+def _belongs_to_workspace(candidate: Path, workspace_dir: Path) -> bool:
+    try:
+        candidate.relative_to(workspace_dir.resolve())
+    except ValueError:
+        return False
+    return True
