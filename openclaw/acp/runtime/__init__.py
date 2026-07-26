@@ -5,7 +5,8 @@ Mirrors src/acp/runtime/.
 
 from __future__ import annotations
 
-from typing import Any, Callable, Mapping
+from collections.abc import Callable, Mapping
+from typing import Any
 
 
 class AcpRuntimeError(Exception):
@@ -64,6 +65,13 @@ def register_acp_runtime_backend(
     _acp_backends[backend_id] = backend
 
 
+def unregister_acp_runtime_backend(backend_id: str) -> None:
+    """Remove a registered ACP runtime backend by id."""
+    normalized = (backend_id or "").strip().lower()
+    if normalized:
+        _acp_backends.pop(normalized, None)
+
+
 def get_acp_runtime_backend(backend_id: str | None = None) -> dict[str, Any] | None:
     """Return the ACP runtime backend for the given id, or None."""
     if not backend_id:
@@ -88,6 +96,7 @@ def reset_acp_backends_for_tests() -> None:
 
 
 # --- Availability ---
+
 
 def is_acp_enabled_by_policy(config: Mapping[str, Any] | None) -> bool:
     """Check if ACP is enabled by policy."""
