@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:37:29 UTC
+Updated: 2026-07-26 20:37:30 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 145
-- **Partial:** 19
+- **Pending:** 144
+- **Partial:** 20
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,162,029
+- **Remaining TypeScript lines:** 1,160,894
 
 ## Current
 
-- `P2-0168` packages/media-core (1135 lines)
+- `P2-0161` packages/acp-core (1454 lines)
 
 ## Up next
 
-- `P2-0168` packages/media-core (1135 lines)
 - `P2-0161` packages/acp-core (1454 lines)
 - `P2-0135` src/shared/text (2053 lines)
 - `P2-0163` packages/gateway-client (2074 lines)
 - `P2-0162` packages/agent-core (8160 lines)
+- `P2-0177` packages/sdk (1912 lines)
 
 ## Recently completed
 
