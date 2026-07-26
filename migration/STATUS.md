@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 17:23:50 UTC
+Updated: 2026-07-26 17:28:02 UTC
 
-- **Done:** 29 / 231
-- **Pending:** 202
+- **Done:** 30 / 231
+- **Pending:** 201
 - **Partial:** 0
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,229,068
+- **Remaining TypeScript lines:** 1,228,947
 
 ## Current
 
-- `P2-0231` extensions/groq (121 lines)
+- `P2-0222` extensions/file-transfer (122 lines)
 
 ## Up next
 
-- `P2-0231` extensions/groq (121 lines)
 - `P2-0222` extensions/file-transfer (122 lines)
 - `P2-0203` extensions/cohere (128 lines)
 - `P2-0193` extensions/brave (130 lines)
 - `P2-0197` extensions/cerebras (136 lines)
+- `P2-0229` extensions/googlechat (140 lines)
 
 ## Recently completed
 
