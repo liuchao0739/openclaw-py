@@ -440,7 +440,8 @@
     "cycle_size": 1,
     "depends_on": [],
     "grade": "missing",
-    "status": "pending"
+    "status": "done",
+    "verified_at": "2026-07-26T18:07:01.572997+00:00"
   },
   {
     "id": "P2-0230",
