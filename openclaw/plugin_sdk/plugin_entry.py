@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping
+from collections.abc import Awaitable, Callable, Mapping
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
@@ -11,6 +11,8 @@ from openclaw.plugin_sdk.lazy_value import create_cached_lazy_value_getter
 __all__ = [
     "OpenClawPluginApi",
     "OpenClawPluginHttpRouteHandler",
+    "OpenClawPluginService",
+    "OpenClawPluginServiceContext",
     "PluginLogger",
     "define_plugin_entry",
     "empty_plugin_config_schema",
@@ -39,12 +41,39 @@ class OpenClawPluginHttpRouteHandler(Protocol):
     ) -> bool | None: ...
 
 
+class OpenClawPluginServiceContext(Protocol):
+    """Context passed to plugin-owned background services."""
+
+    config: Any
+    workspace_dir: str | None
+    state_dir: str
+    logger: PluginLogger
+
+
+class OpenClawPluginService(Protocol):
+    """Background service registered by a plugin entry."""
+
+    id: str
+
+    def start(
+        self,
+        ctx: OpenClawPluginServiceContext,
+    ) -> None | Awaitable[None]: ...
+
+    def stop(
+        self,
+        ctx: OpenClawPluginServiceContext,
+    ) -> None | Awaitable[None]: ...
+
+
 class OpenClawPluginApi(Protocol):
     """Main registration API injected into native plugin entry files."""
 
     def register_http_route(self, params: Mapping[str, Any]) -> None: ...
 
     def register_web_search_provider(self, provider: Mapping[str, Any]) -> None: ...
+
+    def register_service(self, service: OpenClawPluginService) -> None: ...
 
 
 def _config_error(message: str) -> dict[str, Any]:

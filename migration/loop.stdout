@@ -1,7 +1,1 @@
-[2026-07-26 16:33:52] P2-0217 extensions/duckduckgo (27 ts lines, 1 exported symbols)
-[2026-07-26 16:38:47]   attempt 1: PASS at 100% in 293s
-[2026-07-26 16:38:47]   -> done. 18 done, 213 pending
-[2026-07-26 16:38:47] P2-0213 extensions/diffs (28 ts lines, 0 exported symbols)
-[2026-07-26 16:43:10]   attempt 1: PASS at 100% in 259s
-[2026-07-26 16:43:10]   -> done. 19 done, 212 pending
-[2026-07-26 16:43:10] P2-0219 extensions/exa (30 ts lines, 1 exported symbols)
+[2026-07-26 16:50:14] P2-0211 extensions/diagnostics-otel (35 ts lines, 0 exported symbols)
