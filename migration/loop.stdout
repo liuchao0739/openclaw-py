@@ -1733,3 +1733,18 @@ and the repository exists.
 [2026-07-26 20:39:06] P2-0130 src/realtime-transcription (613 ts lines, 5 exported symbols)
 [2026-07-26 20:39:07]   attempt 1: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
 [2026-07-26 20:39:07]   attempt 2: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-26 20:39:07]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-26 20:39:07]   keeping partial work at 0%
+[2026-07-26 20:39:07]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-26 20:39:07]   -> partial. 67 done, 64 pending
+[2026-07-26 20:39:07] P2-0117 src/music-generation (760 ts lines, 16 exported symbols)
+[2026-07-26 20:39:08]   attempt 1: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-26 20:39:08]   attempt 2: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
