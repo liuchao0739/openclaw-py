@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 19:41:40 UTC
+Updated: 2026-07-26 20:09:46 UTC
 
 - **Done:** 64 / 231
-- **Pending:** 166
-- **Partial:** 1
+- **Pending:** 165
+- **Partial:** 2
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,213,254
+- **Remaining TypeScript lines:** 1,212,019
 
 ## Current
 
-- `P2-0228` extensions/google-meet (1235 lines)
+- `P2-0205` extensions/copilot (1238 lines)
 
 ## Up next
 
-- `P2-0228` extensions/google-meet (1235 lines)
 - `P2-0205` extensions/copilot (1238 lines)
 - `P2-0165` packages/llm-core (1244 lines)
 - `P2-0204` extensions/comfy (1327 lines)
 - `P2-0218` extensions/elevenlabs (1474 lines)
+- `P2-0172` packages/model-catalog-core (1533 lines)
 
 ## Recently completed
 
