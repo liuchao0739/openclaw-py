@@ -180,8 +180,67 @@ def lint_changed() -> tuple[bool, str]:
 
 
 def discard_changes() -> None:
-    run(["git", "checkout", "--", "."])
-    run(["git", "clean", "-fd", "openclaw", "tests"])
+    # Never `git checkout -- .` — that would wipe migration tooling mid-run.
+    for path in ("openclaw", "openclaw_extensions", "openclaw_packages", "tests", "pyproject.toml"):
+        run(["git", "checkout", "--", path])
+        if Path(PY_ROOT / path).is_dir():
+            run(["git", "clean", "-fd", path])
+
+
+STATUS = PY_ROOT / "migration" / "STATUS.md"
+
+
+def write_status(plan: list[dict], current: dict | None = None) -> None:
+    """Human-readable progress snapshot; open this file anytime for an update."""
+    done = [t for t in plan if t.get("status") == "done"]
+    pending = [t for t in plan if t.get("status") == "pending"]
+    partial = [t for t in plan if t.get("status") == "partial"]
+    blocked = [t for t in plan if t.get("status") == "blocked"]
+    remaining_lines = sum(t.get("ts_source_lines", 0) for t in pending)
+    stamp = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
+    next_tasks = pending[:5]
+    recent = done[-5:] if done else []
+
+    lines = [
+        "# Migration status",
+        "",
+        f"Updated: {stamp}",
+        "",
+        f"- **Done:** {len(done)} / {len(plan)}",
+        f"- **Pending:** {len(pending)}",
+        f"- **Partial:** {len(partial)}",
+        f"- **Blocked:** {len(blocked)}",
+        f"- **Remaining TypeScript lines:** {remaining_lines:,}",
+        "",
+    ]
+    if current:
+        lines += [
+            "## Current",
+            "",
+            f"- `{current['id']}` {current.get('source', '')} "
+            f"({current.get('ts_source_lines', 0)} lines)",
+            "",
+        ]
+    if next_tasks:
+        lines += ["## Up next", ""]
+        for task in next_tasks:
+            lines.append(
+                f"- `{task['id']}` {task.get('source', '')} "
+                f"({task.get('ts_source_lines', 0)} lines)"
+            )
+        lines.append("")
+    if recent:
+        lines += ["## Recently completed", ""]
+        for task in recent:
+            lines.append(f"- `{task['id']}` {task.get('source', '')}")
+        lines.append("")
+    lines += [
+        "## How to refresh",
+        "",
+        "This file is rewritten after every task. Or ask in chat: 「进度」",
+        "",
+    ]
+    STATUS.write_text("\n".join(lines), encoding="utf-8")
 
 
 def push() -> None:
@@ -301,7 +360,8 @@ def main() -> int:
                 entry["status"] = status
                 entry["verified_at"] = datetime.now(UTC).isoformat()
         save_plan(plan)
-        run(["git", "add", "migration/plan.json"])
+        write_status(plan, current=next_pending(plan))
+        run(["git", "add", "migration/plan.json", "migration/STATUS.md"])
         run(["git", "commit", "-q", "-m", f"migration: record {task['id']} as {status}"])
         push()
 
