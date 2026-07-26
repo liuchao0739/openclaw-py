@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 20:39:04 UTC
+Updated: 2026-07-26 20:39:05 UTC
 
 - **Done:** 67 / 231
-- **Pending:** 67
-- **Partial:** 97
+- **Pending:** 66
+- **Partial:** 98
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 145,340
+- **Remaining TypeScript lines:** 139,495
 
 ## Current
 
-- `P2-0053` src/cli/program (5845 lines)
+- `P2-0077` src/cron/isolated-agent (6837 lines)
 
 ## Up next
 
-- `P2-0053` src/cli/program (5845 lines)
 - `P2-0077` src/cron/isolated-agent (6837 lines)
 - `P2-0130` src/realtime-transcription (613 lines)
 - `P2-0117` src/music-generation (760 lines)
 - `P2-0112` src/media-generation (776 lines)
+- `P2-0145` src/skills/workshop (1988 lines)
 
 ## Recently completed
 
