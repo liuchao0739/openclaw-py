@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 18:35:33 UTC
+Updated: 2026-07-26 18:37:03 UTC
 
-- **Done:** 48 / 231
-- **Pending:** 182
+- **Done:** 49 / 231
+- **Pending:** 181
 - **Partial:** 1
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,224,534
+- **Remaining TypeScript lines:** 1,224,104
 
 ## Current
 
-- `P2-0178` packages/speech-core (430 lines)
+- `P2-0096` src/infra/format-time (445 lines)
 
 ## Up next
 
-- `P2-0178` packages/speech-core (430 lines)
 - `P2-0096` src/infra/format-time (445 lines)
 - `P2-0150` src/tools (497 lines)
 - `P2-0170` packages/media-understanding-common (521 lines)
 - `P2-0200` extensions/cloudflare-ai-gateway (553 lines)
+- `P2-0194` extensions/browser (572 lines)
 
 ## Recently completed
 
