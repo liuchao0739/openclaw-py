@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 18:16:33 UTC
+Updated: 2026-07-26 18:17:46 UTC
 
-- **Done:** 41 / 231
-- **Pending:** 189
+- **Done:** 42 / 231
+- **Pending:** 188
 - **Partial:** 1
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,226,881
+- **Remaining TypeScript lines:** 1,226,619
 
 ## Current
 
-- `P2-0169` packages/media-generation-core (262 lines)
+- `P2-0221` extensions/feishu (287 lines)
 
 ## Up next
 
-- `P2-0169` packages/media-generation-core (262 lines)
 - `P2-0221` extensions/feishu (287 lines)
 - `P2-0181` packages/web-content-core (307 lines)
 - `P2-0209` extensions/deepseek (324 lines)
 - `P2-0190` extensions/arcee (355 lines)
+- `P2-0207` extensions/deepgram (393 lines)
 
 ## Recently completed
 
