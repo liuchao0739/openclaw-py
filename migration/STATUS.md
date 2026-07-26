@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-26 17:28:02 UTC
+Updated: 2026-07-26 17:34:22 UTC
 
 - **Done:** 30 / 231
-- **Pending:** 201
-- **Partial:** 0
+- **Pending:** 200
+- **Partial:** 1
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,228,947
+- **Remaining TypeScript lines:** 1,228,825
 
 ## Current
 
-- `P2-0222` extensions/file-transfer (122 lines)
+- `P2-0203` extensions/cohere (128 lines)
 
 ## Up next
 
-- `P2-0222` extensions/file-transfer (122 lines)
 - `P2-0203` extensions/cohere (128 lines)
 - `P2-0193` extensions/brave (130 lines)
 - `P2-0197` extensions/cerebras (136 lines)
 - `P2-0229` extensions/googlechat (140 lines)
+- `P2-0216` extensions/document-extract (149 lines)
 
 ## Recently completed
 

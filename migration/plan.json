@@ -306,7 +306,8 @@
     "cycle_size": 1,
     "depends_on": [],
     "grade": "missing",
-    "status": "pending"
+    "status": "partial",
+    "verified_at": "2026-07-26T17:34:22.832893+00:00"
   },
   {
     "id": "P2-0203",
