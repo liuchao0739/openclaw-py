@@ -1,0 +1,1 @@
+"""Bundled document extraction plugin."""

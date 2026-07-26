@@ -56,3 +56,8 @@ FAILED tests/openclaw_extensions/test_brave_web_search_provider_merge.py::test_k
 [2026-07-26 17:49:51]   pushed to origin
 [2026-07-26 17:49:51]   -> done. 33 done, 197 pending
 [2026-07-26 17:49:51] P2-0229 extensions/googlechat (140 ts lines, 1 exported symbols)
+[2026-07-26 17:53:22]   pushed to origin
+[2026-07-26 17:53:22]   attempt 1: PASS at 100% in 203s
+[2026-07-26 17:53:26]   pushed to origin
+[2026-07-26 17:53:26]   -> done. 34 done, 196 pending
+[2026-07-26 17:53:26] P2-0216 extensions/document-extract (149 ts lines, 1 exported symbols)
