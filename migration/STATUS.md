@@ -1,16 +1,16 @@
 # Migration status
 
-Updated: 2026-07-27 11:55:18 UTC
+Updated: 2026-07-27 12:04:23 UTC
 
-- **Done:** 76 / 231
+- **Done:** 77 / 231
 - **Pending:** 0
-- **Partial:** 155
+- **Partial:** 154
 - **Blocked:** 0
 - **Remaining TypeScript lines:** 0
 
 ## Current
 
-- `P2-0225` 移植 extension github-copilot (2169 lines)
+- `P2-0180` 移植 packages/tool-call-repair (2325 lines)
 
 ## Recently completed
 
