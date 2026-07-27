@@ -7034,3 +7034,10 @@ ActionRequiredError: You have an unpaid invoice Visit [cursor.com/dashboard](htt
 [2026-07-27 11:25:48] P2-0208 extensions/deepinfra (1567 ts lines, 43 exported symbols)
 [2026-07-27 11:26:18]   attempt 1: agent failed after 30s: ActionRequiredError: You have an unpaid invoice Visit [cursor.com/dashboard](https://cursor.com/dashboard) and pay your invoice in Stripe to resume requests.
 [2026-07-27 11:26:54]   attempt 2: agent failed after 35s: ActionRequiredError: You have an unpaid invoice Visit [cursor.com/dashboard](https://cursor.com/dashboard) and pay your invoice in Stripe to resume requests.
+[2026-07-27 11:27:02]   pushed to origin
+[2026-07-27 11:27:02]   keeping partial work at 35%
+[2026-07-27 11:27:11]   pushed to origin
+[2026-07-27 11:27:11]   -> partial. 72 done, 0 pending
+[2026-07-27 11:27:11] P2-0179 packages/terminal-core (1708 ts lines, 38 exported symbols)
+[2026-07-27 11:27:21]   attempt 1: agent failed after 9s: ActionRequiredError: You have an unpaid invoice Visit [cursor.com/dashboard](https://cursor.com/dashboard) and pay your invoice in Stripe to resume requests.
+[2026-07-27 11:27:28]   attempt 2: agent failed after 6s: ActionRequiredError: You have an unpaid invoice Visit [cursor.com/dashboard](https://cursor.com/dashboard) and pay your invoice in Stripe to resume requests.
