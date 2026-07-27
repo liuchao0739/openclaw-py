@@ -1,0 +1,253 @@
+"""Shared model catalog data contracts for provider manifests and normalized rows.
+
+Mirrors packages/model-catalog-core/src/model-catalog-types.ts.
+"""
+
+from __future__ import annotations
+
+from typing import Literal, TypedDict
+
+MODEL_CATALOG_APIS: tuple[str, ...] = (
+    "openai-completions",
+    "openai-responses",
+    "openai-chatgpt-responses",
+    "anthropic-messages",
+    "google-generative-ai",
+    "google-vertex",
+    "github-copilot",
+    "bedrock-converse-stream",
+    "ollama",
+    "azure-openai-responses",
+)
+
+ModelCatalogApi = Literal[
+    "openai-completions",
+    "openai-responses",
+    "openai-chatgpt-responses",
+    "anthropic-messages",
+    "google-generative-ai",
+    "google-vertex",
+    "github-copilot",
+    "bedrock-converse-stream",
+    "ollama",
+    "azure-openai-responses",
+]
+
+MODEL_CATALOG_THINKING_FORMATS: tuple[str, ...] = (
+    "openai",
+    "openrouter",
+    "deepseek",
+    "together",
+    "qwen",
+    "qwen-chat-template",
+    "zai",
+)
+
+ModelCatalogThinkingFormat = Literal[
+    "openai",
+    "openrouter",
+    "deepseek",
+    "together",
+    "qwen",
+    "qwen-chat-template",
+    "zai",
+]
+
+
+def is_model_catalog_thinking_format(value: str) -> bool:
+    return value in MODEL_CATALOG_THINKING_FORMATS
+
+
+class ModelCatalogOpenRouterRouting(TypedDict, total=False):
+    allow_fallbacks: bool
+    require_parameters: bool
+    data_collection: Literal["deny", "allow"]
+    zdr: bool
+    enforce_distillable_text: bool
+    order: list[str]
+    only: list[str]
+    ignore: list[str]
+    quantizations: list[str]
+    sort: str | dict[str, str | None]
+    max_price: dict[str, str | float]
+    preferred_min_throughput: float | dict[str, float]
+    preferred_max_latency: float | dict[str, float]
+
+
+class ModelCatalogVercelGatewayRouting(TypedDict, total=False):
+    only: list[str]
+    order: list[str]
+
+
+class ModelCatalogCompatConfig(TypedDict, total=False):
+    supportsStore: bool
+    supportsDeveloperRole: bool
+    supportsReasoningEffort: bool
+    supportsUsageInStreaming: bool
+    supportsStrictMode: bool
+    maxTokensField: Literal["max_completion_tokens", "max_tokens"]
+    requiresToolResultName: bool
+    requiresAssistantAfterToolResult: bool
+    requiresThinkingAsText: bool
+    openRouterRouting: ModelCatalogOpenRouterRouting
+    vercelGatewayRouting: ModelCatalogVercelGatewayRouting
+    zaiToolStream: bool
+    cacheControlFormat: Literal["anthropic"]
+    sendSessionAffinityHeaders: bool
+    sendSessionIdHeader: bool
+    supportsEagerToolInputStreaming: bool
+    supportsLongCacheRetention: bool
+    supportsPromptCacheKey: bool
+    supportsTools: bool
+    requiresStringContent: bool
+    strictMessageKeys: bool
+    toolSchemaProfile: str
+    unsupportedToolSchemaKeywords: list[str]
+    nativeWebSearchTool: bool
+    toolCallArgumentsEncoding: str
+    requiresMistralToolIds: bool
+    requiresOpenAiAnthropicToolPayload: bool
+    thinkingFormat: ModelCatalogThinkingFormat
+    supportedReasoningEfforts: list[str]
+    reasoningEffortMap: dict[str, str]
+    visibleReasoningDetailTypes: list[str]
+
+
+class ModelCatalogImageInputConfig(TypedDict, total=False):
+    maxBytes: int
+    maxPixels: int
+    maxSidePx: int
+    preferredSidePx: int
+    tokenMode: Literal["tile", "detail", "provider"]
+
+
+class ModelCatalogMediaInputConfig(TypedDict, total=False):
+    image: ModelCatalogImageInputConfig
+
+
+ModelCatalogInput = Literal["text", "image", "document"]
+ModelCatalogDiscovery = Literal["static", "refreshable", "runtime"]
+ModelCatalogStatus = Literal["available", "preview", "deprecated", "disabled"]
+ModelCatalogSource = Literal[
+    "manifest",
+    "provider-index",
+    "cache",
+    "config",
+    "runtime-refresh",
+]
+
+
+class ModelCatalogTieredCost(TypedDict):
+    input: float
+    output: float
+    cacheRead: float
+    cacheWrite: float
+    range: tuple[float, ...]
+
+
+class ModelCatalogCost(TypedDict, total=False):
+    input: float
+    output: float
+    cacheRead: float
+    cacheWrite: float
+    tieredPricing: list[ModelCatalogTieredCost]
+
+
+class ModelCatalogModel(TypedDict, total=False):
+    id: str
+    name: str
+    api: ModelCatalogApi
+    baseUrl: str
+    headers: dict[str, str]
+    input: list[ModelCatalogInput]
+    reasoning: bool
+    contextWindow: float
+    contextTokens: int
+    maxTokens: float
+    cost: ModelCatalogCost
+    compat: ModelCatalogCompatConfig
+    mediaInput: ModelCatalogMediaInputConfig
+    status: ModelCatalogStatus
+    statusReason: str
+    replaces: list[str]
+    replacedBy: str
+    tags: list[str]
+
+
+class ModelCatalogProvider(TypedDict, total=False):
+    baseUrl: str
+    api: ModelCatalogApi
+    headers: dict[str, str]
+    models: list[ModelCatalogModel]
+
+
+class ModelCatalogAlias(TypedDict, total=False):
+    provider: str
+    api: ModelCatalogApi
+    baseUrl: str
+
+
+class ModelCatalogSuppression(TypedDict, total=False):
+    provider: str
+    model: str
+    reason: str
+    when: dict[str, list[str]]
+
+
+class ModelCatalog(TypedDict, total=False):
+    providers: dict[str, ModelCatalogProvider]
+    aliases: dict[str, ModelCatalogAlias]
+    suppressions: list[ModelCatalogSuppression]
+    discovery: dict[str, ModelCatalogDiscovery]
+    runtimeAugment: bool
+
+
+class NormalizedModelCatalogRow(TypedDict, total=False):
+    provider: str
+    id: str
+    ref: str
+    mergeKey: str
+    name: str
+    source: ModelCatalogSource
+    input: list[ModelCatalogInput]
+    reasoning: bool
+    status: ModelCatalogStatus
+    api: ModelCatalogApi
+    baseUrl: str
+    headers: dict[str, str]
+    contextWindow: float
+    contextTokens: int
+    maxTokens: float
+    cost: ModelCatalogCost
+    compat: ModelCatalogCompatConfig
+    mediaInput: ModelCatalogMediaInputConfig
+    statusReason: str
+    replaces: list[str]
+    replacedBy: str
+    tags: list[str]
+
+
+__all__ = [
+    "MODEL_CATALOG_APIS",
+    "MODEL_CATALOG_THINKING_FORMATS",
+    "ModelCatalog",
+    "ModelCatalogAlias",
+    "ModelCatalogApi",
+    "ModelCatalogCompatConfig",
+    "ModelCatalogCost",
+    "ModelCatalogDiscovery",
+    "ModelCatalogImageInputConfig",
+    "ModelCatalogInput",
+    "ModelCatalogMediaInputConfig",
+    "ModelCatalogModel",
+    "ModelCatalogOpenRouterRouting",
+    "ModelCatalogProvider",
+    "ModelCatalogSource",
+    "ModelCatalogStatus",
+    "ModelCatalogSuppression",
+    "ModelCatalogThinkingFormat",
+    "ModelCatalogTieredCost",
+    "ModelCatalogVercelGatewayRouting",
+    "NormalizedModelCatalogRow",
+    "is_model_catalog_thinking_format",
+]
