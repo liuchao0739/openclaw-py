@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 06:14:52 UTC
+Updated: 2026-07-27 06:14:55 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 88
-- **Partial:** 73
+- **Pending:** 87
+- **Partial:** 74
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 219,661
+- **Remaining TypeScript lines:** 217,659
 
 ## Current
 
-- `P2-0153` src/tts (2002 lines)
+- `P2-0113` src/media-understanding (7216 lines)
 
 ## Up next
 
-- `P2-0153` src/tts (2002 lines)
 - `P2-0113` src/media-understanding (7216 lines)
 - `P2-0121` src/plugin-state (1702 lines)
 - `P2-0007` src/agents/command (4472 lines)
 - `P2-0014` src/agents/runtime-plan (1101 lines)
+- `P2-0003` src/acp (5874 lines)
 
 ## Recently completed
 
