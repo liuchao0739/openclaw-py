@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 04:13:08 UTC
+Updated: 2026-07-27 04:13:10 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 141
-- **Partial:** 20
+- **Pending:** 140
+- **Partial:** 21
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,157,381
+- **Remaining TypeScript lines:** 1,155,307
 
 ## Current
 
-- `P2-0163` packages/gateway-client (2074 lines)
+- `P2-0162` packages/agent-core (8160 lines)
 
 ## Up next
 
-- `P2-0163` packages/gateway-client (2074 lines)
 - `P2-0162` packages/agent-core (8160 lines)
 - `P2-0177` packages/sdk (1912 lines)
 - `P2-0171` packages/memory-host-sdk (9277 lines)
 - `P2-0074` src/config (41314 lines)
+- `P2-0101` src/infra (73354 lines)
 
 ## Recently completed
 
