@@ -1,7 +1,7 @@
 import json
 import os
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Set, Tuple, TypedDict, Union
+from typing import Any, Dict, List, Literal, Optional, Set, Tuple, TypedDict, Union
 
 with open(os.path.join(os.path.dirname(__file__), "openclaw.plugin.json")) as f:
     MANIFEST = json.load(f)
