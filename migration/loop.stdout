@@ -3946,3 +3946,18 @@ and the repository exists.
 [2026-07-27 06:15:13] P2-0001 src/acp/control-plane (5058 ts lines, 85 exported symbols)
 [2026-07-27 06:15:14]   attempt 1: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
 [2026-07-27 06:15:15]   attempt 2: agent failed after 1s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-27 06:15:15]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-27 06:15:15]   keeping partial work at 9%
+[2026-07-27 06:15:15]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-27 06:15:15]   -> partial. 70 done, 78 pending
+[2026-07-27 06:15:15] P2-0152 src/transcripts (702 ts lines, 8 exported symbols)
+[2026-07-27 06:15:16]   attempt 1: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-27 06:15:17]   attempt 2: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
