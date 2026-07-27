@@ -2,23 +2,23 @@
 
 Updated: 2026-07-27 03:44:24 UTC
 
-- **Done:** 69 / 231
-- **Pending:** 161
+- **Done:** 70 / 231
+- **Pending:** 160
 - **Partial:** 1
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,208,204
+- **Remaining TypeScript lines:** 1,206,730
 
 ## Current
 
-- `P2-0218` extensions/elevenlabs (1474 lines)
+- `P2-0172` packages/model-catalog-core (1533 lines)
 
 ## Up next
 
-- `P2-0218` extensions/elevenlabs (1474 lines)
 - `P2-0172` packages/model-catalog-core (1533 lines)
 - `P2-0208` extensions/deepinfra (1567 lines)
 - `P2-0179` packages/terminal-core (1708 lines)
 - `P2-0220` extensions/fal (1769 lines)
+- `P2-0210` extensions/device-pair (1842 lines)
 
 ## Recently completed
 
