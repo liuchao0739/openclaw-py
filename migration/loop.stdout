@@ -2685,3 +2685,27 @@ and the repository exists.
 [2026-07-26 20:40:21] P2-0061 src/commands/doctor/cron (2510 ts lines, 29 exported symbols)
 [2026-07-26 20:40:22]   attempt 1: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
 [2026-07-26 20:40:22]   attempt 2: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-26 20:40:22]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-26 20:40:22]   keeping partial work at 7%
+[2026-07-26 20:40:22]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-26 20:40:22]   -> partial. 68 done, 0 pending
+[2026-07-26 20:40:22] MIGRATION_COMPLETE
+[2026-07-27 00:04:01] P2-0222 already satisfies the gate; marking done
+[2026-07-27 00:04:05]   pushed to origin
+[2026-07-27 00:04:05]   -> done. 69 done, 162 pending
+[2026-07-27 00:04:05] P2-0228 extensions/google-meet (1235 ts lines, 1 exported symbols)
+[2026-07-27 03:44:23]   attempt 1: agent failed after 602s: Connection lost, reconnecting to https://agentn.global.api5.cursor.sh (attempt 1)...
+Retry attempt 1...
+Connection lost, reconnecting to https://agentn.global.api5.cursor.sh (attempt 2)...
+Retry attempt 2...
+Connection lost, reconnecting to https://agentn.global.api5.cursor.sh (attempt 3)...
+Retry a
+[2026-07-27 03:44:24]   attempt 2: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
