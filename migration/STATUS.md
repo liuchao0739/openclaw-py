@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 07:16:14 UTC
+Updated: 2026-07-27 07:16:17 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 51
-- **Partial:** 110
+- **Pending:** 50
+- **Partial:** 111
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 96,898
+- **Remaining TypeScript lines:** 96,075
 
 ## Current
 
-- `P2-0039` src/channels/plugins/outbound (823 lines)
+- `P2-0059` src/commands/channel-setup (847 lines)
 
 ## Up next
 
-- `P2-0039` src/channels/plugins/outbound (823 lines)
 - `P2-0059` src/commands/channel-setup (847 lines)
 - `P2-0143` src/skills/security (1188 lines)
 - `P2-0106` src/llm/utils/oauth (1368 lines)
 - `P2-0022` src/agents/utils (1508 lines)
+- `P2-0071` src/commitments (1508 lines)
 
 ## Recently completed
 
