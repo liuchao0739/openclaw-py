@@ -2791,3 +2791,18 @@ and the repository exists.
 [2026-07-27 04:02:19] P2-0210 extensions/device-pair (1842 ts lines, 21 exported symbols)
 [2026-07-27 04:02:19]   attempt 1: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
 [2026-07-27 04:12:36]   attempt 2: agent failed after 1s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-27 04:12:36]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-27 04:12:36]   keeping partial work at 0%
+[2026-07-27 04:12:36]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-27 04:12:36]   -> partial. 70 done, 155 pending
+[2026-07-27 04:12:36] P2-0225 extensions/github-copilot (2169 ts lines, 27 exported symbols)
+[2026-07-27 04:12:37]   attempt 1: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-27 04:12:38]   attempt 2: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
