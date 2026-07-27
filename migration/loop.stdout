@@ -2986,3 +2986,18 @@ and the repository exists.
 [2026-07-27 04:13:03] P2-0161 packages/acp-core (1454 ts lines, 37 exported symbols)
 [2026-07-27 04:13:04]   attempt 1: agent failed after 1s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
 [2026-07-27 04:13:05]   attempt 2: agent failed after 1s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-27 04:13:05]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-27 04:13:05]   keeping partial work at 0%
+[2026-07-27 04:13:05]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-27 04:13:05]   -> partial. 70 done, 142 pending
+[2026-07-27 04:13:05] P2-0135 src/shared/text (2053 ts lines, 25 exported symbols)
+[2026-07-27 04:13:06]   attempt 1: agent failed after 1s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-27 04:13:07]   attempt 2: agent failed after 1s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
