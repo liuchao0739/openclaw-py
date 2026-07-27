@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 07:15:58 UTC
+Updated: 2026-07-27 07:16:01 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 56
-- **Partial:** 105
+- **Pending:** 55
+- **Partial:** 106
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 118,731
+- **Remaining TypeScript lines:** 112,740
 
 ## Current
 
-- `P2-0079` src/cron/service (5991 lines)
+- `P2-0006` src/agents/cli-runner (6289 lines)
 
 ## Up next
 
-- `P2-0079` src/cron/service (5991 lines)
 - `P2-0006` src/agents/cli-runner (6289 lines)
 - `P2-0105` src/llm/providers (9230 lines)
 - `P2-0032` src/bindings (52 lines)
 - `P2-0128` src/provider-runtime (271 lines)
+- `P2-0039` src/channels/plugins/outbound (823 lines)
 
 ## Recently completed
 
