@@ -5116,3 +5116,25 @@ and the repository exists.
 [2026-07-27 08:17:20] P2-0061 src/commands/doctor/cron (2510 ts lines, 29 exported symbols)
 [2026-07-27 08:17:21]   attempt 1: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
 [2026-07-27 08:17:22]   attempt 2: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-27 08:17:22]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-27 08:17:22]   keeping partial work at 7%
+[2026-07-27 08:17:22]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-27 08:17:22]   -> partial. 70 done, 0 pending
+[2026-07-27 08:17:22] P2-0228 already satisfies the gate; marking done
+[2026-07-27 08:17:23]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-27 08:17:23]   -> done. 71 done, 0 pending
+[2026-07-27 08:17:23] P2-0172 packages/model-catalog-core (1533 ts lines, 30 exported symbols)
+[2026-07-27 08:17:24]   attempt 1: agent failed after 1s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-27 08:17:25]   attempt 2: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
