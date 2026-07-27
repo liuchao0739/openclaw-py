@@ -1,16 +1,16 @@
 # Migration status
 
-Updated: 2026-07-27 11:47:16 UTC
+Updated: 2026-07-27 11:55:18 UTC
 
-- **Done:** 75 / 231
+- **Done:** 76 / 231
 - **Pending:** 0
-- **Partial:** 156
+- **Partial:** 155
 - **Blocked:** 0
 - **Remaining TypeScript lines:** 0
 
 ## Current
 
-- `P2-0210` 移植 extension device-pair (1842 lines)
+- `P2-0225` 移植 extension github-copilot (2169 lines)
 
 ## Recently completed
 
