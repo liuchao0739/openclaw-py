@@ -1,6 +1,6 @@
 # Migration status
 
-Updated: 2026-07-27 10:59:50 UTC
+Updated: 2026-07-27 11:00:11 UTC
 
 - **Done:** 72 / 231
 - **Pending:** 0
