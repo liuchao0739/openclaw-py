@@ -3361,3 +3361,18 @@ and the repository exists.
 [2026-07-27 05:13:55] P2-0134 src/sessions (2265 ts lines, 55 exported symbols)
 [2026-07-27 05:13:56]   attempt 1: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
 [2026-07-27 05:13:57]   attempt 2: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-27 05:13:57]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-27 05:13:57]   keeping partial work at 9%
+[2026-07-27 05:13:57]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-27 05:13:57]   -> partial. 70 done, 117 pending
+[2026-07-27 05:13:57] P2-0013 src/agents/runtime (434 ts lines, 3 exported symbols)
+[2026-07-27 05:13:58]   attempt 1: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-27 05:13:59]   attempt 2: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
