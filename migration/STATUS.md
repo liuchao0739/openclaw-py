@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 06:33:21 UTC
+Updated: 2026-07-27 06:33:23 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 72
-- **Partial:** 89
+- **Pending:** 71
+- **Partial:** 90
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 163,847
+- **Remaining TypeScript lines:** 162,506
 
 ## Current
 
-- `P2-0093` src/image-generation (1341 lines)
+- `P2-0097` src/infra/net/proxy (1408 lines)
 
 ## Up next
 
-- `P2-0093` src/image-generation (1341 lines)
 - `P2-0097` src/infra/net/proxy (1408 lines)
 - `P2-0157` src/video-generation (1756 lines)
 - `P2-0148` src/talk (4516 lines)
 - `P2-0048` src/cli/daemon-cli (4607 lines)
+- `P2-0139` src/skills/lifecycle (4885 lines)
 
 ## Recently completed
 
