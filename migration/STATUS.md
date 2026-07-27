@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 07:25:02 UTC
+Updated: 2026-07-27 07:25:04 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 43
-- **Partial:** 118
+- **Pending:** 42
+- **Partial:** 119
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 86,135
+- **Remaining TypeScript lines:** 83,609
 
 ## Current
 
-- `P2-0088` src/gateway/server (2526 lines)
+- `P2-0037` src/channels/message-access (2965 lines)
 
 ## Up next
 
-- `P2-0088` src/gateway/server (2526 lines)
 - `P2-0037` src/channels/message-access (2965 lines)
 - `P2-0118` src/node-host (4090 lines)
 - `P2-0019` src/agents/sessions/tools (4504 lines)
 - `P2-0066` src/commands/models (7864 lines)
+- `P2-0137` src/skills/config (72 lines)
 
 ## Recently completed
 
