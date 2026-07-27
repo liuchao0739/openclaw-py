@@ -1,4 +1,5 @@
 import re
+from typing import Optional
 
 LINK_PATTERN = re.compile(
     r"(https?://[^\s<>\"']+|www\.[^\s<>\"']+)",
