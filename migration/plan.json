@@ -4470,7 +4470,8 @@
       "P2-0138"
     ],
     "grade": "missing",
-    "status": "pending"
+    "status": "partial",
+    "verified_at": "2026-07-27T07:16:23.665305+00:00"
   },
   {
     "id": "P2-0106",
