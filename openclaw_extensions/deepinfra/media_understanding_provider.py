@@ -1,7 +1,7 @@
 from typing import Dict, List, Optional, Any
 
-from .media_models import DEEPINFRA_BASE_URL, DEEPINFRA_VLM_FALLBACK_MODELS, normalize_deepinfra_base_url, normalize_deepinfra_model_ref
-from .provider_models import DeepInfraSurfaceModel
+from .media_models import DEEPINFRA_VLM_FALLBACK_MODELS, normalize_deepinfra_base_url, normalize_deepinfra_model_ref
+from .provider_models import DEEPINFRA_BASE_URL, DeepInfraSurfaceModel
 from .surface_model_catalogs import resolve_deepinfra_vlm_model_capabilities
 
 

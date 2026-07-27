@@ -2,7 +2,7 @@
 
 ## 目标
 
-将 `/Users/liuchao/openclaw` 中 `src/`、`packages/`、前 50 个 `extensions/` 按
+将 `/Users/liuchao/openclaw-ts` 中 `src/`、`packages/`、前 50 个 `extensions/` 按
 `migration/progress-phase2.json` **完整移植**到 `openclaw-py`（不缩水：逻辑与 TS 测试对齐，Python 侧补 pytest）。
 
 ## 现实边界
@@ -21,7 +21,7 @@
 
 ## 进度真相源
 
-- 清单：`/Users/liuchao/openclaw/migration/progress-phase2.json`
+- 清单：`/Users/liuchao/openclaw-ts/migration/progress-phase2.json`
 - 本仓 git log：`migration P2-xxxx` 提交与官方 id 可能不完全一一对应；以 JSON + pytest 为准。
 
 ## 大任务拆分原则（不缩水）
