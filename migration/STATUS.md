@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 05:13:38 UTC
+Updated: 2026-07-27 05:13:39 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 126
-- **Partial:** 35
+- **Pending:** 125
+- **Partial:** 36
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 653,536
+- **Remaining TypeScript lines:** 643,381
 
 ## Current
 
-- `P2-0031` src/auto-reply (10155 lines)
+- `P2-0073` src/config/sessions (15980 lines)
 
 ## Up next
 
-- `P2-0031` src/auto-reply (10155 lines)
 - `P2-0073` src/config/sessions (15980 lines)
 - `P2-0045` src/channels (7923 lines)
 - `P2-0120` src/plugin-sdk (37078 lines)
 - `P2-0029` src/auto-reply/reply (56133 lines)
+- `P2-0108` src/llm (436 lines)
 
 ## Recently completed
 
