@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 07:15:46 UTC
+Updated: 2026-07-27 07:15:48 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 59
-- **Partial:** 102
+- **Pending:** 58
+- **Partial:** 103
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 126,297
+- **Remaining TypeScript lines:** 124,018
 
 ## Current
 
-- `P2-0129` src/proxy-capture (2279 lines)
+- `P2-0147` src/status (2592 lines)
 
 ## Up next
 
-- `P2-0129` src/proxy-capture (2279 lines)
 - `P2-0147` src/status (2592 lines)
 - `P2-0151` src/trajectory (2695 lines)
 - `P2-0079` src/cron/service (5991 lines)
 - `P2-0006` src/agents/cli-runner (6289 lines)
+- `P2-0105` src/llm/providers (9230 lines)
 
 ## Recently completed
 
