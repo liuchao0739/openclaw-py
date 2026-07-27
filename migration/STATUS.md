@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 06:15:19 UTC
+Updated: 2026-07-27 06:15:21 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 76
-- **Partial:** 85
+- **Pending:** 75
+- **Partial:** 86
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 187,678
+- **Remaining TypeScript lines:** 185,946
 
 ## Current
 
-- `P2-0044` src/channels/turn (1732 lines)
+- `P2-0062` src/commands/doctor/shared (21036 lines)
 
 ## Up next
 
-- `P2-0044` src/channels/turn (1732 lines)
 - `P2-0062` src/commands/doctor/shared (21036 lines)
 - `P2-0084` src/gateway/methods (504 lines)
 - `P2-0159` src/web-search (559 lines)
 - `P2-0093` src/image-generation (1341 lines)
+- `P2-0097` src/infra/net/proxy (1408 lines)
 
 ## Recently completed
 
