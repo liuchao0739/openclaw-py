@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 08:16:58 UTC
+Updated: 2026-07-27 08:17:01 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 8
-- **Partial:** 153
+- **Pending:** 7
+- **Partial:** 154
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 10,506
+- **Remaining TypeScript lines:** 7,446
 
 ## Current
 
-- `P2-0076` src/crestodian (3060 lines)
+- `P2-0087` src/gateway/server/ws-connection (3492 lines)
 
 ## Up next
 
-- `P2-0076` src/crestodian (3060 lines)
 - `P2-0087` src/gateway/server/ws-connection (3492 lines)
 - `P2-0085` src/gateway/server/__tests__ (15 lines)
 - `P2-0122` src/plugins/capability-runtime-vitest-shims (55 lines)
 - `P2-0141` src/skills/research (283 lines)
+- `P2-0103` src/link-understanding (393 lines)
 
 ## Recently completed
 
