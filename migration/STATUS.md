@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 08:14:11 UTC
+Updated: 2026-07-27 08:16:40 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 18
-- **Partial:** 143
+- **Pending:** 17
+- **Partial:** 144
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 28,090
+- **Remaining TypeScript lines:** 27,167
 
 ## Current
 
-- `P2-0080` src/cron/store (923 lines)
+- `P2-0064` src/commands/gateway-status (1017 lines)
 
 ## Up next
 
-- `P2-0080` src/cron/store (923 lines)
 - `P2-0064` src/commands/gateway-status (1017 lines)
 - `P2-0065` src/commands/migrate (1374 lines)
 - `P2-0110` src/mcp (1482 lines)
 - `P2-0004` src/agents/agent-hooks (1810 lines)
+- `P2-0124` src/plugins/contracts (1875 lines)
 
 ## Recently completed
 
