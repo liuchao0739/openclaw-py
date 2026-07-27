@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 04:12:55 UTC
+Updated: 2026-07-27 04:12:56 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 147
-- **Partial:** 14
+- **Pending:** 146
+- **Partial:** 15
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,163,379
+- **Remaining TypeScript lines:** 1,163,067
 
 ## Current
 
-- `P2-0046` src/chat (312 lines)
+- `P2-0116` src/model-catalog (420 lines)
 
 ## Up next
 
-- `P2-0046` src/chat (312 lines)
 - `P2-0116` src/model-catalog (420 lines)
 - `P2-0102` src/interactive (624 lines)
 - `P2-0168` packages/media-core (1135 lines)
 - `P2-0161` packages/acp-core (1454 lines)
+- `P2-0135` src/shared/text (2053 lines)
 
 ## Recently completed
 
