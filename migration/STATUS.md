@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 07:42:11 UTC
+Updated: 2026-07-27 07:57:43 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 25
-- **Partial:** 136
+- **Pending:** 24
+- **Partial:** 137
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 31,099
+- **Remaining TypeScript lines:** 31,012
 
 ## Current
 
-- `P2-0040` src/channels/plugins/status-issues (87 lines)
+- `P2-0034` src/channels/allowlists (179 lines)
 
 ## Up next
 
-- `P2-0040` src/channels/plugins/status-issues (87 lines)
 - `P2-0034` src/channels/allowlists (179 lines)
 - `P2-0144` src/skills/test-support (232 lines)
 - `P2-0078` src/cron/run-log (398 lines)
 - `P2-0030` src/auto-reply/usage-bar (645 lines)
+- `P2-0067` src/commands/onboard-non-interactive (692 lines)
 
 ## Recently completed
 
