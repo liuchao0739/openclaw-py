@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 05:14:08 UTC
+Updated: 2026-07-27 05:14:11 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 112
-- **Partial:** 49
+- **Pending:** 111
+- **Partial:** 50
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 409,196
+- **Remaining TypeScript lines:** 403,141
 
 ## Current
 
-- `P2-0111` src/media (6055 lines)
+- `P2-0133` src/security (9080 lines)
 
 ## Up next
 
-- `P2-0111` src/media (6055 lines)
 - `P2-0133` src/security (9080 lines)
 - `P2-0146` src/state (2789 lines)
 - `P2-0021` src/agents/tools (23886 lines)
 - `P2-0002` src/acp/runtime (898 lines)
+- `P2-0098` src/infra/net (3370 lines)
 
 ## Recently completed
 
