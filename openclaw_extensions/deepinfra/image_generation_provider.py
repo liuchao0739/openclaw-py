@@ -2,12 +2,11 @@ from typing import Dict, List, Optional
 
 from .media_models import (
     DEFAULT_DEEPINFRA_IMAGE_SIZE,
-    DEEPINFRA_BASE_URL,
     DEEPINFRA_IMAGE_FALLBACK_MODELS,
     normalize_deepinfra_base_url,
     normalize_deepinfra_model_ref,
 )
-from .provider_models import DeepInfraSurfaceModel
+from .provider_models import DEEPINFRA_BASE_URL, DeepInfraSurfaceModel
 
 
 DEEPINFRA_IMAGE_SIZES = ["512x512", "1024x1024", "1024x1792", "1792x1024"]

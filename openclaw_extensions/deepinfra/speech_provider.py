@@ -2,11 +2,10 @@ from typing import Dict, List, Optional
 
 from .media_models import (
     DEFAULT_DEEPINFRA_TTS_VOICE,
-    DEEPINFRA_BASE_URL,
     DEEPINFRA_TTS_FALLBACK_MODELS,
     normalize_deepinfra_model_ref,
 )
-from .provider_models import DeepInfraSurfaceModel
+from .provider_models import DEEPINFRA_BASE_URL, DeepInfraSurfaceModel
 
 
 DEEPINFRA_TTS_RESPONSE_FORMATS = ["mp3", "opus", "flac", "wav", "pcm"]
