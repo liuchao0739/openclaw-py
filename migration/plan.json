@@ -845,8 +845,8 @@
     "cycle_size": 1,
     "depends_on": [],
     "grade": "missing",
-    "status": "partial",
-    "verified_at": "2026-07-27T03:44:24.224181+00:00"
+    "status": "done",
+    "verified_at": "2026-07-27T08:17:22.924712+00:00"
   },
   {
     "id": "P2-0205",

@@ -2,15 +2,15 @@
 
 Updated: 2026-07-27 08:17:22 UTC
 
-- **Done:** 70 / 231
+- **Done:** 71 / 231
 - **Pending:** 0
-- **Partial:** 161
+- **Partial:** 160
 - **Blocked:** 0
 - **Remaining TypeScript lines:** 0
 
 ## Current
 
-- `P2-0228` extensions/google-meet (1235 lines)
+- `P2-0172` packages/model-catalog-core (1533 lines)
 
 ## Recently completed
 
