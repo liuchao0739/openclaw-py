@@ -20,10 +20,13 @@ DEFAULT_THEME = TerminalTheme({
 })
 
 
+RESET_CODE = "\x1b[0m"
+
 def apply_theme(text: str, style: str, theme: TerminalTheme = DEFAULT_THEME) -> str:
     color = theme.get(style)
     if color:
-        return f"{color}{text}{theme.get('reset', '\x1b[0m')}"
+        reset = theme.get('reset', RESET_CODE)
+        return f"{color}{text}{reset}"
     return text
 
 
