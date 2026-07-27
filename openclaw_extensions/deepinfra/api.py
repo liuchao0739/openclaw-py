@@ -2,7 +2,8 @@ import json
 import os
 from typing import Dict, List, Optional, Any
 
-from .media_models import DEEPINFRA_BASE_URL, DEEPINFRA_NATIVE_BASE_URL
+from .media_models import DEEPINFRA_NATIVE_BASE_URL
+from .provider_models import DEEPINFRA_BASE_URL
 from .provider_models import discover_deepinfra_models, discover_deepinfra_surfaces, DeepInfraSurfaceModel
 from .image_generation_provider import build_deepinfra_image_generation_provider
 from .speech_provider import build_deepinfra_speech_provider
