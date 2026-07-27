@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 00:03:46 UTC
+Updated: 2026-07-27 00:04:01 UTC
 
-- **Done:** 68 / 231
-- **Pending:** 163
+- **Done:** 69 / 231
+- **Pending:** 162
 - **Partial:** 0
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,209,561
+- **Remaining TypeScript lines:** 1,209,439
 
 ## Current
 
-- `P2-0222` extensions/file-transfer (122 lines)
+- `P2-0228` extensions/google-meet (1235 lines)
 
 ## Up next
 
-- `P2-0222` extensions/file-transfer (122 lines)
 - `P2-0228` extensions/google-meet (1235 lines)
 - `P2-0218` extensions/elevenlabs (1474 lines)
 - `P2-0172` packages/model-catalog-core (1533 lines)
 - `P2-0208` extensions/deepinfra (1567 lines)
+- `P2-0179` packages/terminal-core (1708 lines)
 
 ## Recently completed
 
