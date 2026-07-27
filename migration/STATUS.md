@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 05:13:46 UTC
+Updated: 2026-07-27 05:13:49 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 121
-- **Partial:** 40
+- **Pending:** 120
+- **Partial:** 41
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 526,267
+- **Remaining TypeScript lines:** 525,831
 
 ## Current
 
-- `P2-0108` src/llm (436 lines)
+- `P2-0099` src/infra/outbound (15778 lines)
 
 ## Up next
 
-- `P2-0108` src/llm (436 lines)
 - `P2-0099` src/infra/outbound (15778 lines)
 - `P2-0127` src/process (1917 lines)
 - `P2-0134` src/sessions (2265 lines)
 - `P2-0013` src/agents/runtime (434 lines)
+- `P2-0005` src/agents/auth-profiles (9386 lines)
 
 ## Recently completed
 
