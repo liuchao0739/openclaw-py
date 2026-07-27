@@ -3916,3 +3916,18 @@ and the repository exists.
 [2026-07-27 06:15:08] P2-0115 src/memory-host-sdk (888 ts lines, 56 exported symbols)
 [2026-07-27 06:15:09]   attempt 1: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
 [2026-07-27 06:15:10]   attempt 2: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-27 06:15:10]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-27 06:15:10]   keeping partial work at 0%
+[2026-07-27 06:15:10]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-27 06:15:10]   -> partial. 70 done, 80 pending
+[2026-07-27 06:15:11] P2-0119 src/pairing (1654 ts lines, 26 exported symbols)
+[2026-07-27 06:15:11]   attempt 1: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-27 06:15:12]   attempt 2: agent failed after 1s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
