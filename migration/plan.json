@@ -1,7 +1,7 @@
 [
   {
     "id": "P2-0012",
-    "title": "移植 src/agents/modes",
+    "title": "\u79fb\u690d src/agents/modes",
     "source": "src/agents/modes",
     "target": "openclaw/agents/modes",
     "ts_source_lines": 0,
@@ -15,7 +15,7 @@
   },
   {
     "id": "P2-0068",
-    "title": "移植 src/commands/setup",
+    "title": "\u79fb\u690d src/commands/setup",
     "source": "src/commands/setup",
     "target": "openclaw/commands/setup",
     "ts_source_lines": 0,
@@ -29,7 +29,7 @@
   },
   {
     "id": "P2-0155",
-    "title": "移植 src/types",
+    "title": "\u79fb\u690d src/types",
     "source": "src/types",
     "target": "openclaw/types",
     "ts_source_lines": 0,
@@ -43,7 +43,7 @@
   },
   {
     "id": "P2-0072",
-    "title": "移植 src/compat",
+    "title": "\u79fb\u690d src/compat",
     "source": "src/compat",
     "target": "openclaw/compat",
     "ts_source_lines": 13,
@@ -57,7 +57,7 @@
   },
   {
     "id": "P2-0214",
-    "title": "移植 extension diffs-language-pack",
+    "title": "\u79fb\u690d extension diffs-language-pack",
     "source": "extensions/diffs-language-pack",
     "target": "openclaw_extensions/diffs_language_pack",
     "ts_source_lines": 19,
@@ -72,7 +72,7 @@
   },
   {
     "id": "P2-0184",
-    "title": "移植 extension admin-http-rpc",
+    "title": "\u79fb\u690d extension admin-http-rpc",
     "source": "extensions/admin-http-rpc",
     "target": "openclaw_extensions/admin_http_rpc",
     "ts_source_lines": 22,
@@ -87,7 +87,7 @@
   },
   {
     "id": "P2-0217",
-    "title": "移植 extension duckduckgo",
+    "title": "\u79fb\u690d extension duckduckgo",
     "source": "extensions/duckduckgo",
     "target": "openclaw_extensions/duckduckgo",
     "ts_source_lines": 27,
@@ -102,7 +102,7 @@
   },
   {
     "id": "P2-0213",
-    "title": "移植 extension diffs",
+    "title": "\u79fb\u690d extension diffs",
     "source": "extensions/diffs",
     "target": "openclaw_extensions/diffs",
     "ts_source_lines": 28,
@@ -117,7 +117,7 @@
   },
   {
     "id": "P2-0219",
-    "title": "移植 extension exa",
+    "title": "\u79fb\u690d extension exa",
     "source": "extensions/exa",
     "target": "openclaw_extensions/exa",
     "ts_source_lines": 30,
@@ -132,7 +132,7 @@
   },
   {
     "id": "P2-0211",
-    "title": "移植 extension diagnostics-otel",
+    "title": "\u79fb\u690d extension diagnostics-otel",
     "source": "extensions/diagnostics-otel",
     "target": "openclaw_extensions/diagnostics_otel",
     "ts_source_lines": 35,
@@ -147,7 +147,7 @@
   },
   {
     "id": "P2-0212",
-    "title": "移植 extension diagnostics-prometheus",
+    "title": "\u79fb\u690d extension diagnostics-prometheus",
     "source": "extensions/diagnostics-prometheus",
     "target": "openclaw_extensions/diagnostics_prometheus",
     "ts_source_lines": 37,
@@ -162,7 +162,7 @@
   },
   {
     "id": "P2-0202",
-    "title": "移植 extension codex-supervisor",
+    "title": "\u79fb\u690d extension codex-supervisor",
     "source": "extensions/codex-supervisor",
     "target": "openclaw_extensions/codex_supervisor",
     "ts_source_lines": 41,
@@ -177,7 +177,7 @@
   },
   {
     "id": "P2-0192",
-    "title": "移植 extension bonjour",
+    "title": "\u79fb\u690d extension bonjour",
     "source": "extensions/bonjour",
     "target": "openclaw_extensions/bonjour",
     "ts_source_lines": 58,
@@ -192,7 +192,7 @@
   },
   {
     "id": "P2-0199",
-    "title": "移植 extension clickclack",
+    "title": "\u79fb\u690d extension clickclack",
     "source": "extensions/clickclack",
     "target": "openclaw_extensions/clickclack",
     "ts_source_lines": 65,
@@ -207,7 +207,7 @@
   },
   {
     "id": "P2-0114",
-    "title": "移植 src/memory",
+    "title": "\u79fb\u690d src/memory",
     "source": "src/memory",
     "target": "openclaw/memory",
     "ts_source_lines": 73,
@@ -221,7 +221,7 @@
   },
   {
     "id": "P2-0226",
-    "title": "移植 extension gmi",
+    "title": "\u79fb\u690d extension gmi",
     "source": "extensions/gmi",
     "target": "openclaw_extensions/gmi",
     "ts_source_lines": 84,
@@ -236,7 +236,7 @@
   },
   {
     "id": "P2-0176",
-    "title": "移植 packages/plugin-sdk",
+    "title": "\u79fb\u690d packages/plugin-sdk",
     "source": "packages/plugin-sdk",
     "target": "openclaw_packages/plugin_sdk",
     "ts_source_lines": 97,
@@ -251,7 +251,7 @@
   },
   {
     "id": "P2-0185",
-    "title": "移植 extension alibaba",
+    "title": "\u79fb\u690d extension alibaba",
     "source": "extensions/alibaba",
     "target": "openclaw_extensions/alibaba",
     "ts_source_lines": 105,
@@ -266,7 +266,7 @@
   },
   {
     "id": "P2-0175",
-    "title": "移植 packages/plugin-package-contract",
+    "title": "\u79fb\u690d packages/plugin-package-contract",
     "source": "packages/plugin-package-contract",
     "target": "openclaw_packages/plugin_package_contract",
     "ts_source_lines": 114,
@@ -281,7 +281,7 @@
   },
   {
     "id": "P2-0231",
-    "title": "移植 extension groq",
+    "title": "\u79fb\u690d extension groq",
     "source": "extensions/groq",
     "target": "openclaw_extensions/groq",
     "ts_source_lines": 121,
@@ -296,7 +296,7 @@
   },
   {
     "id": "P2-0222",
-    "title": "移植 extension file-transfer",
+    "title": "\u79fb\u690d extension file-transfer",
     "source": "extensions/file-transfer",
     "target": "openclaw_extensions/file_transfer",
     "ts_source_lines": 122,
@@ -311,7 +311,7 @@
   },
   {
     "id": "P2-0203",
-    "title": "移植 extension cohere",
+    "title": "\u79fb\u690d extension cohere",
     "source": "extensions/cohere",
     "target": "openclaw_extensions/cohere",
     "ts_source_lines": 128,
@@ -326,7 +326,7 @@
   },
   {
     "id": "P2-0193",
-    "title": "移植 extension brave",
+    "title": "\u79fb\u690d extension brave",
     "source": "extensions/brave",
     "target": "openclaw_extensions/brave",
     "ts_source_lines": 130,
@@ -341,7 +341,7 @@
   },
   {
     "id": "P2-0033",
-    "title": "移植 src/bootstrap",
+    "title": "\u79fb\u690d src/bootstrap",
     "source": "src/bootstrap",
     "target": "openclaw/bootstrap",
     "ts_source_lines": 134,
@@ -355,7 +355,7 @@
   },
   {
     "id": "P2-0197",
-    "title": "移植 extension cerebras",
+    "title": "\u79fb\u690d extension cerebras",
     "source": "extensions/cerebras",
     "target": "openclaw_extensions/cerebras",
     "ts_source_lines": 136,
@@ -370,7 +370,7 @@
   },
   {
     "id": "P2-0229",
-    "title": "移植 extension googlechat",
+    "title": "\u79fb\u690d extension googlechat",
     "source": "extensions/googlechat",
     "target": "openclaw_extensions/googlechat",
     "ts_source_lines": 140,
@@ -385,7 +385,7 @@
   },
   {
     "id": "P2-0216",
-    "title": "移植 extension document-extract",
+    "title": "\u79fb\u690d extension document-extract",
     "source": "extensions/document-extract",
     "target": "openclaw_extensions/document_extract",
     "ts_source_lines": 149,
@@ -400,7 +400,7 @@
   },
   {
     "id": "P2-0206",
-    "title": "移植 extension copilot-proxy",
+    "title": "\u79fb\u690d extension copilot-proxy",
     "source": "extensions/copilot-proxy",
     "target": "openclaw_extensions/copilot_proxy",
     "ts_source_lines": 159,
@@ -415,7 +415,7 @@
   },
   {
     "id": "P2-0166",
-    "title": "移植 packages/llm-runtime",
+    "title": "\u79fb\u690d packages/llm-runtime",
     "source": "packages/llm-runtime",
     "target": "openclaw_packages/llm_runtime",
     "ts_source_lines": 187,
@@ -430,7 +430,7 @@
   },
   {
     "id": "P2-0223",
-    "title": "移植 extension firecrawl",
+    "title": "\u79fb\u690d extension firecrawl",
     "source": "extensions/firecrawl",
     "target": "openclaw_extensions/firecrawl",
     "ts_source_lines": 187,
@@ -445,7 +445,7 @@
   },
   {
     "id": "P2-0230",
-    "title": "移植 extension gradium",
+    "title": "\u79fb\u690d extension gradium",
     "source": "extensions/gradium",
     "target": "openclaw_extensions/gradium",
     "ts_source_lines": 228,
@@ -460,7 +460,7 @@
   },
   {
     "id": "P2-0196",
-    "title": "移植 extension canvas",
+    "title": "\u79fb\u690d extension canvas",
     "source": "extensions/canvas",
     "target": "openclaw_extensions/canvas",
     "ts_source_lines": 240,
@@ -475,7 +475,7 @@
   },
   {
     "id": "P2-0224",
-    "title": "移植 extension fireworks",
+    "title": "\u79fb\u690d extension fireworks",
     "source": "extensions/fireworks",
     "target": "openclaw_extensions/fireworks",
     "ts_source_lines": 260,
@@ -490,7 +490,7 @@
   },
   {
     "id": "P2-0169",
-    "title": "移植 packages/media-generation-core",
+    "title": "\u79fb\u690d packages/media-generation-core",
     "source": "packages/media-generation-core",
     "target": "openclaw_packages/media_generation_core",
     "ts_source_lines": 262,
@@ -505,7 +505,7 @@
   },
   {
     "id": "P2-0221",
-    "title": "移植 extension feishu",
+    "title": "\u79fb\u690d extension feishu",
     "source": "extensions/feishu",
     "target": "openclaw_extensions/feishu",
     "ts_source_lines": 287,
@@ -520,7 +520,7 @@
   },
   {
     "id": "P2-0181",
-    "title": "移植 packages/web-content-core",
+    "title": "\u79fb\u690d packages/web-content-core",
     "source": "packages/web-content-core",
     "target": "openclaw_packages/web_content_core",
     "ts_source_lines": 307,
@@ -535,7 +535,7 @@
   },
   {
     "id": "P2-0209",
-    "title": "移植 extension deepseek",
+    "title": "\u79fb\u690d extension deepseek",
     "source": "extensions/deepseek",
     "target": "openclaw_extensions/deepseek",
     "ts_source_lines": 324,
@@ -550,7 +550,7 @@
   },
   {
     "id": "P2-0190",
-    "title": "移植 extension arcee",
+    "title": "\u79fb\u690d extension arcee",
     "source": "extensions/arcee",
     "target": "openclaw_extensions/arcee",
     "ts_source_lines": 355,
@@ -565,7 +565,7 @@
   },
   {
     "id": "P2-0207",
-    "title": "移植 extension deepgram",
+    "title": "\u79fb\u690d extension deepgram",
     "source": "extensions/deepgram",
     "target": "openclaw_extensions/deepgram",
     "ts_source_lines": 393,
@@ -580,7 +580,7 @@
   },
   {
     "id": "P2-0182",
-    "title": "移植 extension acpx",
+    "title": "\u79fb\u690d extension acpx",
     "source": "extensions/acpx",
     "target": "openclaw_extensions/acpx",
     "ts_source_lines": 419,
@@ -595,7 +595,7 @@
   },
   {
     "id": "P2-0178",
-    "title": "移植 packages/speech-core",
+    "title": "\u79fb\u690d packages/speech-core",
     "source": "packages/speech-core",
     "target": "openclaw_packages/speech_core",
     "ts_source_lines": 430,
@@ -610,7 +610,7 @@
   },
   {
     "id": "P2-0096",
-    "title": "移植 src/infra/format-time",
+    "title": "\u79fb\u690d src/infra/format-time",
     "source": "src/infra/format-time",
     "target": "openclaw/infra/format_time",
     "ts_source_lines": 445,
@@ -625,7 +625,7 @@
   },
   {
     "id": "P2-0150",
-    "title": "移植 src/tools",
+    "title": "\u79fb\u690d src/tools",
     "source": "src/tools",
     "target": "openclaw/tools",
     "ts_source_lines": 497,
@@ -640,7 +640,7 @@
   },
   {
     "id": "P2-0170",
-    "title": "移植 packages/media-understanding-common",
+    "title": "\u79fb\u690d packages/media-understanding-common",
     "source": "packages/media-understanding-common",
     "target": "openclaw_packages/media_understanding_common",
     "ts_source_lines": 521,
@@ -655,7 +655,7 @@
   },
   {
     "id": "P2-0200",
-    "title": "移植 extension cloudflare-ai-gateway",
+    "title": "\u79fb\u690d extension cloudflare-ai-gateway",
     "source": "extensions/cloudflare-ai-gateway",
     "target": "openclaw_extensions/cloudflare_ai_gateway",
     "ts_source_lines": 553,
@@ -670,7 +670,7 @@
   },
   {
     "id": "P2-0194",
-    "title": "移植 extension browser",
+    "title": "\u79fb\u690d extension browser",
     "source": "extensions/browser",
     "target": "openclaw_extensions/browser",
     "ts_source_lines": 572,
@@ -685,7 +685,7 @@
   },
   {
     "id": "P2-0191",
-    "title": "移植 extension azure-speech",
+    "title": "\u79fb\u690d extension azure-speech",
     "source": "extensions/azure-speech",
     "target": "openclaw_extensions/azure_speech",
     "ts_source_lines": 584,
@@ -700,7 +700,7 @@
   },
   {
     "id": "P2-0173",
-    "title": "移植 packages/net-policy",
+    "title": "\u79fb\u690d packages/net-policy",
     "source": "packages/net-policy",
     "target": "openclaw_packages/net_policy",
     "ts_source_lines": 602,
@@ -715,7 +715,7 @@
   },
   {
     "id": "P2-0195",
-    "title": "移植 extension byteplus",
+    "title": "\u79fb\u690d extension byteplus",
     "source": "extensions/byteplus",
     "target": "openclaw_extensions/byteplus",
     "ts_source_lines": 625,
@@ -730,7 +730,7 @@
   },
   {
     "id": "P2-0174",
-    "title": "移植 packages/normalization-core",
+    "title": "\u79fb\u690d packages/normalization-core",
     "source": "packages/normalization-core",
     "target": "openclaw_packages/normalization_core",
     "ts_source_lines": 669,
@@ -745,7 +745,7 @@
   },
   {
     "id": "P2-0215",
-    "title": "移植 extension discord",
+    "title": "\u79fb\u690d extension discord",
     "source": "extensions/discord",
     "target": "openclaw_extensions/discord",
     "ts_source_lines": 712,
@@ -760,7 +760,7 @@
   },
   {
     "id": "P2-0187",
-    "title": "移植 extension amazon-bedrock-mantle",
+    "title": "\u79fb\u690d extension amazon-bedrock-mantle",
     "source": "extensions/amazon-bedrock-mantle",
     "target": "openclaw_extensions/amazon_bedrock_mantle",
     "ts_source_lines": 731,
@@ -775,7 +775,7 @@
   },
   {
     "id": "P2-0189",
-    "title": "移植 extension anthropic-vertex",
+    "title": "\u79fb\u690d extension anthropic-vertex",
     "source": "extensions/anthropic-vertex",
     "target": "openclaw_extensions/anthropic_vertex",
     "ts_source_lines": 844,
@@ -790,7 +790,7 @@
   },
   {
     "id": "P2-0123",
-    "title": "移植 src/plugins/compat",
+    "title": "\u79fb\u690d src/plugins/compat",
     "source": "src/plugins/compat",
     "target": "openclaw/plugins/compat",
     "ts_source_lines": 1143,
@@ -805,7 +805,7 @@
   },
   {
     "id": "P2-0201",
-    "title": "移植 extension codex",
+    "title": "\u79fb\u690d extension codex",
     "source": "extensions/codex",
     "target": "openclaw_extensions/codex",
     "ts_source_lines": 1173,
@@ -820,7 +820,7 @@
   },
   {
     "id": "P2-0198",
-    "title": "移植 extension chutes",
+    "title": "\u79fb\u690d extension chutes",
     "source": "extensions/chutes",
     "target": "openclaw_extensions/chutes",
     "ts_source_lines": 1179,
@@ -835,7 +835,7 @@
   },
   {
     "id": "P2-0228",
-    "title": "移植 extension google-meet",
+    "title": "\u79fb\u690d extension google-meet",
     "source": "extensions/google-meet",
     "target": "openclaw_extensions/google_meet",
     "ts_source_lines": 1235,
@@ -850,7 +850,7 @@
   },
   {
     "id": "P2-0205",
-    "title": "移植 extension copilot",
+    "title": "\u79fb\u690d extension copilot",
     "source": "extensions/copilot",
     "target": "openclaw_extensions/copilot",
     "ts_source_lines": 1238,
@@ -865,7 +865,7 @@
   },
   {
     "id": "P2-0165",
-    "title": "移植 packages/llm-core",
+    "title": "\u79fb\u690d packages/llm-core",
     "source": "packages/llm-core",
     "target": "openclaw_packages/llm_core",
     "ts_source_lines": 1244,
@@ -880,7 +880,7 @@
   },
   {
     "id": "P2-0204",
-    "title": "移植 extension comfy",
+    "title": "\u79fb\u690d extension comfy",
     "source": "extensions/comfy",
     "target": "openclaw_extensions/comfy",
     "ts_source_lines": 1327,
@@ -895,7 +895,7 @@
   },
   {
     "id": "P2-0218",
-    "title": "移植 extension elevenlabs",
+    "title": "\u79fb\u690d extension elevenlabs",
     "source": "extensions/elevenlabs",
     "target": "openclaw_extensions/elevenlabs",
     "ts_source_lines": 1474,
@@ -910,7 +910,7 @@
   },
   {
     "id": "P2-0172",
-    "title": "移植 packages/model-catalog-core",
+    "title": "\u79fb\u690d packages/model-catalog-core",
     "source": "packages/model-catalog-core",
     "target": "openclaw_packages/model_catalog_core",
     "ts_source_lines": 1533,
@@ -925,7 +925,7 @@
   },
   {
     "id": "P2-0208",
-    "title": "移植 extension deepinfra",
+    "title": "\u79fb\u690d extension deepinfra",
     "source": "extensions/deepinfra",
     "target": "openclaw_extensions/deepinfra",
     "ts_source_lines": 1567,
@@ -940,7 +940,7 @@
   },
   {
     "id": "P2-0179",
-    "title": "移植 packages/terminal-core",
+    "title": "\u79fb\u690d packages/terminal-core",
     "source": "packages/terminal-core",
     "target": "openclaw_packages/terminal_core",
     "ts_source_lines": 1708,
@@ -950,12 +950,12 @@
     "cycle_size": 1,
     "depends_on": [],
     "grade": "ported",
-    "status": "partial",
+    "status": "done",
     "verified_at": "2026-07-27T11:37:03.882821+00:00"
   },
   {
     "id": "P2-0220",
-    "title": "移植 extension fal",
+    "title": "\u79fb\u690d extension fal",
     "source": "extensions/fal",
     "target": "openclaw_extensions/fal",
     "ts_source_lines": 1769,
@@ -970,7 +970,7 @@
   },
   {
     "id": "P2-0210",
-    "title": "移植 extension device-pair",
+    "title": "\u79fb\u690d extension device-pair",
     "source": "extensions/device-pair",
     "target": "openclaw_extensions/device_pair",
     "ts_source_lines": 1842,
@@ -985,7 +985,7 @@
   },
   {
     "id": "P2-0225",
-    "title": "移植 extension github-copilot",
+    "title": "\u79fb\u690d extension github-copilot",
     "source": "extensions/github-copilot",
     "target": "openclaw_extensions/github_copilot",
     "ts_source_lines": 2169,
@@ -1000,7 +1000,7 @@
   },
   {
     "id": "P2-0180",
-    "title": "移植 packages/tool-call-repair",
+    "title": "\u79fb\u690d packages/tool-call-repair",
     "source": "packages/tool-call-repair",
     "target": "openclaw_packages/tool_call_repair",
     "ts_source_lines": 2325,
@@ -1015,7 +1015,7 @@
   },
   {
     "id": "P2-0167",
-    "title": "移植 packages/markdown-core",
+    "title": "\u79fb\u690d packages/markdown-core",
     "source": "packages/markdown-core",
     "target": "openclaw_packages/markdown_core",
     "ts_source_lines": 2398,
@@ -1030,7 +1030,7 @@
   },
   {
     "id": "P2-0188",
-    "title": "移植 extension anthropic",
+    "title": "\u79fb\u690d extension anthropic",
     "source": "extensions/anthropic",
     "target": "openclaw_extensions/anthropic",
     "ts_source_lines": 2909,
@@ -1045,7 +1045,7 @@
   },
   {
     "id": "P2-0186",
-    "title": "移植 extension amazon-bedrock",
+    "title": "\u79fb\u690d extension amazon-bedrock",
     "source": "extensions/amazon-bedrock",
     "target": "openclaw_extensions/amazon_bedrock",
     "ts_source_lines": 3520,
@@ -1060,7 +1060,7 @@
   },
   {
     "id": "P2-0183",
-    "title": "移植 extension active-memory",
+    "title": "\u79fb\u690d extension active-memory",
     "source": "extensions/active-memory",
     "target": "openclaw_extensions/active_memory",
     "ts_source_lines": 3926,
@@ -1075,7 +1075,7 @@
   },
   {
     "id": "P2-0164",
-    "title": "移植 packages/gateway-protocol",
+    "title": "\u79fb\u690d packages/gateway-protocol",
     "source": "packages/gateway-protocol",
     "target": "openclaw_packages/gateway_protocol",
     "ts_source_lines": 8545,
@@ -1090,7 +1090,7 @@
   },
   {
     "id": "P2-0227",
-    "title": "移植 extension google",
+    "title": "\u79fb\u690d extension google",
     "source": "extensions/google",
     "target": "openclaw_extensions/google",
     "ts_source_lines": 9140,
@@ -1105,7 +1105,7 @@
   },
   {
     "id": "P2-0043",
-    "title": "移植 src/channels/transport",
+    "title": "\u79fb\u690d src/channels/transport",
     "source": "src/channels/transport",
     "target": "openclaw/channels/transport",
     "ts_source_lines": 112,
@@ -1121,7 +1121,7 @@
   },
   {
     "id": "P2-0046",
-    "title": "移植 src/chat",
+    "title": "\u79fb\u690d src/chat",
     "source": "src/chat",
     "target": "openclaw/chat",
     "ts_source_lines": 312,
@@ -1139,7 +1139,7 @@
   },
   {
     "id": "P2-0116",
-    "title": "移植 src/model-catalog",
+    "title": "\u79fb\u690d src/model-catalog",
     "source": "src/model-catalog",
     "target": "openclaw/model_catalog",
     "ts_source_lines": 420,
@@ -1157,7 +1157,7 @@
   },
   {
     "id": "P2-0102",
-    "title": "移植 src/interactive",
+    "title": "\u79fb\u690d src/interactive",
     "source": "src/interactive",
     "target": "openclaw/interactive",
     "ts_source_lines": 624,
@@ -1174,7 +1174,7 @@
   },
   {
     "id": "P2-0168",
-    "title": "移植 packages/media-core",
+    "title": "\u79fb\u690d packages/media-core",
     "source": "packages/media-core",
     "target": "openclaw_packages/media_core",
     "ts_source_lines": 1135,
@@ -1191,7 +1191,7 @@
   },
   {
     "id": "P2-0161",
-    "title": "移植 packages/acp-core",
+    "title": "\u79fb\u690d packages/acp-core",
     "source": "packages/acp-core",
     "target": "openclaw_packages/acp_core",
     "ts_source_lines": 1454,
@@ -1208,7 +1208,7 @@
   },
   {
     "id": "P2-0135",
-    "title": "移植 src/shared/text",
+    "title": "\u79fb\u690d src/shared/text",
     "source": "src/shared/text",
     "target": "openclaw/shared/text",
     "ts_source_lines": 2053,
@@ -1227,7 +1227,7 @@
   },
   {
     "id": "P2-0163",
-    "title": "移植 packages/gateway-client",
+    "title": "\u79fb\u690d packages/gateway-client",
     "source": "packages/gateway-client",
     "target": "openclaw_packages/gateway_client",
     "ts_source_lines": 2074,
@@ -1244,7 +1244,7 @@
   },
   {
     "id": "P2-0162",
-    "title": "移植 packages/agent-core",
+    "title": "\u79fb\u690d packages/agent-core",
     "source": "packages/agent-core",
     "target": "openclaw_packages/agent_core",
     "ts_source_lines": 8160,
@@ -1261,7 +1261,7 @@
   },
   {
     "id": "P2-0177",
-    "title": "移植 packages/sdk",
+    "title": "\u79fb\u690d packages/sdk",
     "source": "packages/sdk",
     "target": "openclaw_packages/sdk",
     "ts_source_lines": 1912,
@@ -1278,7 +1278,7 @@
   },
   {
     "id": "P2-0171",
-    "title": "移植 packages/memory-host-sdk",
+    "title": "\u79fb\u690d packages/memory-host-sdk",
     "source": "packages/memory-host-sdk",
     "target": "openclaw_packages/memory_host_sdk",
     "ts_source_lines": 9277,
@@ -1295,7 +1295,7 @@
   },
   {
     "id": "P2-0074",
-    "title": "移植 src/config 根文件",
+    "title": "\u79fb\u690d src/config \u6839\u6587\u4ef6",
     "source": "src/config",
     "target": "openclaw/config",
     "ts_source_lines": 41314,
@@ -1337,7 +1337,7 @@
   },
   {
     "id": "P2-0101",
-    "title": "移植 src/infra 根文件",
+    "title": "\u79fb\u690d src/infra \u6839\u6587\u4ef6",
     "source": "src/infra",
     "target": "openclaw/infra",
     "ts_source_lines": 73354,
@@ -1399,7 +1399,7 @@
   },
   {
     "id": "P2-0023",
-    "title": "移植 src/agents 根文件",
+    "title": "\u79fb\u690d src/agents \u6839\u6587\u4ef6",
     "source": "src/agents",
     "target": "openclaw/agents",
     "ts_source_lines": 134294,
@@ -1489,7 +1489,7 @@
   },
   {
     "id": "P2-0126",
-    "title": "移植 src/plugins 根文件",
+    "title": "\u79fb\u690d src/plugins \u6839\u6587\u4ef6",
     "source": "src/plugins",
     "target": "openclaw/plugins",
     "ts_source_lines": 86085,
@@ -1571,7 +1571,7 @@
   },
   {
     "id": "P2-0136",
-    "title": "移植 src/shared 根文件",
+    "title": "\u79fb\u690d src/shared \u6839\u6587\u4ef6",
     "source": "src/shared",
     "target": "openclaw/shared",
     "ts_source_lines": 6176,
@@ -1597,7 +1597,7 @@
   },
   {
     "id": "P2-0109",
-    "title": "移植 src/logging",
+    "title": "\u79fb\u690d src/logging",
     "source": "src/logging",
     "target": "openclaw/logging",
     "ts_source_lines": 11348,
@@ -1624,7 +1624,7 @@
   },
   {
     "id": "P2-0131",
-    "title": "移植 src/routing",
+    "title": "\u79fb\u690d src/routing",
     "source": "src/routing",
     "target": "openclaw/routing",
     "ts_source_lines": 1806,
@@ -1646,7 +1646,7 @@
   },
   {
     "id": "P2-0156",
-    "title": "移植 src/utils",
+    "title": "\u79fb\u690d src/utils",
     "source": "src/utils",
     "target": "openclaw/utils",
     "ts_source_lines": 2851,
@@ -1674,7 +1674,7 @@
   },
   {
     "id": "P2-0057",
-    "title": "移植 src/cli 根文件",
+    "title": "\u79fb\u690d src/cli \u6839\u6587\u4ef6",
     "source": "src/cli",
     "target": "openclaw/cli",
     "ts_source_lines": 34918,
@@ -1745,7 +1745,7 @@
   },
   {
     "id": "P2-0091",
-    "title": "移植 src/gateway 根文件",
+    "title": "\u79fb\u690d src/gateway \u6839\u6587\u4ef6",
     "source": "src/gateway",
     "target": "openclaw/gateway",
     "ts_source_lines": 73408,
@@ -1821,7 +1821,7 @@
   },
   {
     "id": "P2-0041",
-    "title": "移植 src/channels/plugins 根文件",
+    "title": "\u79fb\u690d src/channels/plugins \u6839\u6587\u4ef6",
     "source": "src/channels/plugins",
     "target": "openclaw/channels/plugins",
     "ts_source_lines": 16868,
@@ -1864,7 +1864,7 @@
   },
   {
     "id": "P2-0031",
-    "title": "移植 src/auto-reply 根文件",
+    "title": "\u79fb\u690d src/auto-reply \u6839\u6587\u4ef6",
     "source": "src/auto-reply",
     "target": "openclaw/auto_reply",
     "ts_source_lines": 10155,
@@ -1908,7 +1908,7 @@
   },
   {
     "id": "P2-0073",
-    "title": "移植 src/config/sessions 根文件",
+    "title": "\u79fb\u690d src/config/sessions \u6839\u6587\u4ef6",
     "source": "src/config/sessions",
     "target": "openclaw/config/sessions",
     "ts_source_lines": 15980,
@@ -1945,7 +1945,7 @@
   },
   {
     "id": "P2-0045",
-    "title": "移植 src/channels 根文件",
+    "title": "\u79fb\u690d src/channels \u6839\u6587\u4ef6",
     "source": "src/channels",
     "target": "openclaw/channels",
     "ts_source_lines": 7923,
@@ -1980,7 +1980,7 @@
   },
   {
     "id": "P2-0120",
-    "title": "移植 src/plugin-sdk 根文件",
+    "title": "\u79fb\u690d src/plugin-sdk \u6839\u6587\u4ef6",
     "source": "src/plugin-sdk",
     "target": "openclaw/plugin_sdk",
     "ts_source_lines": 37078,
@@ -2094,7 +2094,7 @@
   },
   {
     "id": "P2-0029",
-    "title": "移植 src/auto-reply/reply 根文件",
+    "title": "\u79fb\u690d src/auto-reply/reply \u6839\u6587\u4ef6",
     "source": "src/auto-reply/reply",
     "target": "openclaw/auto_reply/reply",
     "ts_source_lines": 56133,
@@ -2175,7 +2175,7 @@
   },
   {
     "id": "P2-0108",
-    "title": "移植 src/llm 根文件",
+    "title": "\u79fb\u690d src/llm \u6839\u6587\u4ef6",
     "source": "src/llm",
     "target": "openclaw/llm",
     "ts_source_lines": 436,
@@ -2195,7 +2195,7 @@
   },
   {
     "id": "P2-0099",
-    "title": "移植 src/infra/outbound 根文件",
+    "title": "\u79fb\u690d src/infra/outbound \u6839\u6587\u4ef6",
     "source": "src/infra/outbound",
     "target": "openclaw/infra/outbound",
     "ts_source_lines": 15778,
@@ -2242,7 +2242,7 @@
   },
   {
     "id": "P2-0127",
-    "title": "移植 src/process",
+    "title": "\u79fb\u690d src/process",
     "source": "src/process",
     "target": "openclaw/process",
     "ts_source_lines": 1917,
@@ -2263,7 +2263,7 @@
   },
   {
     "id": "P2-0134",
-    "title": "移植 src/sessions",
+    "title": "\u79fb\u690d src/sessions",
     "source": "src/sessions",
     "target": "openclaw/sessions",
     "ts_source_lines": 2265,
@@ -2288,7 +2288,7 @@
   },
   {
     "id": "P2-0013",
-    "title": "移植 src/agents/runtime",
+    "title": "\u79fb\u690d src/agents/runtime",
     "source": "src/agents/runtime",
     "target": "openclaw/agents/runtime",
     "ts_source_lines": 434,
@@ -2309,7 +2309,7 @@
   },
   {
     "id": "P2-0005",
-    "title": "移植 src/agents/auth-profiles 根文件",
+    "title": "\u79fb\u690d src/agents/auth-profiles \u6839\u6587\u4ef6",
     "source": "src/agents/auth-profiles",
     "target": "openclaw/agents/auth_profiles",
     "ts_source_lines": 9386,
@@ -2341,7 +2341,7 @@
   },
   {
     "id": "P2-0070",
-    "title": "移植 src/commands 根文件",
+    "title": "\u79fb\u690d src/commands \u6839\u6587\u4ef6",
     "source": "src/commands",
     "target": "openclaw/commands",
     "ts_source_lines": 45685,
@@ -2425,7 +2425,7 @@
   },
   {
     "id": "P2-0132",
-    "title": "移植 src/secrets 根文件",
+    "title": "\u79fb\u690d src/secrets \u6839\u6587\u4ef6",
     "source": "src/secrets",
     "target": "openclaw/secrets",
     "ts_source_lines": 14211,
@@ -2456,7 +2456,7 @@
   },
   {
     "id": "P2-0010",
-    "title": "移植 src/agents/embedded-agent-runner 根文件",
+    "title": "\u79fb\u690d src/agents/embedded-agent-runner \u6839\u6587\u4ef6",
     "source": "src/agents/embedded-agent-runner",
     "target": "openclaw/agents/embedded_agent_runner",
     "ts_source_lines": 26959,
@@ -2516,7 +2516,7 @@
   },
   {
     "id": "P2-0111",
-    "title": "移植 src/media",
+    "title": "\u79fb\u690d src/media",
     "source": "src/media",
     "target": "openclaw/media",
     "ts_source_lines": 6055,
@@ -2545,7 +2545,7 @@
   },
   {
     "id": "P2-0133",
-    "title": "移植 src/security",
+    "title": "\u79fb\u690d src/security",
     "source": "src/security",
     "target": "openclaw/security",
     "ts_source_lines": 9080,
@@ -2583,7 +2583,7 @@
   },
   {
     "id": "P2-0146",
-    "title": "移植 src/state",
+    "title": "\u79fb\u690d src/state",
     "source": "src/state",
     "target": "openclaw/state",
     "ts_source_lines": 2789,
@@ -2603,7 +2603,7 @@
   },
   {
     "id": "P2-0021",
-    "title": "移植 src/agents/tools 根文件",
+    "title": "\u79fb\u690d src/agents/tools \u6839\u6587\u4ef6",
     "source": "src/agents/tools",
     "target": "openclaw/agents/tools",
     "ts_source_lines": 23886,
@@ -2672,7 +2672,7 @@
   },
   {
     "id": "P2-0002",
-    "title": "移植 src/acp/runtime",
+    "title": "\u79fb\u690d src/acp/runtime",
     "source": "src/acp/runtime",
     "target": "openclaw/acp/runtime",
     "ts_source_lines": 898,
@@ -2698,7 +2698,7 @@
   },
   {
     "id": "P2-0098",
-    "title": "移植 src/infra/net 根文件",
+    "title": "\u79fb\u690d src/infra/net \u6839\u6587\u4ef6",
     "source": "src/infra/net",
     "target": "openclaw/infra/net",
     "ts_source_lines": 3370,
@@ -2719,7 +2719,7 @@
   },
   {
     "id": "P2-0149",
-    "title": "移植 src/tasks 根文件",
+    "title": "\u79fb\u690d src/tasks \u6839\u6587\u4ef6",
     "source": "src/tasks",
     "target": "openclaw/tasks",
     "ts_source_lines": 8623,
@@ -2752,7 +2752,7 @@
   },
   {
     "id": "P2-0081",
-    "title": "移植 src/cron 根文件",
+    "title": "\u79fb\u690d src/cron \u6839\u6587\u4ef6",
     "source": "src/cron",
     "target": "openclaw/cron",
     "ts_source_lines": 5208,
@@ -2795,7 +2795,7 @@
   },
   {
     "id": "P2-0142",
-    "title": "移植 src/skills/runtime",
+    "title": "\u79fb\u690d src/skills/runtime",
     "source": "src/skills/runtime",
     "target": "openclaw/skills/runtime",
     "ts_source_lines": 2115,
@@ -2824,7 +2824,7 @@
   },
   {
     "id": "P2-0140",
-    "title": "移植 src/skills/loading",
+    "title": "\u79fb\u690d src/skills/loading",
     "source": "src/skills/loading",
     "target": "openclaw/skills/loading",
     "ts_source_lines": 3326,
@@ -2853,7 +2853,7 @@
   },
   {
     "id": "P2-0011",
-    "title": "移植 src/agents/harness 根文件",
+    "title": "\u79fb\u690d src/agents/harness \u6839\u6587\u4ef6",
     "source": "src/agents/harness",
     "target": "openclaw/agents/harness",
     "ts_source_lines": 6244,
@@ -2885,7 +2885,7 @@
   },
   {
     "id": "P2-0020",
-    "title": "移植 src/agents/sessions 根文件",
+    "title": "\u79fb\u690d src/agents/sessions \u6839\u6587\u4ef6",
     "source": "src/agents/sessions",
     "target": "openclaw/agents/sessions",
     "ts_source_lines": 15519,
@@ -2919,7 +2919,7 @@
   },
   {
     "id": "P2-0015",
-    "title": "移植 src/agents/sandbox 根文件",
+    "title": "\u79fb\u690d src/agents/sandbox \u6839\u6587\u4ef6",
     "source": "src/agents/sandbox",
     "target": "openclaw/agents/sandbox",
     "ts_source_lines": 9483,
@@ -2949,7 +2949,7 @@
   },
   {
     "id": "P2-0035",
-    "title": "移植 src/channels/inbound-event",
+    "title": "\u79fb\u690d src/channels/inbound-event",
     "source": "src/channels/inbound-event",
     "target": "openclaw/channels/inbound_event",
     "ts_source_lines": 729,
@@ -2973,7 +2973,7 @@
   },
   {
     "id": "P2-0092",
-    "title": "移植 src/hooks",
+    "title": "\u79fb\u690d src/hooks",
     "source": "src/hooks",
     "target": "openclaw/hooks",
     "ts_source_lines": 5481,
@@ -3007,7 +3007,7 @@
   },
   {
     "id": "P2-0138",
-    "title": "移植 src/skills/discovery",
+    "title": "\u79fb\u690d src/skills/discovery",
     "source": "src/skills/discovery",
     "target": "openclaw/skills/discovery",
     "ts_source_lines": 1075,
@@ -3034,7 +3034,7 @@
   },
   {
     "id": "P2-0075",
-    "title": "移植 src/context-engine",
+    "title": "\u79fb\u690d src/context-engine",
     "source": "src/context-engine",
     "target": "openclaw/context_engine",
     "ts_source_lines": 2091,
@@ -3058,7 +3058,7 @@
   },
   {
     "id": "P2-0036",
-    "title": "移植 src/channels/message 根文件",
+    "title": "\u79fb\u690d src/channels/message \u6839\u6587\u4ef6",
     "source": "src/channels/message",
     "target": "openclaw/channels/message",
     "ts_source_lines": 3952,
@@ -3087,7 +3087,7 @@
   },
   {
     "id": "P2-0008",
-    "title": "移植 src/agents/embedded-agent-helpers",
+    "title": "\u79fb\u690d src/agents/embedded-agent-helpers",
     "source": "src/agents/embedded-agent-helpers",
     "target": "openclaw/agents/embedded_agent_helpers",
     "ts_source_lines": 4553,
@@ -3116,7 +3116,7 @@
   },
   {
     "id": "P2-0160",
-    "title": "移植 src/wizard",
+    "title": "\u79fb\u690d src/wizard",
     "source": "src/wizard",
     "target": "openclaw/wizard",
     "ts_source_lines": 4007,
@@ -3151,7 +3151,7 @@
   },
   {
     "id": "P2-0125",
-    "title": "移植 src/plugins/runtime 根文件",
+    "title": "\u79fb\u690d src/plugins/runtime \u6839\u6587\u4ef6",
     "source": "src/plugins/runtime",
     "target": "openclaw/plugins/runtime",
     "ts_source_lines": 4569,
@@ -3199,7 +3199,7 @@
   },
   {
     "id": "P2-0082",
-    "title": "移植 src/daemon 根文件",
+    "title": "\u79fb\u690d src/daemon \u6839\u6587\u4ef6",
     "source": "src/daemon",
     "target": "openclaw/daemon",
     "ts_source_lines": 9399,
@@ -3222,7 +3222,7 @@
   },
   {
     "id": "P2-0009",
-    "title": "移植 src/agents/embedded-agent-runner/run 根文件",
+    "title": "\u79fb\u690d src/agents/embedded-agent-runner/run \u6839\u6587\u4ef6",
     "source": "src/agents/embedded-agent-runner/run",
     "target": "openclaw/agents/embedded_agent_runner/run",
     "ts_source_lines": 22652,
@@ -3284,7 +3284,7 @@
   },
   {
     "id": "P2-0089",
-    "title": "移植 src/gateway/server-methods 根文件",
+    "title": "\u79fb\u690d src/gateway/server-methods \u6839\u6587\u4ef6",
     "source": "src/gateway/server-methods",
     "target": "openclaw/gateway/server_methods",
     "ts_source_lines": 34431,
@@ -3357,7 +3357,7 @@
   },
   {
     "id": "P2-0153",
-    "title": "移植 src/tts",
+    "title": "\u79fb\u690d src/tts",
     "source": "src/tts",
     "target": "openclaw/tts",
     "ts_source_lines": 2002,
@@ -3382,7 +3382,7 @@
   },
   {
     "id": "P2-0113",
-    "title": "移植 src/media-understanding",
+    "title": "\u79fb\u690d src/media-understanding",
     "source": "src/media-understanding",
     "target": "openclaw/media_understanding",
     "ts_source_lines": 7216,
@@ -3421,7 +3421,7 @@
   },
   {
     "id": "P2-0121",
-    "title": "移植 src/plugin-state",
+    "title": "\u79fb\u690d src/plugin-state",
     "source": "src/plugin-state",
     "target": "openclaw/plugin_state",
     "ts_source_lines": 1702,
@@ -3441,7 +3441,7 @@
   },
   {
     "id": "P2-0007",
-    "title": "移植 src/agents/command 根文件",
+    "title": "\u79fb\u690d src/agents/command \u6839\u6587\u4ef6",
     "source": "src/agents/command",
     "target": "openclaw/agents/command",
     "ts_source_lines": 4472,
@@ -3493,7 +3493,7 @@
   },
   {
     "id": "P2-0014",
-    "title": "移植 src/agents/runtime-plan",
+    "title": "\u79fb\u690d src/agents/runtime-plan",
     "source": "src/agents/runtime-plan",
     "target": "openclaw/agents/runtime_plan",
     "ts_source_lines": 1101,
@@ -3516,7 +3516,7 @@
   },
   {
     "id": "P2-0003",
-    "title": "移植 src/acp 根文件",
+    "title": "\u79fb\u690d src/acp \u6839\u6587\u4ef6",
     "source": "src/acp",
     "target": "openclaw/acp",
     "ts_source_lines": 5874,
@@ -3550,7 +3550,7 @@
   },
   {
     "id": "P2-0107",
-    "title": "移植 src/llm/utils 根文件",
+    "title": "\u79fb\u690d src/llm/utils \u6839\u6587\u4ef6",
     "source": "src/llm/utils",
     "target": "openclaw/llm/utils",
     "ts_source_lines": 399,
@@ -3569,7 +3569,7 @@
   },
   {
     "id": "P2-0115",
-    "title": "移植 src/memory-host-sdk",
+    "title": "\u79fb\u690d src/memory-host-sdk",
     "source": "src/memory-host-sdk",
     "target": "openclaw/memory_host_sdk",
     "ts_source_lines": 888,
@@ -3590,7 +3590,7 @@
   },
   {
     "id": "P2-0119",
-    "title": "移植 src/pairing",
+    "title": "\u79fb\u690d src/pairing",
     "source": "src/pairing",
     "target": "openclaw/pairing",
     "ts_source_lines": 1654,
@@ -3616,7 +3616,7 @@
   },
   {
     "id": "P2-0001",
-    "title": "移植 src/acp/control-plane 根文件",
+    "title": "\u79fb\u690d src/acp/control-plane \u6839\u6587\u4ef6",
     "source": "src/acp/control-plane",
     "target": "openclaw/acp/control_plane",
     "ts_source_lines": 5058,
@@ -3646,7 +3646,7 @@
   },
   {
     "id": "P2-0152",
-    "title": "移植 src/transcripts",
+    "title": "\u79fb\u690d src/transcripts",
     "source": "src/transcripts",
     "target": "openclaw/transcripts",
     "ts_source_lines": 702,
@@ -3665,7 +3665,7 @@
   },
   {
     "id": "P2-0094",
-    "title": "移植 src/infra/command-analysis",
+    "title": "\u79fb\u690d src/infra/command-analysis",
     "source": "src/infra/command-analysis",
     "target": "openclaw/infra/command_analysis",
     "ts_source_lines": 915,
@@ -3685,7 +3685,7 @@
   },
   {
     "id": "P2-0044",
-    "title": "移植 src/channels/turn",
+    "title": "\u79fb\u690d src/channels/turn",
     "source": "src/channels/turn",
     "target": "openclaw/channels/turn",
     "ts_source_lines": 1732,
@@ -3712,7 +3712,7 @@
   },
   {
     "id": "P2-0062",
-    "title": "移植 src/commands/doctor/shared 根文件",
+    "title": "\u79fb\u690d src/commands/doctor/shared \u6839\u6587\u4ef6",
     "source": "src/commands/doctor/shared",
     "target": "openclaw/commands/doctor/shared",
     "ts_source_lines": 21036,
@@ -3753,7 +3753,7 @@
   },
   {
     "id": "P2-0084",
-    "title": "移植 src/gateway/methods",
+    "title": "\u79fb\u690d src/gateway/methods",
     "source": "src/gateway/methods",
     "target": "openclaw/gateway/methods",
     "ts_source_lines": 504,
@@ -3772,7 +3772,7 @@
   },
   {
     "id": "P2-0159",
-    "title": "移植 src/web-search",
+    "title": "\u79fb\u690d src/web-search",
     "source": "src/web-search",
     "target": "openclaw/web_search",
     "ts_source_lines": 559,
@@ -3795,7 +3795,7 @@
   },
   {
     "id": "P2-0093",
-    "title": "移植 src/image-generation",
+    "title": "\u79fb\u690d src/image-generation",
     "source": "src/image-generation",
     "target": "openclaw/image_generation",
     "ts_source_lines": 1341,
@@ -3824,7 +3824,7 @@
   },
   {
     "id": "P2-0097",
-    "title": "移植 src/infra/net/proxy",
+    "title": "\u79fb\u690d src/infra/net/proxy",
     "source": "src/infra/net/proxy",
     "target": "openclaw/infra/net/proxy",
     "ts_source_lines": 1408,
@@ -3845,7 +3845,7 @@
   },
   {
     "id": "P2-0157",
-    "title": "移植 src/video-generation",
+    "title": "\u79fb\u690d src/video-generation",
     "source": "src/video-generation",
     "target": "openclaw/video_generation",
     "ts_source_lines": 1756,
@@ -3872,7 +3872,7 @@
   },
   {
     "id": "P2-0148",
-    "title": "移植 src/talk",
+    "title": "\u79fb\u690d src/talk",
     "source": "src/talk",
     "target": "openclaw/talk",
     "ts_source_lines": 4516,
@@ -3902,7 +3902,7 @@
   },
   {
     "id": "P2-0048",
-    "title": "移植 src/cli/daemon-cli 根文件",
+    "title": "\u79fb\u690d src/cli/daemon-cli \u6839\u6587\u4ef6",
     "source": "src/cli/daemon-cli",
     "target": "openclaw/cli/daemon_cli",
     "ts_source_lines": 4607,
@@ -3932,7 +3932,7 @@
   },
   {
     "id": "P2-0139",
-    "title": "移植 src/skills/lifecycle",
+    "title": "\u79fb\u690d src/skills/lifecycle",
     "source": "src/skills/lifecycle",
     "target": "openclaw/skills/lifecycle",
     "ts_source_lines": 4885,
@@ -3960,7 +3960,7 @@
   },
   {
     "id": "P2-0053",
-    "title": "移植 src/cli/program 根文件",
+    "title": "\u79fb\u690d src/cli/program \u6839\u6587\u4ef6",
     "source": "src/cli/program",
     "target": "openclaw/cli/program",
     "ts_source_lines": 5845,
@@ -3989,7 +3989,7 @@
   },
   {
     "id": "P2-0077",
-    "title": "移植 src/cron/isolated-agent 根文件",
+    "title": "\u79fb\u690d src/cron/isolated-agent \u6839\u6587\u4ef6",
     "source": "src/cron/isolated-agent",
     "target": "openclaw/cron/isolated_agent",
     "ts_source_lines": 6837,
@@ -4033,7 +4033,7 @@
   },
   {
     "id": "P2-0055",
-    "title": "移植 src/cli/shared",
+    "title": "\u79fb\u690d src/cli/shared",
     "source": "src/cli/shared",
     "target": "openclaw/cli/shared",
     "ts_source_lines": 11,
@@ -4049,7 +4049,7 @@
   },
   {
     "id": "P2-0130",
-    "title": "移植 src/realtime-transcription",
+    "title": "\u79fb\u690d src/realtime-transcription",
     "source": "src/realtime-transcription",
     "target": "openclaw/realtime_transcription",
     "ts_source_lines": 613,
@@ -4068,7 +4068,7 @@
   },
   {
     "id": "P2-0117",
-    "title": "移植 src/music-generation",
+    "title": "\u79fb\u690d src/music-generation",
     "source": "src/music-generation",
     "target": "openclaw/music_generation",
     "ts_source_lines": 760,
@@ -4095,7 +4095,7 @@
   },
   {
     "id": "P2-0112",
-    "title": "移植 src/media-generation",
+    "title": "\u79fb\u690d src/media-generation",
     "source": "src/media-generation",
     "target": "openclaw/media_generation",
     "ts_source_lines": 776,
@@ -4118,7 +4118,7 @@
   },
   {
     "id": "P2-0145",
-    "title": "移植 src/skills/workshop",
+    "title": "\u79fb\u690d src/skills/workshop",
     "source": "src/skills/workshop",
     "target": "openclaw/skills/workshop",
     "ts_source_lines": 1988,
@@ -4143,7 +4143,7 @@
   },
   {
     "id": "P2-0104",
-    "title": "移植 src/llm/providers/stream-wrappers",
+    "title": "\u79fb\u690d src/llm/providers/stream-wrappers",
     "source": "src/llm/providers/stream-wrappers",
     "target": "openclaw/llm/providers/stream_wrappers",
     "ts_source_lines": 2218,
@@ -4169,7 +4169,7 @@
   },
   {
     "id": "P2-0129",
-    "title": "移植 src/proxy-capture",
+    "title": "\u79fb\u690d src/proxy-capture",
     "source": "src/proxy-capture",
     "target": "openclaw/proxy_capture",
     "ts_source_lines": 2279,
@@ -4189,7 +4189,7 @@
   },
   {
     "id": "P2-0147",
-    "title": "移植 src/status",
+    "title": "\u79fb\u690d src/status",
     "source": "src/status",
     "target": "openclaw/status",
     "ts_source_lines": 2592,
@@ -4228,7 +4228,7 @@
   },
   {
     "id": "P2-0151",
-    "title": "移植 src/trajectory",
+    "title": "\u79fb\u690d src/trajectory",
     "source": "src/trajectory",
     "target": "openclaw/trajectory",
     "ts_source_lines": 2695,
@@ -4254,7 +4254,7 @@
   },
   {
     "id": "P2-0079",
-    "title": "移植 src/cron/service 根文件",
+    "title": "\u79fb\u690d src/cron/service \u6839\u6587\u4ef6",
     "source": "src/cron/service",
     "target": "openclaw/cron/service",
     "ts_source_lines": 5991,
@@ -4283,7 +4283,7 @@
   },
   {
     "id": "P2-0006",
-    "title": "移植 src/agents/cli-runner 根文件",
+    "title": "\u79fb\u690d src/agents/cli-runner \u6839\u6587\u4ef6",
     "source": "src/agents/cli-runner",
     "target": "openclaw/agents/cli_runner",
     "ts_source_lines": 6289,
@@ -4332,7 +4332,7 @@
   },
   {
     "id": "P2-0105",
-    "title": "移植 src/llm/providers 根文件",
+    "title": "\u79fb\u690d src/llm/providers \u6839\u6587\u4ef6",
     "source": "src/llm/providers",
     "target": "openclaw/llm/providers",
     "ts_source_lines": 9230,
@@ -4356,7 +4356,7 @@
   },
   {
     "id": "P2-0032",
-    "title": "移植 src/bindings",
+    "title": "\u79fb\u690d src/bindings",
     "source": "src/bindings",
     "target": "openclaw/bindings",
     "ts_source_lines": 52,
@@ -4373,7 +4373,7 @@
   },
   {
     "id": "P2-0128",
-    "title": "移植 src/provider-runtime",
+    "title": "\u79fb\u690d src/provider-runtime",
     "source": "src/provider-runtime",
     "target": "openclaw/provider_runtime",
     "ts_source_lines": 271,
@@ -4390,7 +4390,7 @@
   },
   {
     "id": "P2-0016",
-    "title": "移植 src/agents/schema",
+    "title": "\u79fb\u690d src/agents/schema",
     "source": "src/agents/schema",
     "target": "openclaw/agents/schema",
     "ts_source_lines": 564,
@@ -4406,7 +4406,7 @@
   },
   {
     "id": "P2-0039",
-    "title": "移植 src/channels/plugins/outbound",
+    "title": "\u79fb\u690d src/channels/plugins/outbound",
     "source": "src/channels/plugins/outbound",
     "target": "openclaw/channels/plugins/outbound",
     "ts_source_lines": 823,
@@ -4429,7 +4429,7 @@
   },
   {
     "id": "P2-0059",
-    "title": "移植 src/commands/channel-setup",
+    "title": "\u79fb\u690d src/commands/channel-setup",
     "source": "src/commands/channel-setup",
     "target": "openclaw/commands/channel_setup",
     "ts_source_lines": 847,
@@ -4454,7 +4454,7 @@
   },
   {
     "id": "P2-0143",
-    "title": "移植 src/skills/security",
+    "title": "\u79fb\u690d src/skills/security",
     "source": "src/skills/security",
     "target": "openclaw/skills/security",
     "ts_source_lines": 1188,
@@ -4475,7 +4475,7 @@
   },
   {
     "id": "P2-0106",
-    "title": "移植 src/llm/utils/oauth",
+    "title": "\u79fb\u690d src/llm/utils/oauth",
     "source": "src/llm/utils/oauth",
     "target": "openclaw/llm/utils/oauth",
     "ts_source_lines": 1368,
@@ -4496,7 +4496,7 @@
   },
   {
     "id": "P2-0022",
-    "title": "移植 src/agents/utils",
+    "title": "\u79fb\u690d src/agents/utils",
     "source": "src/agents/utils",
     "target": "openclaw/agents/utils",
     "ts_source_lines": 1508,
@@ -4518,7 +4518,7 @@
   },
   {
     "id": "P2-0071",
-    "title": "移植 src/commitments",
+    "title": "\u79fb\u690d src/commitments",
     "source": "src/commitments",
     "target": "openclaw/commitments",
     "ts_source_lines": 1508,
@@ -4541,7 +4541,7 @@
   },
   {
     "id": "P2-0095",
-    "title": "移植 src/infra/command-explainer",
+    "title": "\u79fb\u690d src/infra/command-explainer",
     "source": "src/infra/command-explainer",
     "target": "openclaw/infra/command_explainer",
     "ts_source_lines": 1679,
@@ -4559,7 +4559,7 @@
   },
   {
     "id": "P2-0027",
-    "title": "移植 src/auto-reply/reply/queue",
+    "title": "\u79fb\u690d src/auto-reply/reply/queue",
     "source": "src/auto-reply/reply/queue",
     "target": "openclaw/auto_reply/reply/queue",
     "ts_source_lines": 1842,
@@ -4596,7 +4596,7 @@
   },
   {
     "id": "P2-0088",
-    "title": "移植 src/gateway/server 根文件",
+    "title": "\u79fb\u690d src/gateway/server \u6839\u6587\u4ef6",
     "source": "src/gateway/server",
     "target": "openclaw/gateway/server",
     "ts_source_lines": 2526,
@@ -4636,7 +4636,7 @@
   },
   {
     "id": "P2-0037",
-    "title": "移植 src/channels/message-access",
+    "title": "\u79fb\u690d src/channels/message-access",
     "source": "src/channels/message-access",
     "target": "openclaw/channels/message_access",
     "ts_source_lines": 2965,
@@ -4657,7 +4657,7 @@
   },
   {
     "id": "P2-0118",
-    "title": "移植 src/node-host",
+    "title": "\u79fb\u690d src/node-host",
     "source": "src/node-host",
     "target": "openclaw/node_host",
     "ts_source_lines": 4090,
@@ -4682,7 +4682,7 @@
   },
   {
     "id": "P2-0019",
-    "title": "移植 src/agents/sessions/tools 根文件",
+    "title": "\u79fb\u690d src/agents/sessions/tools \u6839\u6587\u4ef6",
     "source": "src/agents/sessions/tools",
     "target": "openclaw/agents/sessions/tools",
     "ts_source_lines": 4504,
@@ -4708,7 +4708,7 @@
   },
   {
     "id": "P2-0066",
-    "title": "移植 src/commands/models 根文件",
+    "title": "\u79fb\u690d src/commands/models \u6839\u6587\u4ef6",
     "source": "src/commands/models",
     "target": "openclaw/commands/models",
     "ts_source_lines": 7864,
@@ -4744,7 +4744,7 @@
   },
   {
     "id": "P2-0137",
-    "title": "移植 src/skills/config",
+    "title": "\u79fb\u690d src/skills/config",
     "source": "src/skills/config",
     "target": "openclaw/skills/config",
     "ts_source_lines": 72,
@@ -4762,7 +4762,7 @@
   },
   {
     "id": "P2-0042",
-    "title": "移植 src/channels/status",
+    "title": "\u79fb\u690d src/channels/status",
     "source": "src/channels/status",
     "target": "openclaw/channels/status",
     "ts_source_lines": 144,
@@ -4782,7 +4782,7 @@
   },
   {
     "id": "P2-0100",
-    "title": "移植 src/infra/tls",
+    "title": "\u79fb\u690d src/infra/tls",
     "source": "src/infra/tls",
     "target": "openclaw/infra/tls",
     "ts_source_lines": 181,
@@ -4801,7 +4801,7 @@
   },
   {
     "id": "P2-0017",
-    "title": "移植 src/agents/sessions/compaction",
+    "title": "\u79fb\u690d src/agents/sessions/compaction",
     "source": "src/agents/sessions/compaction",
     "target": "openclaw/agents/sessions/compaction",
     "ts_source_lines": 203,
@@ -4821,7 +4821,7 @@
   },
   {
     "id": "P2-0086",
-    "title": "移植 src/gateway/server/plugins-http",
+    "title": "\u79fb\u690d src/gateway/server/plugins-http",
     "source": "src/gateway/server/plugins-http",
     "target": "openclaw/gateway/server/plugins_http",
     "ts_source_lines": 253,
@@ -4840,7 +4840,7 @@
   },
   {
     "id": "P2-0158",
-    "title": "移植 src/web-fetch",
+    "title": "\u79fb\u690d src/web-fetch",
     "source": "src/web-fetch",
     "target": "openclaw/web_fetch",
     "ts_source_lines": 289,
@@ -4861,7 +4861,7 @@
   },
   {
     "id": "P2-0063",
-    "title": "移植 src/commands/doctor 根文件",
+    "title": "\u79fb\u690d src/commands/doctor \u6839\u6587\u4ef6",
     "source": "src/commands/doctor",
     "target": "openclaw/commands/doctor",
     "ts_source_lines": 499,
@@ -4884,7 +4884,7 @@
   },
   {
     "id": "P2-0025",
-    "title": "移植 src/auto-reply/reply/commands-subagents",
+    "title": "\u79fb\u690d src/auto-reply/reply/commands-subagents",
     "source": "src/auto-reply/reply/commands-subagents",
     "target": "openclaw/auto_reply/reply/commands_subagents",
     "ts_source_lines": 873,
@@ -4917,7 +4917,7 @@
   },
   {
     "id": "P2-0069",
-    "title": "移植 src/commands/status-all",
+    "title": "\u79fb\u690d src/commands/status-all",
     "source": "src/commands/status-all",
     "target": "openclaw/commands/status_all",
     "ts_source_lines": 2890,
@@ -4951,7 +4951,7 @@
   },
   {
     "id": "P2-0018",
-    "title": "移植 src/agents/sessions/extensions",
+    "title": "\u79fb\u690d src/agents/sessions/extensions",
     "source": "src/agents/sessions/extensions",
     "target": "openclaw/agents/sessions/extensions",
     "ts_source_lines": 3774,
@@ -4974,7 +4974,7 @@
   },
   {
     "id": "P2-0049",
-    "title": "移植 src/cli/gateway-cli",
+    "title": "\u79fb\u690d src/cli/gateway-cli",
     "source": "src/cli/gateway-cli",
     "target": "openclaw/cli/gateway_cli",
     "ts_source_lines": 4287,
@@ -5008,7 +5008,7 @@
   },
   {
     "id": "P2-0056",
-    "title": "移植 src/cli/update-cli",
+    "title": "\u79fb\u690d src/cli/update-cli",
     "source": "src/cli/update-cli",
     "target": "openclaw/cli/update_cli",
     "ts_source_lines": 5943,
@@ -5036,7 +5036,7 @@
   },
   {
     "id": "P2-0154",
-    "title": "移植 src/tui",
+    "title": "\u79fb\u690d src/tui",
     "source": "src/tui",
     "target": "openclaw/tui",
     "ts_source_lines": 8405,
@@ -5071,7 +5071,7 @@
   },
   {
     "id": "P2-0083",
-    "title": "移植 src/flows",
+    "title": "\u79fb\u690d src/flows",
     "source": "src/flows",
     "target": "openclaw/flows",
     "ts_source_lines": 9048,
@@ -5113,7 +5113,7 @@
   },
   {
     "id": "P2-0038",
-    "title": "移植 src/channels/plugins/actions",
+    "title": "\u79fb\u690d src/channels/plugins/actions",
     "source": "src/channels/plugins/actions",
     "target": "openclaw/channels/plugins/actions",
     "ts_source_lines": 52,
@@ -5129,7 +5129,7 @@
   },
   {
     "id": "P2-0040",
-    "title": "移植 src/channels/plugins/status-issues",
+    "title": "\u79fb\u690d src/channels/plugins/status-issues",
     "source": "src/channels/plugins/status-issues",
     "target": "openclaw/channels/plugins/status_issues",
     "ts_source_lines": 87,
@@ -5147,7 +5147,7 @@
   },
   {
     "id": "P2-0034",
-    "title": "移植 src/channels/allowlists",
+    "title": "\u79fb\u690d src/channels/allowlists",
     "source": "src/channels/allowlists",
     "target": "openclaw/channels/allowlists",
     "ts_source_lines": 179,
@@ -5165,7 +5165,7 @@
   },
   {
     "id": "P2-0026",
-    "title": "移植 src/auto-reply/reply/exec",
+    "title": "\u79fb\u690d src/auto-reply/reply/exec",
     "source": "src/auto-reply/reply/exec",
     "target": "openclaw/auto_reply/reply/exec",
     "ts_source_lines": 216,
@@ -5183,7 +5183,7 @@
   },
   {
     "id": "P2-0144",
-    "title": "移植 src/skills/test-support",
+    "title": "\u79fb\u690d src/skills/test-support",
     "source": "src/skills/test-support",
     "target": "openclaw/skills/test_support",
     "ts_source_lines": 232,
@@ -5200,7 +5200,7 @@
   },
   {
     "id": "P2-0078",
-    "title": "移植 src/cron/run-log",
+    "title": "\u79fb\u690d src/cron/run-log",
     "source": "src/cron/run-log",
     "target": "openclaw/cron/run_log",
     "ts_source_lines": 398,
@@ -5222,7 +5222,7 @@
   },
   {
     "id": "P2-0050",
-    "title": "移植 src/cli/node-cli",
+    "title": "\u79fb\u690d src/cli/node-cli",
     "source": "src/cli/node-cli",
     "target": "openclaw/cli/node_cli",
     "ts_source_lines": 442,
@@ -5244,7 +5244,7 @@
   },
   {
     "id": "P2-0030",
-    "title": "移植 src/auto-reply/usage-bar",
+    "title": "\u79fb\u690d src/auto-reply/usage-bar",
     "source": "src/auto-reply/usage-bar",
     "target": "openclaw/auto_reply/usage_bar",
     "ts_source_lines": 645,
@@ -5262,7 +5262,7 @@
   },
   {
     "id": "P2-0067",
-    "title": "移植 src/commands/onboard-non-interactive",
+    "title": "\u79fb\u690d src/commands/onboard-non-interactive",
     "source": "src/commands/onboard-non-interactive",
     "target": "openclaw/commands/onboard_non_interactive",
     "ts_source_lines": 692,
@@ -5285,7 +5285,7 @@
   },
   {
     "id": "P2-0052",
-    "title": "移植 src/cli/program/message",
+    "title": "\u79fb\u690d src/cli/program/message",
     "source": "src/cli/program/message",
     "target": "openclaw/cli/program/message",
     "ts_source_lines": 776,
@@ -5309,7 +5309,7 @@
   },
   {
     "id": "P2-0080",
-    "title": "移植 src/cron/store",
+    "title": "\u79fb\u690d src/cron/store",
     "source": "src/cron/store",
     "target": "openclaw/cron/store",
     "ts_source_lines": 923,
@@ -5329,7 +5329,7 @@
   },
   {
     "id": "P2-0064",
-    "title": "移植 src/commands/gateway-status",
+    "title": "\u79fb\u690d src/commands/gateway-status",
     "source": "src/commands/gateway-status",
     "target": "openclaw/commands/gateway_status",
     "ts_source_lines": 1017,
@@ -5352,7 +5352,7 @@
   },
   {
     "id": "P2-0065",
-    "title": "移植 src/commands/migrate",
+    "title": "\u79fb\u690d src/commands/migrate",
     "source": "src/commands/migrate",
     "target": "openclaw/commands/migrate",
     "ts_source_lines": 1374,
@@ -5375,7 +5375,7 @@
   },
   {
     "id": "P2-0110",
-    "title": "移植 src/mcp",
+    "title": "\u79fb\u690d src/mcp",
     "source": "src/mcp",
     "target": "openclaw/mcp",
     "ts_source_lines": 1482,
@@ -5401,7 +5401,7 @@
   },
   {
     "id": "P2-0004",
-    "title": "移植 src/agents/agent-hooks",
+    "title": "\u79fb\u690d src/agents/agent-hooks",
     "source": "src/agents/agent-hooks",
     "target": "openclaw/agents/agent_hooks",
     "ts_source_lines": 1810,
@@ -5428,7 +5428,7 @@
   },
   {
     "id": "P2-0124",
-    "title": "移植 src/plugins/contracts",
+    "title": "\u79fb\u690d src/plugins/contracts",
     "source": "src/plugins/contracts",
     "target": "openclaw/plugins/contracts",
     "ts_source_lines": 1875,
@@ -5449,7 +5449,7 @@
   },
   {
     "id": "P2-0051",
-    "title": "移植 src/cli/nodes-cli 根文件",
+    "title": "\u79fb\u690d src/cli/nodes-cli \u6839\u6587\u4ef6",
     "source": "src/cli/nodes-cli",
     "target": "openclaw/cli/nodes_cli",
     "ts_source_lines": 2067,
@@ -5473,7 +5473,7 @@
   },
   {
     "id": "P2-0047",
-    "title": "移植 src/cli/cron-cli",
+    "title": "\u79fb\u690d src/cli/cron-cli",
     "source": "src/cli/cron-cli",
     "target": "openclaw/cli/cron_cli",
     "ts_source_lines": 2090,
@@ -5499,7 +5499,7 @@
   },
   {
     "id": "P2-0024",
-    "title": "移植 src/auto-reply/reply/commands-acp",
+    "title": "\u79fb\u690d src/auto-reply/reply/commands-acp",
     "source": "src/auto-reply/reply/commands-acp",
     "target": "openclaw/auto_reply/reply/commands_acp",
     "ts_source_lines": 2300,
@@ -5535,7 +5535,7 @@
   },
   {
     "id": "P2-0060",
-    "title": "移植 src/commands/channels",
+    "title": "\u79fb\u690d src/commands/channels",
     "source": "src/commands/channels",
     "target": "openclaw/commands/channels",
     "ts_source_lines": 2646,
@@ -5572,7 +5572,7 @@
   },
   {
     "id": "P2-0076",
-    "title": "移植 src/crestodian",
+    "title": "\u79fb\u690d src/crestodian",
     "source": "src/crestodian",
     "target": "openclaw/crestodian",
     "ts_source_lines": 3060,
@@ -5598,7 +5598,7 @@
   },
   {
     "id": "P2-0087",
-    "title": "移植 src/gateway/server/ws-connection",
+    "title": "\u79fb\u690d src/gateway/server/ws-connection",
     "source": "src/gateway/server/ws-connection",
     "target": "openclaw/gateway/server/ws_connection",
     "ts_source_lines": 3492,
@@ -5626,7 +5626,7 @@
   },
   {
     "id": "P2-0058",
-    "title": "移植 src/commands/agent",
+    "title": "\u79fb\u690d src/commands/agent",
     "source": "src/commands/agent",
     "target": "openclaw/commands/agent",
     "ts_source_lines": 6,
@@ -5643,7 +5643,7 @@
   },
   {
     "id": "P2-0085",
-    "title": "移植 src/gateway/server/__tests__",
+    "title": "\u79fb\u690d src/gateway/server/__tests__",
     "source": "src/gateway/server/__tests__",
     "target": "openclaw/gateway/server/__tests__",
     "ts_source_lines": 15,
@@ -5660,7 +5660,7 @@
   },
   {
     "id": "P2-0028",
-    "title": "移植 src/auto-reply/reply/test-fixtures",
+    "title": "\u79fb\u690d src/auto-reply/reply/test-fixtures",
     "source": "src/auto-reply/reply/test-fixtures",
     "target": "openclaw/auto_reply/reply/test_fixtures",
     "ts_source_lines": 35,
@@ -5677,7 +5677,7 @@
   },
   {
     "id": "P2-0122",
-    "title": "移植 src/plugins/capability-runtime-vitest-shims",
+    "title": "\u79fb\u690d src/plugins/capability-runtime-vitest-shims",
     "source": "src/plugins/capability-runtime-vitest-shims",
     "target": "openclaw/plugins/capability_runtime_vitest_shims",
     "ts_source_lines": 55,
@@ -5697,7 +5697,7 @@
   },
   {
     "id": "P2-0054",
-    "title": "移植 src/cli/send-runtime",
+    "title": "\u79fb\u690d src/cli/send-runtime",
     "source": "src/cli/send-runtime",
     "target": "openclaw/cli/send_runtime",
     "ts_source_lines": 93,
@@ -5718,7 +5718,7 @@
   },
   {
     "id": "P2-0141",
-    "title": "移植 src/skills/research",
+    "title": "\u79fb\u690d src/skills/research",
     "source": "src/skills/research",
     "target": "openclaw/skills/research",
     "ts_source_lines": 283,
@@ -5739,7 +5739,7 @@
   },
   {
     "id": "P2-0103",
-    "title": "移植 src/link-understanding",
+    "title": "\u79fb\u690d src/link-understanding",
     "source": "src/link-understanding",
     "target": "openclaw/link_understanding",
     "ts_source_lines": 393,
@@ -5763,7 +5763,7 @@
   },
   {
     "id": "P2-0090",
-    "title": "移植 src/gateway/test",
+    "title": "\u79fb\u690d src/gateway/test",
     "source": "src/gateway/test",
     "target": "openclaw/gateway/test",
     "ts_source_lines": 698,
@@ -5783,7 +5783,7 @@
   },
   {
     "id": "P2-0061",
-    "title": "移植 src/commands/doctor/cron",
+    "title": "\u79fb\u690d src/commands/doctor/cron",
     "source": "src/commands/doctor/cron",
     "target": "openclaw/commands/doctor/cron",
     "ts_source_lines": 2510,
