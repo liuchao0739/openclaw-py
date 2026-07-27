@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 06:15:13 UTC
+Updated: 2026-07-27 06:15:15 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 79
-- **Partial:** 82
+- **Pending:** 78
+- **Partial:** 83
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 194,353
+- **Remaining TypeScript lines:** 189,295
 
 ## Current
 
-- `P2-0001` src/acp/control-plane (5058 lines)
+- `P2-0152` src/transcripts (702 lines)
 
 ## Up next
 
-- `P2-0001` src/acp/control-plane (5058 lines)
 - `P2-0152` src/transcripts (702 lines)
 - `P2-0094` src/infra/command-analysis (915 lines)
 - `P2-0044` src/channels/turn (1732 lines)
 - `P2-0062` src/commands/doctor/shared (21036 lines)
+- `P2-0084` src/gateway/methods (504 lines)
 
 ## Recently completed
 
