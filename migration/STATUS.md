@@ -1,16 +1,16 @@
 # Migration status
 
-Updated: 2026-07-27 11:42:51 UTC
+Updated: 2026-07-27 11:47:16 UTC
 
-- **Done:** 74 / 231
+- **Done:** 75 / 231
 - **Pending:** 0
-- **Partial:** 157
+- **Partial:** 156
 - **Blocked:** 0
 - **Remaining TypeScript lines:** 0
 
 ## Current
 
-- `P2-0220` 移植 extension fal (1769 lines)
+- `P2-0210` 移植 extension device-pair (1842 lines)
 
 ## Recently completed
 
