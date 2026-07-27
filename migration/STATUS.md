@@ -1,20 +1,16 @@
 # Migration status
 
-Updated: 2026-07-27 08:17:20 UTC
+Updated: 2026-07-27 08:17:22 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 1
-- **Partial:** 160
+- **Pending:** 0
+- **Partial:** 161
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 2,510
+- **Remaining TypeScript lines:** 0
 
 ## Current
 
-- `P2-0061` src/commands/doctor/cron (2510 lines)
-
-## Up next
-
-- `P2-0061` src/commands/doctor/cron (2510 lines)
+- `P2-0228` extensions/google-meet (1235 lines)
 
 ## Recently completed
 
