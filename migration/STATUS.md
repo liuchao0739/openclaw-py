@@ -1,16 +1,16 @@
 # Migration status
 
-Updated: 2026-07-27 09:11:24 UTC
+Updated: 2026-07-27 09:11:31 UTC
 
-- **Done:** 71 / 231
+- **Done:** 72 / 231
 - **Pending:** 0
-- **Partial:** 160
+- **Partial:** 159
 - **Blocked:** 0
 - **Remaining TypeScript lines:** 0
 
 ## Current
 
-- `P2-0172` packages/model-catalog-core (1533 lines)
+- `P2-0208` extensions/deepinfra (1567 lines)
 
 ## Recently completed
 
