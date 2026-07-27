@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 04:12:58 UTC
+Updated: 2026-07-27 04:13:00 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 145
-- **Partial:** 16
+- **Pending:** 144
+- **Partial:** 17
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,162,647
+- **Remaining TypeScript lines:** 1,162,023
 
 ## Current
 
-- `P2-0102` src/interactive (624 lines)
+- `P2-0168` packages/media-core (1135 lines)
 
 ## Up next
 
-- `P2-0102` src/interactive (624 lines)
 - `P2-0168` packages/media-core (1135 lines)
 - `P2-0161` packages/acp-core (1454 lines)
 - `P2-0135` src/shared/text (2053 lines)
 - `P2-0163` packages/gateway-client (2074 lines)
+- `P2-0162` packages/agent-core (8160 lines)
 
 ## Recently completed
 
