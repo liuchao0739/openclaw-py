@@ -4201,3 +4201,18 @@ and the repository exists.
 [2026-07-27 07:15:41] P2-0112 src/media-generation (776 ts lines, 17 exported symbols)
 [2026-07-27 07:15:42]   attempt 1: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
 [2026-07-27 07:15:42]   attempt 2: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-27 07:15:43]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-27 07:15:43]   keeping partial work at 0%
+[2026-07-27 07:15:43]   push failed: ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[2026-07-27 07:15:43]   -> partial. 70 done, 61 pending
+[2026-07-27 07:15:43] P2-0145 src/skills/workshop (1988 ts lines, 35 exported symbols)
+[2026-07-27 07:15:43]   attempt 1: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
+[2026-07-27 07:15:44]   attempt 2: agent failed after 0s: Error: [unavailable] getaddrinfo ENOTFOUND api2.cursor.sh
