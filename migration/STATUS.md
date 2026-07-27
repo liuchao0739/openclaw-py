@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 04:12:38 UTC
+Updated: 2026-07-27 04:12:40 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 154
-- **Partial:** 7
+- **Pending:** 153
+- **Partial:** 8
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,196,142
+- **Remaining TypeScript lines:** 1,193,817
 
 ## Current
 
-- `P2-0180` packages/tool-call-repair (2325 lines)
+- `P2-0167` packages/markdown-core (2398 lines)
 
 ## Up next
 
-- `P2-0180` packages/tool-call-repair (2325 lines)
 - `P2-0167` packages/markdown-core (2398 lines)
 - `P2-0188` extensions/anthropic (2909 lines)
 - `P2-0186` extensions/amazon-bedrock (3520 lines)
 - `P2-0183` extensions/active-memory (3926 lines)
+- `P2-0164` packages/gateway-protocol (8545 lines)
 
 ## Recently completed
 
