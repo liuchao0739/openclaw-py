@@ -116,7 +116,6 @@ def truncate_to_visible_width(input: str, max_width: int) -> str:
     if visible_width(input) <= max_width:
         return input
 
-    ANSI_SEQUENCE_REGEX.lastindex = 0
     out = ""
     used = 0
     pos = 0
