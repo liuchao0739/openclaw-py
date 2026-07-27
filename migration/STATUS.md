@@ -1,6 +1,6 @@
 # Migration status
 
-Updated: 2026-07-27 11:27:10 UTC
+Updated: 2026-07-27 11:27:32 UTC
 
 - **Done:** 73 / 231
 - **Pending:** 0
@@ -10,15 +10,15 @@ Updated: 2026-07-27 11:27:10 UTC
 
 ## Current
 
-- `P2-0179` 移植 packages/terminal-core (1708 lines)
+- `P2-0179` packages/terminal-core (1708 lines)
 
 ## Recently completed
 
-- `P2-0054` 移植 src/cli/send-runtime
-- `P2-0028` 移植 src/auto-reply/reply/test-fixtures
-- `P2-0058` 移植 src/commands/agent
-- `P2-0050` 移植 src/cli/node-cli
-- `P2-0026` 移植 src/auto-reply/reply/exec
+- `P2-0026` src/auto-reply/reply/exec
+- `P2-0050` src/cli/node-cli
+- `P2-0058` src/commands/agent
+- `P2-0028` src/auto-reply/reply/test-fixtures
+- `P2-0054` src/cli/send-runtime
 
 ## How to refresh
 
