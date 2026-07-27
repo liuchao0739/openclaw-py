@@ -67,7 +67,11 @@ def save_plan(plan: list[dict]) -> None:
 
 
 def next_pending(plan: list[dict]) -> dict | None:
-    return next((task for task in plan if task.get("status") == "pending"), None)
+    """Pick the next task: unfinished pending first, then partials to retry."""
+    pending = next((task for task in plan if task.get("status") == "pending"), None)
+    if pending is not None:
+        return pending
+    return next((task for task in plan if task.get("status") == "partial"), None)
 
 
 def source_file_list(source: Path, limit: int = 40) -> str:
@@ -217,8 +221,10 @@ def write_status(plan: list[dict], current: dict | None = None) -> None:
         lines += [
             "## Current",
             "",
-            f"- `{current['id']}` {current.get('source', '')} "
-            f"({current.get('ts_source_lines', 0)} lines)",
+            (
+                f"- `{current['id']}` {current.get('source', '')} "
+                f"({current.get('ts_source_lines', 0)} lines)"
+            ),
             "",
         ]
     if next_tasks:
