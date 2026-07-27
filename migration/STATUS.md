@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 07:57:47 UTC
+Updated: 2026-07-27 08:14:08 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 21
-- **Partial:** 140
+- **Pending:** 20
+- **Partial:** 141
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 30,203
+- **Remaining TypeScript lines:** 29,558
 
 ## Current
 
-- `P2-0030` src/auto-reply/usage-bar (645 lines)
+- `P2-0067` src/commands/onboard-non-interactive (692 lines)
 
 ## Up next
 
-- `P2-0030` src/auto-reply/usage-bar (645 lines)
 - `P2-0067` src/commands/onboard-non-interactive (692 lines)
 - `P2-0052` src/cli/program/message (776 lines)
 - `P2-0080` src/cron/store (923 lines)
 - `P2-0064` src/commands/gateway-status (1017 lines)
+- `P2-0065` src/commands/migrate (1374 lines)
 
 ## Recently completed
 
