@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 08:17:01 UTC
+Updated: 2026-07-27 08:17:06 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 7
-- **Partial:** 154
+- **Pending:** 6
+- **Partial:** 155
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 7,446
+- **Remaining TypeScript lines:** 3,954
 
 ## Current
 
-- `P2-0087` src/gateway/server/ws-connection (3492 lines)
+- `P2-0085` src/gateway/server/__tests__ (15 lines)
 
 ## Up next
 
-- `P2-0087` src/gateway/server/ws-connection (3492 lines)
 - `P2-0085` src/gateway/server/__tests__ (15 lines)
 - `P2-0122` src/plugins/capability-runtime-vitest-shims (55 lines)
 - `P2-0141` src/skills/research (283 lines)
 - `P2-0103` src/link-understanding (393 lines)
+- `P2-0090` src/gateway/test (698 lines)
 
 ## Recently completed
 
