@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 07:25:33 UTC
+Updated: 2026-07-27 07:25:35 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 33
-- **Partial:** 128
+- **Pending:** 32
+- **Partial:** 129
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 63,333
+- **Remaining TypeScript lines:** 63,044
 
 ## Current
 
-- `P2-0158` src/web-fetch (289 lines)
+- `P2-0063` src/commands/doctor (499 lines)
 
 ## Up next
 
-- `P2-0158` src/web-fetch (289 lines)
 - `P2-0063` src/commands/doctor (499 lines)
 - `P2-0025` src/auto-reply/reply/commands-subagents (873 lines)
 - `P2-0069` src/commands/status-all (2890 lines)
 - `P2-0049` src/cli/gateway-cli (4287 lines)
+- `P2-0056` src/cli/update-cli (5943 lines)
 
 ## Recently completed
 
