@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 04:12:40 UTC
+Updated: 2026-07-27 04:12:41 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 153
-- **Partial:** 8
+- **Pending:** 152
+- **Partial:** 9
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,193,817
+- **Remaining TypeScript lines:** 1,191,419
 
 ## Current
 
-- `P2-0167` packages/markdown-core (2398 lines)
+- `P2-0188` extensions/anthropic (2909 lines)
 
 ## Up next
 
-- `P2-0167` packages/markdown-core (2398 lines)
 - `P2-0188` extensions/anthropic (2909 lines)
 - `P2-0186` extensions/amazon-bedrock (3520 lines)
 - `P2-0183` extensions/active-memory (3926 lines)
 - `P2-0164` packages/gateway-protocol (8545 lines)
+- `P2-0227` extensions/google (9140 lines)
 
 ## Recently completed
 
