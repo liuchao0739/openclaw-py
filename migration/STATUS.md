@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 05:14:22 UTC
+Updated: 2026-07-27 05:14:23 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 106
-- **Partial:** 55
+- **Pending:** 105
+- **Partial:** 56
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 363,118
+- **Remaining TypeScript lines:** 354,495
 
 ## Current
 
-- `P2-0149` src/tasks (8623 lines)
+- `P2-0081` src/cron (5208 lines)
 
 ## Up next
 
-- `P2-0149` src/tasks (8623 lines)
 - `P2-0081` src/cron (5208 lines)
 - `P2-0142` src/skills/runtime (2115 lines)
 - `P2-0140` src/skills/loading (3326 lines)
 - `P2-0011` src/agents/harness (6244 lines)
+- `P2-0020` src/agents/sessions (15519 lines)
 
 ## Recently completed
 
