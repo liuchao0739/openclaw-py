@@ -1,24 +1,24 @@
 # Migration status
 
-Updated: 2026-07-27 04:02:16 UTC
+Updated: 2026-07-27 04:02:17 UTC
 
 - **Done:** 70 / 231
-- **Pending:** 158
-- **Partial:** 3
+- **Pending:** 157
+- **Partial:** 4
 - **Blocked:** 0
-- **Remaining TypeScript lines:** 1,203,630
+- **Remaining TypeScript lines:** 1,201,922
 
 ## Current
 
-- `P2-0179` packages/terminal-core (1708 lines)
+- `P2-0220` extensions/fal (1769 lines)
 
 ## Up next
 
-- `P2-0179` packages/terminal-core (1708 lines)
 - `P2-0220` extensions/fal (1769 lines)
 - `P2-0210` extensions/device-pair (1842 lines)
 - `P2-0225` extensions/github-copilot (2169 lines)
 - `P2-0180` packages/tool-call-repair (2325 lines)
+- `P2-0167` packages/markdown-core (2398 lines)
 
 ## Recently completed
 
