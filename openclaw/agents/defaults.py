@@ -1,5 +1,21 @@
-"""Agent defaults — provider, model, and context token fallbacks."""
+from __future__ import annotations
 
-DEFAULT_PROVIDER = "openai"
-DEFAULT_MODEL = "gpt-5.5"
-DEFAULT_CONTEXT_TOKENS = 200_000
+from typing import Any
+
+
+def build_defaults(
+    config: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    return {
+        "temperature": 0.7,
+        "topP": 0.9,
+        "maxTokens": 128000,
+        "streaming": True,
+        "thinking": True,
+        "tools": True,
+    }
+
+
+def resolve_default(key: str, config: dict[str, Any] | None = None) -> Any:
+    defaults = build_defaults(config)
+    return defaults.get(key)

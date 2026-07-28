@@ -1,77 +1,106 @@
-from typing import Dict, List, Optional
+from __future__ import annotations
 
-from .auth import resolveFirstGithubToken
-from .token import DEFAULT_COPILOT_API_BASE_URL, resolveCopilotApiToken
+import json
+import os
+from typing import Any
+
+from openclaw.plugin_sdk.provider_auth import build_copilot_ide_headers
+from openclaw.plugin_sdk.secret_input_runtime import resolve_configured_secret_input_string
+
+from openclaw_extensions.github_copilot.auth import resolve_first_github_token
+from openclaw_extensions.github_copilot.token import (
+    DEFAULT_COPILOT_API_BASE_URL,
+    resolve_copilot_api_token,
+)
 
 COPILOT_EMBEDDING_PROVIDER_ID = "github-copilot"
 
-PREFERRED_MODELS = ["text-embedding-3-small", "text-embedding-3-large", "text-embedding-ada-002"]
+PREFERRED_MODELS = [
+    "text-embedding-3-small",
+    "text-embedding-3-large",
+    "text-embedding-ada-002",
+]
 
-COPILOT_HEADERS_STATIC = {
+COPILOT_HEADERS_STATIC: dict[str, str] = {
     "Content-Type": "application/json",
 }
+COPILOT_HEADERS_STATIC.update(build_copilot_ide_headers())
+
 COPILOT_ERROR_BODY_LIMIT_BYTES = 8 * 1024
 COPILOT_EMBEDDINGS_RESPONSE_MAX_BYTES = 64 * 1024 * 1024
 
 
-def isCopilotSetupError(err: Exception) -> bool:
-    message = str(err)
-    return any(phrase in message for phrase in [
-        "No GitHub token available",
-        "Copilot token exchange failed",
-        "Copilot token response",
-        "No embedding models available",
-        "GitHub Copilot model discovery",
-        "github-copilot.model-discovery",
-        "GitHub Copilot embedding model",
-        "Unexpected response from GitHub Copilot token endpoint",
+def _is_copilot_setup_error(err: Any) -> bool:
+    if not isinstance(err, Exception):
+        return False
+    msg = str(err)
+    return any([
+        "No GitHub token available" in msg,
+        "Copilot token exchange failed" in msg,
+        "Copilot token response" in msg,
+        "No embedding models available" in msg,
+        "GitHub Copilot model discovery" in msg,
+        "github-copilot.model-discovery" in msg,
+        "GitHub Copilot embedding model" in msg,
+        "Unexpected response from GitHub Copilot token endpoint" in msg,
     ])
 
 
-async def discoverEmbeddingModels(params: Dict) -> List[str]:
-    import requests
+def _discover_embedding_models(params: dict[str, Any]) -> list[str]:
+    import urllib.request
+    base = params.get("baseUrl", "").rstrip("/")
+    url = f"{base}/models"
+    headers = dict(COPILOT_HEADERS_STATIC)
+    headers.update(params.get("headers", {}))
+    headers["Authorization"] = f"Bearer {params.get('copilotToken', '')}"
 
-    baseUrl = params.get("baseUrl")
-    copilotToken = params.get("copilotToken")
-    headers = params.get("headers") or {}
+    req = urllib.request.Request(url, headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=10) as res:
+            if res.status != 200:
+                return []
+            body = res.read().decode("utf-8")
+            payload = json.loads(body)
+            data = payload.get("data", [])
+            if not isinstance(data, list):
+                return []
 
-    url = f"{baseUrl.rstrip('/')}/models"
-    response = requests.get(url, headers={
-        **COPILOT_HEADERS_STATIC,
-        **headers,
-        "Authorization": f"Bearer {copilotToken}",
-    })
-
-    if not response.ok:
-        detail = response.text[:COPILOT_ERROR_BODY_LIMIT_BYTES]
-        raise ValueError(f"GitHub Copilot model discovery HTTP {response.status}: {detail}")
-
-    payload = response.json()
-    allModels = payload.get("data", []) if isinstance(payload.get("data"), list) else []
-
-    embeddingModels = []
-    for entry in allModels:
-        entry_id = str(entry.get("id", "")).strip() if isinstance(entry.get("id"), str) else ""
-        if not entry_id:
-            continue
-        endpoints = entry.get("supported_endpoints", [])
-        hasEmbeddingEndpoint = any(isinstance(e, str) and "embeddings" in e for e in endpoints)
-        isEmbeddingModel = hasEmbeddingEndpoint or "embedding" in entry_id.lower()
-        if isEmbeddingModel:
-            embeddingModels.append(entry_id)
-    return embeddingModels
+            result = []
+            for entry in data:
+                if not isinstance(entry, dict):
+                    continue
+                entry_id = entry.get("id", "")
+                if not isinstance(entry_id, str):
+                    continue
+                entry_id = entry_id.strip()
+                if not entry_id:
+                    continue
+                endpoints = entry.get("supported_endpoints", [])
+                has_embedding_ep = False
+                if isinstance(endpoints, list):
+                    has_embedding_ep = any(
+                        isinstance(ep, str) and "embeddings" in ep
+                        for ep in endpoints
+                    )
+                if has_embedding_ep or "embedding" in entry_id.lower():
+                    result.append(entry_id)
+            return result
+    except Exception:
+        return []
 
 
-def pickBestModel(available: List[str], userModel: Optional[str] = None) -> str:
-    if userModel:
-        normalized = userModel.strip()
-        stripped = normalized[len(f"{COPILOT_EMBEDDING_PROVIDER_ID}/"):] if normalized.startswith(f"{COPILOT_EMBEDDING_PROVIDER_ID}/") else normalized
+def _pick_best_model(available: list[str], user_model: str | None = None) -> str:
+    if user_model:
+        normalized = user_model.strip()
+        prefix = f"{COPILOT_EMBEDDING_PROVIDER_ID}/"
+        stripped = normalized[len(prefix):] if normalized.startswith(prefix) else normalized
         if not available:
             raise ValueError("No embedding models available from GitHub Copilot")
         if stripped not in available:
-            raise ValueError(f"GitHub Copilot embedding model \"{stripped}\" is not available. Available: {', '.join(available)}")
+            raise ValueError(
+                f'GitHub Copilot embedding model "{stripped}" is not available. Available: {", ".join(available)}'
+            )
         return stripped
-
     for preferred in PREFERRED_MODELS:
         if preferred in available:
             return preferred
@@ -80,40 +109,42 @@ def pickBestModel(available: List[str], userModel: Optional[str] = None) -> str:
     raise ValueError("No embedding models available from GitHub Copilot")
 
 
-def parseGitHubCopilotEmbeddingPayload(payload: Dict, expectedCount: int) -> List[List[float]]:
+def _parse_embedding_payload(payload: Any, expected_count: int) -> list[list[float]]:
+    if not isinstance(payload, dict):
+        raise ValueError("GitHub Copilot embeddings response missing data[]")
     data = payload.get("data")
     if not isinstance(data, list):
         raise ValueError("GitHub Copilot embeddings response missing data[]")
 
-    vectors = [None] * expectedCount
+    vectors: list[list[float] | None] = [None] * expected_count
     for entry in data:
         if not isinstance(entry, dict):
             raise ValueError("GitHub Copilot embeddings response contains an invalid entry")
-        indexValue = entry.get("index")
+        index_val = entry.get("index")
         embedding = entry.get("embedding")
-        index = int(indexValue) if isinstance(indexValue, int) else float("nan")
-        if not isinstance(index, int) or index < 0 or index >= expectedCount:
+        if not isinstance(index_val, int) or not (0 <= index_val < expected_count):
             raise ValueError("GitHub Copilot embeddings response contains an invalid index")
-        if vectors[index] is not None:
+        if vectors[index_val] is not None:
             raise ValueError("GitHub Copilot embeddings response contains duplicate indexes")
         if not isinstance(embedding, list) or not all(isinstance(v, (int, float)) for v in embedding):
             raise ValueError("GitHub Copilot embeddings response contains an invalid embedding")
-        vectors[index] = [float(v) for v in embedding]
+        vectors[index_val] = [float(v) for v in embedding]
 
-    for i in range(expectedCount):
+    for i in range(expected_count):
         if vectors[i] is None:
             raise ValueError("GitHub Copilot embeddings response missing vectors for some inputs")
-    return vectors
+
+    return vectors  # type: ignore[return-value]
 
 
-async def resolveGitHubCopilotEmbeddingSession(client: Dict) -> Dict:
-    token = await resolveCopilotApiToken({
+async def _resolve_embedding_session(client: dict[str, Any]) -> dict[str, Any]:
+    token = await resolve_copilot_api_token({
         "githubToken": client.get("githubToken"),
-        "env": client.get("env"),
+        "env": client.get("env", os.environ),
     })
-    baseUrl = client.get("baseUrl", "").strip() or token.get("baseUrl") or DEFAULT_COPILOT_API_BASE_URL
+    base_url = (client.get("baseUrl") or token.get("baseUrl") or DEFAULT_COPILOT_API_BASE_URL).strip()
     return {
-        "baseUrl": baseUrl,
+        "baseUrl": base_url,
         "headers": {
             **COPILOT_HEADERS_STATIC,
             **(client.get("headers") or {}),
@@ -122,105 +153,114 @@ async def resolveGitHubCopilotEmbeddingSession(client: Dict) -> Dict:
     }
 
 
-async def createGitHubCopilotEmbeddingProvider(client: Dict) -> Dict:
-    import requests
+async def _create_embedding_provider(client: dict[str, Any]) -> dict[str, Any]:
+    initial_session = await _resolve_embedding_session(client)
 
-    initialSession = await resolveGitHubCopilotEmbeddingSession(client)
-
-    async def embed(inputTexts: List[str], signal=None):
-        if not inputTexts:
+    async def embed(inputs: list[str]) -> list[list[float]]:
+        if not inputs:
             return []
-
-        session = await resolveGitHubCopilotEmbeddingSession(client)
+        session = await _resolve_embedding_session(client)
+        import urllib.request
         url = f"{session['baseUrl'].rstrip('/')}/embeddings"
+        body = json.dumps({"model": client.get("model"), "input": inputs}).encode("utf-8")
+        req = urllib.request.Request(
+            url,
+            data=body,
+            headers=session["headers"],
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=30) as res:
+            if res.status != 200:
+                detail = res.read().decode("utf-8", errors="replace")[:COPILOT_ERROR_BODY_LIMIT_BYTES]
+                raise RuntimeError(f"GitHub Copilot embeddings HTTP {res.status}: {detail}")
+            resp_body = res.read().decode("utf-8")
+            payload = json.loads(resp_body)
+            return _parse_embedding_payload(payload, len(inputs))
 
-        response = requests.post(url, headers=session["headers"], json={"model": client["model"], "input": inputTexts})
-        if not response.ok:
-            detail = response.text[:COPILOT_ERROR_BODY_LIMIT_BYTES]
-            raise ValueError(f"GitHub Copilot embeddings HTTP {response.status}: {detail}")
+    async def embed_query(text: str, options: dict[str, Any] | None = None) -> list[float]:
+        vectors = await embed([text])
+        return vectors[0] if vectors else []
 
-        payload = response.json()
-        return parseGitHubCopilotEmbeddingPayload(payload, len(inputTexts))
-
-    async def embed_query(text, options=None):
-        if not text:
-            return []
-        results = await embed([text])
-        return results[0] if results else []
-
-    async def embed_batch(texts, options=None):
+    async def embed_batch(texts: list[str], options: dict[str, Any] | None = None) -> list[list[float]]:
         return await embed(texts)
 
     return {
         "provider": {
             "id": COPILOT_EMBEDDING_PROVIDER_ID,
-            "model": client["model"],
+            "model": client.get("model"),
             "embedQuery": embed_query,
             "embedBatch": embed_batch,
         },
         "client": {
             **client,
-            "baseUrl": initialSession["baseUrl"],
+            "baseUrl": initial_session["baseUrl"],
         },
     }
 
 
-async def create_copilot_embedding_provider(options):
-    remoteGithubToken = options.get("remote", {}).get("apiKey") or ""
-    result = await resolveFirstGithubToken({
-        "agentDir": options.get("agentDir"),
-        "config": options.get("config"),
-        "env": {},
-    })
-    profileGithubToken = result.get("githubToken", "")
-    githubToken = remoteGithubToken or profileGithubToken
-
-    if not githubToken:
-        raise ValueError("No GitHub token available for Copilot embedding provider")
-
-    tokenResult = await resolveCopilotApiToken({"githubToken": githubToken, "env": {}})
-    copilotToken = tokenResult.get("token")
-    resolvedBaseUrl = tokenResult.get("baseUrl")
-    baseUrl = options.get("remote", {}).get("baseUrl", "").strip() or resolvedBaseUrl or DEFAULT_COPILOT_API_BASE_URL
-
-    availableModels = await discoverEmbeddingModels({
-        "baseUrl": baseUrl,
-        "copilotToken": copilotToken,
-        "headers": options.get("remote", {}).get("headers"),
-    })
-
-    userModel = options.get("model", "").strip() or None
-    model = pickBestModel(availableModels, userModel)
-
-    providerResult = await createGitHubCopilotEmbeddingProvider({
-        "baseUrl": baseUrl,
-        "env": {},
-        "githubToken": githubToken,
-        "headers": options.get("remote", {}).get("headers"),
-        "model": model,
-    })
-
-    return {
-        "provider": providerResult["provider"],
-        "runtime": {
-            "id": COPILOT_EMBEDDING_PROVIDER_ID,
-            "cacheKeyData": {
-                "provider": COPILOT_EMBEDDING_PROVIDER_ID,
-                "baseUrl": baseUrl,
-                "model": model,
-            },
-        },
-    }
-
-
-githubCopilotMemoryEmbeddingProviderAdapter = {
+github_copilot_memory_embedding_provider_adapter: dict[str, Any] = {
     "id": COPILOT_EMBEDDING_PROVIDER_ID,
     "transport": "remote",
     "authProviderId": COPILOT_EMBEDDING_PROVIDER_ID,
     "autoSelectPriority": 15,
     "allowExplicitWhenConfiguredAuto": True,
-    "shouldContinueAutoSelection": isCopilotSetupError,
-    "create": create_copilot_embedding_provider,
+    "shouldContinueAutoSelection": lambda err: _is_copilot_setup_error(err),
+    "create": async lambda options: await _create_embedding_provider_from_options(options),
 }
 
-__all__ = ["githubCopilotMemoryEmbeddingProviderAdapter"]
+
+async def _create_embedding_provider_from_options(options: dict[str, Any]) -> dict[str, Any]:
+    remote_github_token = await resolve_configured_secret_input_string({
+        "config": options.get("config"),
+        "env": os.environ,
+        "value": options.get("remote", {}).get("apiKey") if isinstance(options.get("remote"), dict) else None,
+        "path": "agents.*.memorySearch.remote.apiKey",
+    })
+    resolved = await resolve_first_github_token({
+        "agentDir": options.get("agentDir"),
+        "config": options.get("config"),
+        "env": os.environ,
+    })
+    profile_github_token = resolved.get("githubToken", "")
+    github_token = (remote_github_token or {}).get("value", "") or profile_github_token
+    if not github_token:
+        raise ValueError("No GitHub token available for Copilot embedding provider")
+
+    token_result = await resolve_copilot_api_token({
+        "githubToken": github_token,
+        "env": os.environ,
+    })
+    copilot_token = token_result.get("token", "")
+    resolved_base_url = token_result.get("baseUrl", "")
+    base_url = (
+        (options.get("remote", {}) or {}).get("baseUrl", "") or resolved_base_url or DEFAULT_COPILOT_API_BASE_URL
+    ).strip()
+
+    available_models = _discover_embedding_models({
+        "baseUrl": base_url,
+        "copilotToken": copilot_token,
+        "headers": (options.get("remote", {}) or {}).get("headers"),
+    })
+
+    user_model = (options.get("model") or "").strip() or None
+    model = _pick_best_model(available_models, user_model)
+
+    result = await _create_embedding_provider({
+        "baseUrl": base_url,
+        "env": os.environ,
+        "githubToken": github_token,
+        "headers": (options.get("remote", {}) or {}).get("headers"),
+        "model": model,
+    })
+
+    return {
+        "provider": result["provider"],
+        "runtime": {
+            "id": COPILOT_EMBEDDING_PROVIDER_ID,
+            "cacheKeyData": {
+                "provider": COPILOT_EMBEDDING_PROVIDER_ID,
+                "baseUrl": base_url,
+                "model": model,
+            },
+        },
+    }

@@ -2,7 +2,8 @@
 
 from openclaw.chat.canvas_render import (
     coerce_canvas_preview,
-    extract_canvas_previews,
+    extract_canvas_from_text,
+    extract_canvas_shortcodes,
 )
 from openclaw.chat.tool_content import (
     is_tool_call_block,
@@ -15,7 +16,8 @@ from openclaw.chat.tool_content import (
 
 __all__ = [
     "coerce_canvas_preview",
-    "extract_canvas_previews",
+    "extract_canvas_from_text",
+    "extract_canvas_shortcodes",
     "is_tool_call_block",
     "is_tool_call_content_type",
     "is_tool_result_block",

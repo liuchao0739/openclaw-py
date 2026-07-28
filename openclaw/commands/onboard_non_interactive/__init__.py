@@ -1,13 +1,9 @@
-"""Commands/onboard-non-interactive — config write and remote setup."""
-
-from openclaw.commands.onboard_non_interactive.config_write import (
-    commit_non_interactive_onboard_config,
-)
-from openclaw.commands.onboard_non_interactive.remote import (
-    run_non_interactive_remote_setup,
-)
+from .config_write import onboard_config_write
+from .onboard import onboard_non_interactive_command
+from .onboard_remote import onboard_remote_command
 
 __all__ = [
-    "commit_non_interactive_onboard_config",
-    "run_non_interactive_remote_setup",
+    "onboard_config_write",
+    "onboard_non_interactive_command",
+    "onboard_remote_command",
 ]

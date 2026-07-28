@@ -18,6 +18,7 @@ class KnownApi(StrEnum):
 ThinkingLevel = Literal["minimal", "low", "medium", "high", "xhigh", "max"]
 ModelThinkingLevel = Literal["off", "minimal", "low", "medium", "high", "xhigh", "max"]
 StopReason = Literal["stop", "length", "toolUse", "error", "aborted"]
+Transport = Literal["sse", "websocket", "websocket-cached", "auto"]
 
 
 class TextContent(BaseModel):
@@ -121,3 +122,11 @@ class ModelRef(BaseModel):
 
     def as_key(self) -> str:
         return f"{self.provider}/{self.model}"
+
+
+class Context(BaseModel):
+    messages: list[Message] = Field(default_factory=list)
+    tools: list[Tool] = Field(default_factory=list)
+    system_prompt: str | None = Field(default=None, alias="systemPrompt")
+
+    model_config = {"populate_by_name": True}

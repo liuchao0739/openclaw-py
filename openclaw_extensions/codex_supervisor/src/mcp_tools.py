@@ -5,9 +5,10 @@ from __future__ import annotations
 import os
 import re
 from collections.abc import Callable
-from typing import Any
+from typing import Any, TypedDict
 from urllib.parse import urlparse, urlunparse
 
+from openclaw_extensions.codex_supervisor.src.supervisor import CodexSupervisor
 from openclaw_extensions.codex_supervisor.src.types import (
     CodexSupervisorEndpoint,
     CodexSupervisorSession,
@@ -113,4 +114,220 @@ def sanitize_codex_supervisor_session_list_result(
     }
 
 
-CodexSupervisorMcpToolOptions = dict[str, Callable[[], bool] | None]
+class CodexSupervisorMcpToolOptions(TypedDict, total=False):
+    rawTranscriptReadsAllowed: Callable[[], bool]
+    writeControlsAllowed: Callable[[], bool]
+
+
+def _text_result(text: str, structured_content: dict[str, Any] | None = None) -> dict[str, Any]:
+    result: dict[str, Any] = {"content": [{"type": "text", "text": text}]}
+    if structured_content is not None:
+        result["structuredContent"] = structured_content
+    return result
+
+
+def _error_result(message: str) -> dict[str, Any]:
+    return {"content": [{"type": "text", "text": message}], "isError": True}
+
+
+def _raw_transcript_reads_allowed_for(opts: CodexSupervisorMcpToolOptions | None = None) -> bool:
+    if opts and opts.get("rawTranscriptReadsAllowed"):
+        return opts["rawTranscriptReadsAllowed"]()
+    return raw_transcript_reads_allowed()
+
+
+def _write_controls_allowed_for(opts: CodexSupervisorMcpToolOptions | None = None) -> bool:
+    if opts and opts.get("writeControlsAllowed"):
+        return opts["writeControlsAllowed"]()
+    return write_controls_allowed()
+
+
+def register_codex_supervisor_mcp_tools(
+    server: Any,
+    supervisor: CodexSupervisor,
+    opts: CodexSupervisorMcpToolOptions | None = None,
+) -> None:
+    server.tool(
+        "codex_endpoint_probe",
+        "Check configured Codex app-server endpoints.",
+        {},
+        lambda: _probe_endpoints(supervisor),
+    )
+
+    server.tool(
+        "codex_sessions_list",
+        "List Codex sessions visible to the OpenClaw supervisor.",
+        {
+            "include_stored": {"type": "boolean"},
+            "max_stored_sessions": {"type": "integer", "minimum": 1, "maximum": 1000},
+        },
+        lambda include_stored=False, max_stored_sessions=None: _list_sessions(
+            supervisor, opts, include_stored, max_stored_sessions
+        ),
+    )
+
+    server.tool(
+        "codex_session_read",
+        "Read one Codex session transcript from app-server.",
+        {
+            "endpoint_id": {"type": "string"},
+            "thread_id": {"type": "string", "minLength": 1},
+            "include_turns": {"type": "boolean"},
+        },
+        lambda endpoint_id=None, thread_id="", include_turns=False: _read_session(
+            supervisor, opts, endpoint_id, thread_id, include_turns
+        ),
+    )
+
+    server.tool(
+        "codex_session_send",
+        "Send text to a Codex session. Idle sessions start a turn; active sessions are steered.",
+        {
+            "endpoint_id": {"type": "string"},
+            "thread_id": {"type": "string", "minLength": 1},
+            "text": {"type": "string", "minLength": 1},
+            "mode": {"type": "string", "enum": ["auto", "start", "steer"]},
+        },
+        lambda endpoint_id=None, thread_id="", text="", mode=None: _send_session(
+            supervisor, opts, endpoint_id, thread_id, text, mode
+        ),
+    )
+
+    server.tool(
+        "codex_session_interrupt",
+        "Interrupt an active Codex turn.",
+        {
+            "endpoint_id": {"type": "string"},
+            "thread_id": {"type": "string", "minLength": 1},
+            "turn_id": {"type": "string"},
+        },
+        lambda endpoint_id=None, thread_id="", turn_id=None: _interrupt_session(
+            supervisor, opts, endpoint_id, thread_id, turn_id
+        ),
+    )
+
+
+def _probe_endpoints(supervisor: CodexSupervisor) -> dict[str, Any]:
+    endpoints = [redact_codex_supervisor_endpoint(endpoint) for endpoint in supervisor.list_endpoints()]
+    import asyncio
+    health = asyncio.get_event_loop().run_until_complete(supervisor.probe_endpoints())
+    health_entries = [
+        {"endpointId": entry["endpointId"], "ok": entry["ok"]} for entry in health
+    ]
+    ok_count = sum(1 for entry in health_entries if entry["ok"])
+    return _text_result(
+        f"codex endpoints: {ok_count}/{len(health_entries)} ok",
+        {"endpoints": endpoints, "health": health_entries},
+    )
+
+
+def _list_sessions(
+    supervisor: CodexSupervisor,
+    opts: CodexSupervisorMcpToolOptions | None,
+    include_stored: bool,
+    max_stored_sessions: int | None,
+) -> dict[str, Any]:
+    import asyncio
+    result = asyncio.get_event_loop().run_until_complete(
+        supervisor.list_session_snapshot(
+            {"includeStored": include_stored, "maxStoredSessions": max_stored_sessions}
+        )
+    )
+    return _text_result(
+        f"codex sessions: {len(result['sessions'])}",
+        sanitize_codex_supervisor_session_list_result(
+            result, _raw_transcript_reads_allowed_for(opts)
+        ),
+    )
+
+
+def _read_session(
+    supervisor: CodexSupervisor,
+    opts: CodexSupervisorMcpToolOptions | None,
+    endpoint_id: str | None,
+    thread_id: str,
+    include_turns: bool,
+) -> dict[str, Any]:
+    if not _raw_transcript_reads_allowed_for(opts):
+        return _error_result(
+            f"Codex session reads are disabled; set {RAW_TRANSCRIPTS_ENV}=1 for a trusted supervisor-only MCP"
+        )
+    import asyncio
+    try:
+        response = asyncio.get_event_loop().run_until_complete(
+            supervisor.read_session(
+                {
+                    "endpointId": endpoint_id,
+                    "threadId": thread_id,
+                    "includeTurns": include_turns,
+                }
+            )
+        )
+        return _text_result(
+            f"codex session: {thread_id}",
+            {"response": redact_codex_supervisor_value(response)},
+        )
+    except Exception as e:
+        return _error_result(str(e))
+
+
+def _send_session(
+    supervisor: CodexSupervisor,
+    opts: CodexSupervisorMcpToolOptions | None,
+    endpoint_id: str | None,
+    thread_id: str,
+    text: str,
+    mode: str | None,
+) -> dict[str, Any]:
+    if not _write_controls_allowed_for(opts):
+        return _error_result(
+            f"Codex write controls are disabled; set {WRITE_CONTROLS_ENV}=1 for a trusted supervisor-only MCP"
+        )
+    import asyncio
+    try:
+        result = asyncio.get_event_loop().run_until_complete(
+            supervisor.send_to_session(
+                {
+                    "endpointId": endpoint_id,
+                    "threadId": thread_id,
+                    "text": text,
+                    "mode": mode,
+                }
+            )
+        )
+        return _text_result(
+            f"codex {result['mode']}: {result.get('turnId', thread_id)}",
+            {"result": result},
+        )
+    except Exception as e:
+        return _error_result(str(e))
+
+
+def _interrupt_session(
+    supervisor: CodexSupervisor,
+    opts: CodexSupervisorMcpToolOptions | None,
+    endpoint_id: str | None,
+    thread_id: str,
+    turn_id: str | None,
+) -> dict[str, Any]:
+    if not _write_controls_allowed_for(opts):
+        return _error_result(
+            f"Codex write controls are disabled; set {WRITE_CONTROLS_ENV}=1 for a trusted supervisor-only MCP"
+        )
+    import asyncio
+    try:
+        result = asyncio.get_event_loop().run_until_complete(
+            supervisor.interrupt_session(
+                {
+                    "endpointId": endpoint_id,
+                    "threadId": thread_id,
+                    "turnId": turn_id,
+                }
+            )
+        )
+        return _text_result(
+            f"codex interrupted: {result['turnId']}",
+            {"result": result},
+        )
+    except Exception as e:
+        return _error_result(str(e))

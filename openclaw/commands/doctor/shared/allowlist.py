@@ -1,21 +1,28 @@
-"""Shared doctor allowlist predicates for normalized sender lists."""
-
 from __future__ import annotations
 
 from typing import Any
 
+from openclaw.commands.doctor.types import DoctorAccountRecord, DoctorAllowFromEntry, DoctorAllowFromList
 
-def _normalize_string_entries(entries: list[Any] | None) -> list[str]:
-    if not entries:
+
+def _validate_allow_from_entry(entry: Any) -> bool:
+    if isinstance(entry, str):
+        return True
+    if isinstance(entry, int):
+        return 0 <= entry <= 255
+    return False
+
+
+def normalize_allow_from_list(raw: DoctorAllowFromList | None = None) -> DoctorAllowFromList:
+    if raw is None:
         return []
-    result: list[str] = []
-    for entry in entries:
-        s = str(entry).strip() if entry is not None else ""
-        if s:
-            result.append(s)
-    return result
+    return [e for e in raw if _validate_allow_from_entry(e)]
 
 
-def has_allow_from_entries(lst: list[Any] | None) -> bool:
-    """Return True when an allowFrom-like list has at least one normalized sender entry."""
-    return isinstance(lst, list) and len(_normalize_string_entries(lst)) > 0
+def validate_account_record(record: DoctorAccountRecord) -> list[str]:
+    errors: list[str] = []
+    if not isinstance(record, dict):
+        return ["Account record must be an object."]
+    if "accountId" not in record:
+        errors.append("Missing accountId field.")
+    return errors

@@ -1,14 +1,7 @@
-"""Duration formatting helpers produce compact, precise, and human display
-strings from millisecond values.
-
-Mirrors src/infra/format-time/format-duration.ts.
-"""
-
 from __future__ import annotations
 
 import math
-import re
-from typing import Any
+from typing import Any, Optional
 
 
 def _is_finite(value: Any) -> bool:
@@ -20,54 +13,48 @@ def _is_finite(value: Any) -> bool:
 
 
 def format_duration_seconds(
-    ms: float,
+    ms: int | float,
     options: dict[str, Any] | None = None,
 ) -> str:
-    """Format milliseconds as seconds with optional decimals."""
     if not _is_finite(ms):
         return "unknown"
     opts = options or {}
     decimals = opts.get("decimals", 1)
     unit = opts.get("unit", "s")
     seconds = max(0, ms) / 1000
-    fixed = f"{seconds:.{max(0, int(decimals))}f}"
-    # Trim trailing zeros: "1.0" -> "1", "1.50" -> "1.5"
-    trimmed = re.sub(r"\.0+$", "", fixed)
-    trimmed = re.sub(r"(\.\d*[1-9])0+$", r"\1", trimmed)
+    fixed = f"{seconds:.{max(0, decimals)}f}"
+    if "." in fixed:
+        trimmed = fixed.rstrip("0").rstrip(".")
+    else:
+        trimmed = fixed
     return f"{trimmed} seconds" if unit == "seconds" else f"{trimmed}s"
 
 
 def format_duration_precise(
-    ms: float,
+    ms: int | float,
     options: dict[str, Any] | None = None,
 ) -> str:
-    """Precise decimal-seconds output: '500ms' or '1.23s'."""
     if not _is_finite(ms):
         return "unknown"
     if ms < 1000:
         return f"{max(0, round(ms))}ms"
     opts = options or {}
-    return format_duration_seconds(
-        ms,
-        {"decimals": opts.get("decimals", 2), "unit": opts.get("unit", "s")},
-    )
+    decimals = opts.get("decimals", 2)
+    unit = opts.get("unit", "s")
+    return format_duration_seconds(ms, {"decimals": decimals, "unit": unit})
 
 
 def format_duration_compact(
-    ms: float | None,
+    ms: int | float | None = None,
     options: dict[str, Any] | None = None,
 ) -> str | None:
-    """Compact compound duration: '500ms', '45s', '2m5s', '1h30m'.
-
-    With ``spaced``: '45s', '2m 5s', '1h 30m'.
-    Omits trailing zero components. Returns None for null/non-finite/non-positive.
-    """
     if ms is None or not _is_finite(ms) or ms <= 0:
         return None
     if ms < 1000:
         return f"{round(ms)}ms"
     opts = options or {}
-    sep = " " if opts.get("spaced") else ""
+    spaced = opts.get("spaced", False)
+    sep = " " if spaced else ""
     total_seconds = round(ms / 1000)
     hours = total_seconds // 3600
     minutes = (total_seconds % 3600) // 60
@@ -84,10 +71,9 @@ def format_duration_compact(
 
 
 def format_duration_human(
-    ms: float | None,
+    ms: int | float | None = None,
     fallback: str = "n/a",
 ) -> str:
-    """Rounded single-unit duration for display: '500ms', '5s', '3m', '2h', '5d'."""
     if ms is None or not _is_finite(ms) or ms < 0:
         return fallback
     if ms < 1000:
@@ -95,11 +81,49 @@ def format_duration_human(
     sec = round(ms / 1000)
     if sec < 60:
         return f"{sec}s"
-    minute = round(sec / 60)
-    if minute < 60:
-        return f"{minute}m"
-    hr = round(minute / 60)
+    min = round(sec / 60)
+    if min < 60:
+        return f"{min}m"
+    hr = round(min / 60)
     if hr < 24:
         return f"{hr}h"
     day = round(hr / 24)
     return f"{day}d"
+
+
+def format_duration(ms: int) -> str:
+    if ms < 1000:
+        return f"{ms}ms"
+    seconds = ms / 1000
+    if seconds < 60:
+        return f"{seconds:.1f}s"
+    minutes = seconds / 60
+    if minutes < 60:
+        return f"{minutes:.1f}m"
+    hours = minutes / 60
+    if hours < 24:
+        return f"{hours:.1f}h"
+    days = hours / 24
+    return f"{days:.1f}d"
+
+
+def format_datetime(ts: float, *, fmt: str = "%Y-%m-%d %H:%M:%S") -> str:
+    from datetime import datetime, timezone
+    return datetime.fromtimestamp(ts, tz=timezone.utc).strftime(fmt)
+
+
+def format_relative(ts: float, now: float | None = None) -> str:
+    import time
+    if now is None:
+        now = time.time()
+    diff = now - ts
+    if abs(diff) < 60:
+        return "just now"
+    if abs(diff) < 3600:
+        minutes = int(abs(diff) / 60)
+        return f"{minutes}m ago" if diff > 0 else f"in {minutes}m"
+    if abs(diff) < 86400:
+        hours = int(abs(diff) / 3600)
+        return f"{hours}h ago" if diff > 0 else f"in {hours}h"
+    days = int(abs(diff) / 86400)
+    return f"{days}d ago" if diff > 0 else f"in {days}d"

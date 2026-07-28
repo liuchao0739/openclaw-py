@@ -13,6 +13,7 @@ from .api import (
     revokeDeviceBootstrapToken,
     resolveGatewayBindUrl,
     resolveGatewayPort,
+    resolveTailnetHostWithRunner,
     resolveScheme,
     normalizeUrl,
     validateMobilePairingUrl,
@@ -112,6 +113,14 @@ def resolveAuthLabel(cfg: Dict) -> Dict:
     return {"error": "Gateway auth is not configured (no token or password)."}
 
 
+async def resolveTailnetHost(api) -> Optional[str]:
+    try:
+        from .api import runPluginCommandWithTimeout
+        return resolveTailnetHostWithRunner(lambda argv, opts: runPluginCommandWithTimeout(argv, opts))
+    except Exception:
+        return pickTailnetIPv4()
+
+
 async def resolveGatewayUrl(api) -> Dict:
     cfg = api.config
     pluginCfg = api.pluginConfig or {}
@@ -132,7 +141,7 @@ async def resolveGatewayUrl(api) -> Dict:
 
     tailscaleMode = cfg.get("gateway", {}).get("tailscale", {}).get("mode", "off")
     if tailscaleMode in ("serve", "funnel"):
-        host = pickTailnetIPv4()
+        host = await resolveTailnetHost(api)
         if not host:
             return {"error": "Tailscale Serve is enabled, but MagicDNS could not be resolved."}
         return {"url": f"wss://{host}", "source": f"gateway.tailscale.mode={tailscaleMode}"}

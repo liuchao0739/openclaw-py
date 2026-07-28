@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import math
 import time
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from typing import Any, TypedDict
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
@@ -102,8 +102,8 @@ def format_relative_timestamp(
         tz_name = opts.get("timezone")
         if tz_name is not None and resolve_timezone(tz_name) is None:
             raise ValueError("invalid timezone")
-        tz = ZoneInfo(tz_name) if tz_name else UTC
-        dt = datetime.fromtimestamp(timestamp_ms / 1000, tz=UTC).astimezone(tz)
+        tz = ZoneInfo(tz_name) if tz_name else timezone.utc
+        dt = datetime.fromtimestamp(timestamp_ms / 1000, tz=timezone.utc).astimezone(tz)
         return f"{dt.strftime('%b')} {dt.day}"
     except (ZoneInfoNotFoundError, ValueError, OSError, OverflowError):
         return f"{day}d ago"

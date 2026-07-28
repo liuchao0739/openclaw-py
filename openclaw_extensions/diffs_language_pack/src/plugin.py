@@ -1,83 +1,64 @@
-"""Diffs Language Pack plugin module implements plugin behavior."""
-
 from __future__ import annotations
 
-from typing import Any, Protocol
-from urllib.parse import urlparse
+from typing import Any
 
-from openclaw_extensions.diffs_language_pack.api import OpenClawPluginApi
 from openclaw_extensions.diffs_language_pack.src.viewer_assets import (
     VIEWER_ASSET_PREFIX,
     get_served_viewer_asset,
 )
 
 
-class HttpRequest(Protocol):
-    method: str
-    url: str | None
+def register_diffs_language_pack_plugin(api: Any) -> None:
+    api.register_http_route({
+        "path": "/plugins/diffs-language-pack",
+        "auth": "plugin",
+        "match": "prefix",
+        "handler": _create_diffs_language_pack_http_handler(),
+    })
 
 
-class HttpResponse(Protocol):
-    status_code: int
-
-    def set_header(self, name: str, value: str) -> None: ...
-
-    def end(self, body: str | bytes | None = None) -> None: ...
-
-
-def register_diffs_language_pack_plugin(api: OpenClawPluginApi) -> None:
-    api.register_http_route(
-        {
-            "path": "/plugins/diffs-language-pack",
-            "auth": "plugin",
-            "match": "prefix",
-            "handler": create_diffs_language_pack_http_handler(),
-        }
-    )
-
-
-def create_diffs_language_pack_http_handler():
-    async def handler(req: HttpRequest, res: HttpResponse) -> bool:
-        parsed = parse_request_url(req.url)
-        if parsed is None or not parsed.path.startswith(VIEWER_ASSET_PREFIX):
+def _create_diffs_language_pack_http_handler():
+    async def handler(req: dict[str, Any], res: dict[str, Any]) -> bool:
+        url = req.get("url")
+        if not url:
             return False
-        if req.method not in ("GET", "HEAD"):
-            respond_text(res, 405, "Method not allowed")
+        from urllib.parse import urlparse
+        try:
+            parsed = urlparse(url)
+        except Exception:
+            return False
+        pathname = parsed.path
+        if not pathname.startswith(VIEWER_ASSET_PREFIX):
+            return False
+        method = (req.get("method", "GET") or "GET").upper()
+        if method not in ("GET", "HEAD"):
+            _respond_text(res, 405, "Method not allowed")
             return True
-
-        asset = await get_served_viewer_asset(parsed.path)
-        if asset is None:
-            respond_text(res, 404, "Asset not found")
+        asset = await get_served_viewer_asset(pathname)
+        if not asset:
+            _respond_text(res, 404, "Asset not found")
             return True
-
-        res.status_code = 200
-        set_shared_headers(res, asset.content_type)
-        if req.method == "HEAD":
-            res.end()
+        res["statusCode"] = 200
+        _set_shared_headers(res.get("setHeader", lambda k, v: None), asset["contentType"])
+        if method == "HEAD":
+            res["end"]()
         else:
-            res.end(asset.body)
+            body = asset["body"]
+            if isinstance(body, bytes):
+                body = body.decode("utf-8")
+            res["end"](body)
         return True
-
     return handler
 
 
-def parse_request_url(raw_url: str | None) -> Any | None:
-    if not raw_url:
-        return None
-    try:
-        return urlparse(raw_url)
-    except ValueError:
-        return None
+def _respond_text(res: dict[str, Any], status_code: int, body: str) -> None:
+    res["statusCode"] = status_code
+    _set_shared_headers(res.get("setHeader", lambda k, v: None), "text/plain; charset=utf-8")
+    res["end"](body)
 
 
-def respond_text(res: HttpResponse, status_code: int, body: str) -> None:
-    res.status_code = status_code
-    set_shared_headers(res, "text/plain; charset=utf-8")
-    res.end(body)
-
-
-def set_shared_headers(res: HttpResponse, content_type: str) -> None:
-    res.set_header("cache-control", "no-store, max-age=0")
-    res.set_header("content-type", content_type)
-    res.set_header("x-content-type-options", "nosniff")
-    res.set_header("referrer-policy", "no-referrer")
+def _set_shared_headers(set_header: Any, content_type: str) -> None:
+    set_header("cache-control", "no-store, max-age=0")
+    set_header("content-type", content_type)
+    set_header("x-content-type-options", "nosniff")
+    set_header("referrer-policy", "no-referrer")

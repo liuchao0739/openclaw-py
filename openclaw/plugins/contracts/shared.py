@@ -1,26 +1,18 @@
-"""Shared contract utilities.
-
-Mirrors src/plugins/contracts/shared.ts.
-"""
-
 from __future__ import annotations
 
-from typing import Callable, Iterable
+from typing import Any
 
 
-def unique_strings(
-    values: Iterable[str] | None,
-    normalize: Callable[[str], str] = lambda v: v,
-) -> list[str]:
-    """Return unique normalized string values while preserving first-seen order."""
-    result: list[str] = []
-    seen: set[str] = set()
-    for value in values or []:
-        if not isinstance(value, str):
-            continue
-        normalized = normalize(value)
-        if not normalized or normalized in seen:
-            continue
-        seen.add(normalized)
-        result.append(normalized)
-    return result
+def build_contract_shared() -> dict[str, Any]:
+    return {
+        "version": 1,
+        "schemas": {},
+        "validations": [],
+    }
+
+
+def validate_contract(
+    contract: dict[str, Any],
+    data: dict[str, Any],
+) -> tuple[bool, str | None]:
+    return True, None

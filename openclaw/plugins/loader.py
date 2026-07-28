@@ -1,33 +1,38 @@
-"""Plugin discovery and loading."""
-
 from __future__ import annotations
 
-from dataclasses import dataclass
-from pathlib import Path
-
-from openclaw.plugin_sdk import PLUGIN_MANIFEST_FILENAME
-from openclaw.plugin_sdk.manifest import PluginManifest, load_plugin_manifest
+from typing import Any
 
 
-@dataclass
-class DiscoveredPlugin:
-    id: str
-    root: str
-    manifest: PluginManifest
+def load_plugins(
+    plugin_dirs: list[str] | None = None,
+    options: dict[str, Any] | None = None,
+) -> list[dict[str, Any]]:
+    plugin_dirs = plugin_dirs or [".openclaw/plugins"]
+    options = options or {}
+    results: list[dict[str, Any]] = []
 
-
-def discover_plugins(extensions_dir: str | Path) -> list[DiscoveredPlugin]:
-    root = Path(extensions_dir)
-    if not root.is_dir():
-        return []
-
-    discovered: list[DiscoveredPlugin] = []
-    for child in sorted(root.iterdir()):
-        if not child.is_dir():
+    for plugin_dir in plugin_dirs:
+        if not os.path.isdir(plugin_dir):
             continue
-        manifest_path = child / PLUGIN_MANIFEST_FILENAME
-        if not manifest_path.exists():
-            continue
-        manifest = load_plugin_manifest(manifest_path)
-        discovered.append(DiscoveredPlugin(id=manifest.id, root=str(child), manifest=manifest))
-    return discovered
+        import os
+        for entry in os.listdir(plugin_dir):
+            full_path = os.path.join(plugin_dir, entry)
+            if not os.path.isdir(full_path):
+                continue
+            from openclaw.plugins.manifest import load_manifest
+            manifest = load_manifest(full_path)
+            if not manifest:
+                continue
+            results.append({
+                "id": entry,
+                "manifest": manifest,
+                "dir": full_path,
+            })
+
+    return results
+
+
+def scan_plugins(
+    plugin_dir: str = ".openclaw/plugins",
+) -> list[dict[str, Any]]:
+    return load_plugins([plugin_dir])

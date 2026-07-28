@@ -1,26 +1,28 @@
-"""Defines a lazily computed enumerable property on a runtime facade.
-
-Mirrors src/plugins/runtime/runtime-cache.ts.
-"""
-
 from __future__ import annotations
 
-from typing import Any, Callable
+from typing import Any
 
 
-def define_cached_value(target: Any, key: str, create: Callable[[], Any]) -> None:
-    """Define a lazily computed cached property on target.
+def build_runtime_cache() -> dict[str, Any]:
+    return {
+        "entries": {},
+        "maxSize": 1000,
+        "ttlMs": 3600000,
+    }
 
-    The value is computed on first access and cached for subsequent accesses.
-    """
-    cache: list[Any] = [None]
-    ready: list[bool] = [False]
 
-    def _getter(self: Any) -> Any:
-        if not ready[0]:
-            cache[0] = create()
-            ready[0] = True
-        return cache[0]
+def get_runtime_cache_entry(
+    cache: dict[str, Any],
+    key: str,
+) -> Any:
+    entries = cache.get("entries", {})
+    return entries.get(key)
 
-    # Use object.__setattr__ to avoid triggering __setattr__ on the target
-    setattr(target.__class__ if hasattr(target, "__class__") else target, key, property(_getter))
+
+def set_runtime_cache_entry(
+    cache: dict[str, Any],
+    key: str,
+    value: Any,
+) -> dict[str, Any]:
+    cache.setdefault("entries", {})[key] = value
+    return cache

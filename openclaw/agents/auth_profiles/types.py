@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Literal, TypedDict
+from typing import Any, Literal, TypedDict, Union
 
 OAuthProvider = str
 
@@ -81,7 +81,7 @@ class OAuthCredential(OAuthCredentials, total=False):
     displayName: str
 
 
-AuthProfileCredential = ApiKeyCredential | TokenCredential | OAuthCredential
+AuthProfileCredential = Union[ApiKeyCredential, TokenCredential, OAuthCredential]
 
 
 class ProfileUsageStats(TypedDict, total=False):

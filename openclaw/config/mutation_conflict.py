@@ -1,17 +1,19 @@
-"""Raised when a config write loses an optimistic snapshot race."""
+from __future__ import annotations
+
+from typing import Optional
 
 
 class ConfigMutationConflictError(Exception):
     """Error raised when a config mutation loses an optimistic snapshot race."""
 
-    current_hash: str | None
+    current_hash: Optional[str]
     retryable: bool
 
     def __init__(
         self,
         message: str,
         *,
-        current_hash: str | None = None,
+        current_hash: Optional[str] = None,
         retryable: bool = True,
     ) -> None:
         super().__init__(message)

@@ -1,23 +1,22 @@
-"""Tool error summary helpers (minimal port)."""
-
 from __future__ import annotations
 
-import re
-from typing import Literal, TypedDict
-
-ExecLikeToolName = Literal["exec", "bash", "shell", "run", "command"]
-
-_TOOL_NAME_PATTERN = re.compile(r"^(exec|bash|shell|run|command)(?:$|[_-])", re.I)
+from typing import Any
 
 
-class ToolErrorSummary(TypedDict, total=False):
-    toolName: str
-    error: str
-    errorCode: str
-    timedOut: bool
+def build_tool_error_summary(
+    errors: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    return {
+        "errors": errors or [],
+        "count": len(errors or []),
+        "hasErrors": bool(errors),
+    }
 
 
-def is_exec_like_tool_name(tool_name: str | None) -> bool:
-    if not tool_name or not isinstance(tool_name, str):
-        return False
-    return bool(_TOOL_NAME_PATTERN.match(tool_name.strip()))
+def summarize_tool_errors(
+    errors: list[dict[str, Any]],
+) -> str:
+    if not errors:
+        return ""
+    messages = [e.get("message", str(e)) for e in errors[:5]]
+    return "; ".join(messages)

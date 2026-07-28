@@ -1,501 +1,430 @@
-"""Diagnostics Prometheus plugin module implements service behavior."""
-
 from __future__ import annotations
 
-import json
-import math
 import re
-from dataclasses import dataclass, field
-from typing import Any, TypedDict
+from collections.abc import Callable
+from typing import Any
 
-from openclaw_extensions.diagnostics_prometheus.api import (
+from openclaw.plugin_sdk.diagnostic_runtime import (
     DiagnosticEventMetadata,
     DiagnosticEventPayload,
-    OpenClawPluginHttpRouteHandler,
-    OpenClawPluginServiceContext,
     is_internal_diagnostic_event_metadata,
-    redact_sensitive_text,
 )
-
-LabelSet = dict[str, str]
-
-
-class CounterSample(TypedDict):
-    help: str
-    labels: LabelSet
-    value: float
-
-
-class HistogramSample(TypedDict):
-    buckets: list[float]
-    counts: list[float]
-    count: float
-    help: str
-    labels: LabelSet
-    sum: float
-
-
-class GaugeSample(TypedDict):
-    help: str
-    labels: LabelSet
-    value: float
-
-
-@dataclass
-class MetricSnapshot:
-    counters: dict[str, CounterSample]
-    gauges: dict[str, GaugeSample]
-    histograms: dict[str, HistogramSample]
-
-
-@dataclass
-class PrometheusMetricStore:
-    counters: dict[str, CounterSample] = field(default_factory=dict)
-    gauges: dict[str, GaugeSample] = field(default_factory=dict)
-    histograms: dict[str, HistogramSample] = field(default_factory=dict)
-    dropped_series: int = 0
-
+from openclaw.plugin_sdk.plugin_entry import (
+    OpenClawPluginHttpRouteHandler,
+    OpenClawPluginService,
+    OpenClawPluginServiceContext,
+)
+from openclaw.plugin_sdk.security_runtime import redact_sensitive_text
 
 DURATION_BUCKETS_SECONDS = [
-    0.005,
-    0.01,
-    0.025,
-    0.05,
-    0.1,
-    0.25,
-    0.5,
-    1,
-    2.5,
-    5,
-    10,
-    30,
-    60,
-    120,
-    300,
-    600,
+    0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10, 30, 60, 120, 300, 600,
 ]
 TOKEN_BUCKETS = [1, 4, 16, 64, 256, 1024, 4096, 16384, 65536, 262144, 1048576]
 BYTE_BUCKETS = [
-    1024,
-    4096,
-    16384,
-    65536,
-    262144,
-    1048576,
-    4194304,
-    16777216,
-    67108864,
-    268435456,
-    1073741824,
-    4294967296,
-    17179869184,
+    1024, 4096, 16384, 65536, 262144, 1048576, 4194304, 16777216, 67108864, 268435456, 1073741824,
+    4294967296, 17179869184,
 ]
 RATIO_BUCKETS = [0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 2, 4, 8, 16]
-LOW_CARDINALITY_VALUE_RE = re.compile(r"^[A-Za-z0-9_.:-]{1,120}$")
+LOW_CARDINALITY_VALUE_RE = re.compile(r'^[A-Za-z0-9_.:-]{1,120}$')
 MAX_PROMETHEUS_SERIES = 2048
 DROPPED_SERIES_COUNTER_NAME = "openclaw_prometheus_series_dropped_total"
 
 
-def low_cardinality_label(value: str | None, fallback: str = "unknown") -> str:
+def _low_cardinality_label(value: str | None, fallback: str = "unknown") -> str:
     if not value:
         return fallback
     redacted = redact_sensitive_text(value.strip())
-    redacted_lower = redacted.lower()
-    if redacted_lower.startswith("agent:") or ":agent:" in redacted_lower:
+    lowered = redacted.lower()
+    if lowered.startswith("agent:") or ":agent:" in lowered:
         return fallback
-    return redacted if LOW_CARDINALITY_VALUE_RE.fullmatch(redacted) else fallback
+    return redacted if LOW_CARDINALITY_VALUE_RE.match(redacted) else fallback
 
 
-def low_cardinality_queue_lane_label(value: str | None, fallback: str = "unknown") -> str:
+def _low_cardinality_queue_lane_label(value: str | None, fallback: str = "unknown") -> str:
     if not value:
         return fallback
     redacted = redact_sensitive_text(value.strip())
-    redacted_lower = redacted.lower()
-    if redacted_lower.startswith("agent:"):
+    lowered = redacted.lower()
+    if lowered.startswith("agent:"):
         return fallback
-    scoped_lane_index = redacted.find(":")
-    lane = redacted[:scoped_lane_index] if scoped_lane_index >= 0 else redacted
-    return lane if LOW_CARDINALITY_VALUE_RE.fullmatch(lane) else fallback
+    scoped_index = redacted.find(":")
+    lane = redacted[:scoped_index] if scoped_index >= 0 else redacted
+    return lane if LOW_CARDINALITY_VALUE_RE.match(lane) else fallback
 
 
-def numeric_value(value: float | None) -> float | None:
-    if not isinstance(value, (int, float)) or not (value >= 0 and math.isfinite(value)):
+def _numeric_value(value: int | float | None) -> int | float | None:
+    if value is None:
         return None
-    return float(value)
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        import math
+        if math.isfinite(value) and value >= 0:
+            return value
+    return None
 
 
-def seconds(ms: float | None) -> float | None:
-    value = numeric_value(ms)
-    return None if value is None else value / 1000
+def _seconds(ms: int | float | None) -> float | None:
+    value = _numeric_value(ms)
+    if value is None:
+        return None
+    return value / 1000
 
 
-def sorted_labels(labels: LabelSet) -> list[tuple[str, str]]:
-    return sorted(labels.items(), key=lambda item: item[0])
+def _sorted_labels(labels: dict[str, str]) -> list[tuple[str, str]]:
+    return sorted(labels.items(), key=lambda x: x[0])
 
 
-def metric_key(name: str, labels: LabelSet) -> str:
-    return f"{name}|{json.dumps(sorted_labels(labels))}"
+def _metric_key(name: str, labels: dict[str, str]) -> str:
+    import json
+    return f"{name}|{json.dumps(_sorted_labels(labels))}"
 
 
-def escape_help(value: str) -> str:
+def _escape_help(value: str) -> str:
     return value.replace("\\", "\\\\").replace("\n", "\\n")
 
 
-def escape_label_value(value: str) -> str:
+def _escape_label_value(value: str) -> str:
     return value.replace("\\", "\\\\").replace("\n", "\\n").replace('"', '\\"')
 
 
-def format_labels(labels: LabelSet) -> str:
-    entries = sorted_labels(labels)
+def _format_labels(labels: dict[str, str]) -> str:
+    entries = _sorted_labels(labels)
     if not entries:
         return ""
-    return "{" + ",".join(f'{key}="{escape_label_value(value)}"' for key, value in entries) + "}"
+    return "{" + ",".join(f'{k}="{_escape_label_value(v)}"' for k, v in entries) + "}"
 
 
-def format_prometheus_number(value: float) -> str:
+def _format_prometheus_number(value: int | float) -> str:
+    import math
     if not math.isfinite(value):
         return "0"
-    if float(value).is_integer():
+    if isinstance(value, int) or (isinstance(value, float) and value == int(value)):
         return str(int(value))
-    return str(float(f"{value:.12g}"))
+    return f"{value:.12g}"
 
 
-def create_prometheus_metric_store() -> PrometheusMetricStore:
-    store = PrometheusMetricStore()
+def create_prometheus_metric_store() -> dict[str, Any]:
+    counters: dict[str, dict[str, Any]] = {}
+    gauges: dict[str, dict[str, Any]] = {}
+    histograms: dict[str, dict[str, Any]] = {}
+    dropped_series = 0
 
-    def can_create_series(series_map: dict[str, Any], key: str, metric_name: str) -> bool:
-        if key in series_map:
+    def _can_create_series(store: dict[str, Any], key: str, metric_name: str) -> bool:
+        nonlocal dropped_series
+        if key in store:
             return True
         if metric_name == DROPPED_SERIES_COUNTER_NAME:
             return True
-        if len(store.counters) + len(store.gauges) + len(store.histograms) < MAX_PROMETHEUS_SERIES:
+        if len(counters) + len(gauges) + len(histograms) < MAX_PROMETHEUS_SERIES:
             return True
-        store.dropped_series += 1
+        dropped_series += 1
         return False
 
-    def counter(name: str, help_text: str, labels: LabelSet, amount: float = 1) -> None:
-        if not isinstance(amount, (int, float)) or amount <= 0:
+    def counter(name: str, help_text: str, labels: dict[str, str], amount: int | float = 1) -> None:
+        nonlocal dropped_series
+        import math
+        if not math.isfinite(amount) or amount <= 0:
             return
-        key = metric_key(name, labels)
-        if not can_create_series(store.counters, key, name):
+        key = _metric_key(name, labels)
+        if not _can_create_series(counters, key, name):
             return
-        existing = store.counters.get(key)
-        if existing:
+        existing = counters.get(key)
+        if existing is not None:
             existing["value"] += amount
             return
-        store.counters[key] = {"help": help_text, "labels": labels, "value": amount}
+        counters[key] = {"help": help_text, "labels": dict(labels), "value": amount}
 
-    def gauge(name: str, help_text: str, labels: LabelSet, value: float | None) -> None:
-        if value is None or not isinstance(value, (int, float)) or not math.isfinite(value):
+    def gauge(name: str, help_text: str, labels: dict[str, str], value: int | float | None) -> None:
+        if value is None:
             return
-        key = metric_key(name, labels)
-        if not can_create_series(store.gauges, key, name):
+        key = _metric_key(name, labels)
+        if not _can_create_series(gauges, key, name):
             return
-        store.gauges[key] = {"help": help_text, "labels": labels, "value": float(value)}
+        gauges[key] = {"help": help_text, "labels": dict(labels), "value": value}
 
     def histogram(
         name: str,
         help_text: str,
-        labels: LabelSet,
-        value: float | None,
+        labels: dict[str, str],
+        value: int | float | None,
         buckets: list[float] | None = None,
     ) -> None:
-        if (
-            value is None
-            or not isinstance(value, (int, float))
-            or value < 0
-            or not math.isfinite(value)
-        ):
+        if buckets is None:
+            buckets = DURATION_BUCKETS_SECONDS
+        if value is None:
             return
-        bucket_list = buckets if buckets is not None else DURATION_BUCKETS_SECONDS
-        key = metric_key(name, labels)
-        if not can_create_series(store.histograms, key, name):
+        import math
+        if not math.isfinite(value) or value < 0:
             return
-        sample = store.histograms.get(key)
+        key = _metric_key(name, labels)
+        if not _can_create_series(histograms, key, name):
+            return
+        sample = histograms.get(key)
         if sample is None:
             sample = {
-                "buckets": bucket_list,
-                "counts": [0.0] * len(bucket_list),
-                "count": 0.0,
+                "buckets": list(buckets),
+                "counts": [0] * len(buckets),
+                "count": 0,
                 "help": help_text,
-                "labels": labels,
-                "sum": 0.0,
+                "labels": dict(labels),
+                "sum": 0,
             }
-            store.histograms[key] = sample
+            histograms[key] = sample
         sample["count"] += 1
-        sample["sum"] += float(value)
-        for index, bucket in enumerate(sample["buckets"]):
-            if value <= bucket:
-                sample["counts"][index] = (sample["counts"][index] or 0) + 1
+        sample["sum"] += value
+        for i, bucket in enumerate(sample["buckets"]):
+            if bucket is not None and value <= bucket:
+                sample["counts"][i] = (sample["counts"][i] or 0) + 1
 
-    def snapshot() -> MetricSnapshot:
-        counter_snapshot = dict(store.counters)
-        if store.dropped_series > 0:
-            counter_snapshot[metric_key(DROPPED_SERIES_COUNTER_NAME, {})] = {
+    def snapshot() -> dict[str, Any]:
+        nonlocal dropped_series
+        counter_snapshot = dict(counters)
+        if dropped_series > 0:
+            counter_snapshot[_metric_key(DROPPED_SERIES_COUNTER_NAME, {})] = {
                 "help": "Prometheus metric series dropped because the exporter series cap was reached.",
                 "labels": {},
-                "value": float(store.dropped_series),
+                "value": dropped_series,
             }
-        return MetricSnapshot(
-            counters=counter_snapshot,
-            gauges=dict(store.gauges),
-            histograms=dict(store.histograms),
-        )
+        return {
+            "counters": counter_snapshot,
+            "gauges": dict(gauges),
+            "histograms": dict(histograms),
+        }
 
     def reset() -> None:
-        store.counters.clear()
-        store.gauges.clear()
-        store.histograms.clear()
-        store.dropped_series = 0
+        nonlocal dropped_series
+        counters.clear()
+        gauges.clear()
+        histograms.clear()
+        dropped_series = 0
 
-    store.counter = counter  # type: ignore[attr-defined]
-    store.gauge = gauge  # type: ignore[attr-defined]
-    store.histogram = histogram  # type: ignore[attr-defined]
-    store.snapshot = snapshot  # type: ignore[attr-defined]
-    store.reset = reset  # type: ignore[attr-defined]
-    return store
+    return {"counter": counter, "gauge": gauge, "histogram": histogram, "reset": reset, "snapshot": snapshot}
 
 
-def safe_error_message(err: BaseException | Any) -> str:
-    if isinstance(err, BaseException):
-        message = err.args[0] if err.args else err.__class__.__name__
-        message = str(message) if message is not None else err.__class__.__name__
+def _safe_error_message(err: Any) -> str:
+    if isinstance(err, Exception):
+        message = err.message if hasattr(err, "message") else str(err)
     else:
         message = str(err)
-    return (
-        redact_sensitive_text(message)
-        .replace("\x00", " ")
-        .translate(str.maketrans({"\r": " ", "\n": " ", "\t": " ", "\u2028": " ", "\u2029": " "}))
-        [:500]
-    )
+    redacted = redact_sensitive_text(message)
+    redacted = redacted.replace("\x00", " ")
+    redacted = re.sub(r"[\r\n\t\u2028\u2029]", " ", redacted)
+    return redacted[:500]
 
 
-def should_record_diagnostic_event(metadata: DiagnosticEventMetadata) -> bool:
-    return metadata.get("trusted") is True or is_internal_diagnostic_event_metadata(metadata)
+def _should_record_diagnostic_event(metadata: DiagnosticEventMetadata) -> bool:
+    return metadata.get("trusted", False) or is_internal_diagnostic_event_metadata(metadata)
 
 
-def render_prometheus_metrics(store: PrometheusMetricStore) -> str:
-    snapshot = store.snapshot()
+def render_prometheus_metrics(store: dict[str, Any]) -> str:
+    snap = store["snapshot"]()
     lines: list[str] = []
     emitted: set[str] = set()
 
-    def emit_header(name: str, metric_type: str, help_text: str) -> None:
+    def emit_header(name: str, type_str: str, help_text: str) -> None:
         if name in emitted:
             return
         emitted.add(name)
-        lines.append(f"# HELP {name} {escape_help(help_text)}")
-        lines.append(f"# TYPE {name} {metric_type}")
+        lines.append(f"# HELP {name} {_escape_help(help_text)}")
+        lines.append(f"# TYPE {name} {type_str}")
 
-    for key, sample in sorted(snapshot.counters.items(), key=lambda item: item[0]):
+    for key, sample in sorted(snap["counters"].items(), key=lambda x: x[0]):
         name = key.split("|", 1)[0]
         emit_header(name, "counter", sample["help"])
-        lines.append(f"{name}{format_labels(sample['labels'])} {format_prometheus_number(sample['value'])}")
+        lines.append(f"{name}{_format_labels(sample['labels'])} {_format_prometheus_number(sample['value'])}")
 
-    for key, sample in sorted(snapshot.gauges.items(), key=lambda item: item[0]):
+    for key, sample in sorted(snap["gauges"].items(), key=lambda x: x[0]):
         name = key.split("|", 1)[0]
         emit_header(name, "gauge", sample["help"])
-        lines.append(f"{name}{format_labels(sample['labels'])} {format_prometheus_number(sample['value'])}")
+        lines.append(f"{name}{_format_labels(sample['labels'])} {_format_prometheus_number(sample['value'])}")
 
-    for key, sample in sorted(snapshot.histograms.items(), key=lambda item: item[0]):
+    for key, sample in sorted(snap["histograms"].items(), key=lambda x: x[0]):
         name = key.split("|", 1)[0]
         emit_header(name, "histogram", sample["help"])
-        for index, bucket in enumerate(sample["buckets"]):
+        for i, bucket in enumerate(sample["buckets"]):
+            if bucket is None:
+                continue
             lines.append(
-                f"{name}_bucket{format_labels({**sample['labels'], 'le': str(bucket)})} "
-                f"{format_prometheus_number(sample['counts'][index] or 0)}"
+                f"{name}_bucket{_format_labels({**sample['labels'], 'le': str(bucket)})} "
+                f"{_format_prometheus_number(sample['counts'][i] or 0)}"
             )
         lines.append(
-            f"{name}_bucket{format_labels({**sample['labels'], 'le': '+Inf'})} "
-            f"{format_prometheus_number(sample['count'])}"
+            f"{name}_bucket{_format_labels({**sample['labels'], 'le': '+Inf'})} "
+            f"{_format_prometheus_number(sample['count'])}"
         )
-        lines.append(
-            f"{name}_sum{format_labels(sample['labels'])} {format_prometheus_number(sample['sum'])}"
-        )
-        lines.append(
-            f"{name}_count{format_labels(sample['labels'])} {format_prometheus_number(sample['count'])}"
-        )
+        lines.append(f"{name}_sum{_format_labels(sample['labels'])} {_format_prometheus_number(sample['sum'])}")
+        lines.append(f"{name}_count{_format_labels(sample['labels'])} {_format_prometheus_number(sample['count'])}")
 
     lines.append("")
     return "\n".join(lines)
 
 
-def run_labels(evt: dict[str, Any]) -> LabelSet:
-    labels: LabelSet = {
-        "channel": low_cardinality_label(evt.get("channel")),
-        "model": low_cardinality_label(evt.get("model")),
-        "outcome": low_cardinality_label(evt.get("outcome"), "unknown"),
-        "provider": low_cardinality_label(evt.get("provider")),
-        "trigger": low_cardinality_label(evt.get("trigger")),
-    }
+def _run_labels(evt: dict[str, Any]) -> dict[str, str]:
+    result: dict[str, str] = {}
     if evt.get("blockedBy"):
-        labels["blocked_by"] = low_cardinality_label(evt.get("blockedBy"))
-    return labels
+        result["blocked_by"] = _low_cardinality_label(evt["blockedBy"])
+    result["channel"] = _low_cardinality_label(evt.get("channel"))
+    result["model"] = _low_cardinality_label(evt.get("model"))
+    result["outcome"] = _low_cardinality_label(evt.get("outcome"), "unknown")
+    result["provider"] = _low_cardinality_label(evt.get("provider"))
+    result["trigger"] = _low_cardinality_label(evt.get("trigger"))
+    return result
 
 
-def model_call_labels(evt: dict[str, Any]) -> LabelSet:
+def _model_call_labels(evt: dict[str, Any]) -> dict[str, str]:
+    result = {
+        "api": _low_cardinality_label(evt.get("api")),
+        "error_category": "none",
+        "model": _low_cardinality_label(evt.get("model")),
+        "outcome": "completed",
+        "provider": _low_cardinality_label(evt.get("provider")),
+        "transport": _low_cardinality_label(evt.get("transport")),
+    }
+    if evt.get("type") == "model.call.error":
+        result["error_category"] = _low_cardinality_label(evt.get("errorCategory"), "other")
+        result["outcome"] = "error"
+    return result
+
+
+def _model_failover_labels(evt: dict[str, Any]) -> dict[str, str]:
     return {
-        "api": low_cardinality_label(evt.get("api")),
-        "error_category": (
-            low_cardinality_label(evt.get("errorCategory"), "other")
-            if evt.get("type") == "model.call.error"
-            else "none"
-        ),
-        "model": low_cardinality_label(evt.get("model")),
-        "outcome": "error" if evt.get("type") == "model.call.error" else "completed",
-        "provider": low_cardinality_label(evt.get("provider")),
-        "transport": low_cardinality_label(evt.get("transport")),
+        "from_model": _low_cardinality_label(evt.get("fromModel")),
+        "from_provider": _low_cardinality_label(evt.get("fromProvider")),
+        "lane": _low_cardinality_queue_lane_label(evt.get("lane")),
+        "reason": _low_cardinality_label(evt.get("reason"), "other"),
+        "suspended": str(evt.get("suspended", "unknown")),
+        "to_model": _low_cardinality_label(evt.get("toModel")),
+        "to_provider": _low_cardinality_label(evt.get("toProvider")),
     }
 
 
-def model_failover_labels(evt: dict[str, Any]) -> LabelSet:
-    suspended = evt.get("suspended")
+def _tool_execution_labels(evt: dict[str, Any]) -> dict[str, str]:
+    result = {
+        "error_category": "none",
+        "outcome": "completed",
+        "params_kind": _low_cardinality_label(evt.get("paramsSummary", {}).get("kind") if isinstance(evt.get("paramsSummary"), dict) else None),
+        "tool": _low_cardinality_label(evt.get("toolName"), "tool"),
+        "tool_owner": _low_cardinality_label(evt.get("toolOwner"), "none"),
+        "tool_source": _low_cardinality_label(evt.get("toolSource"), "core"),
+    }
+    if evt.get("type") == "tool.execution.error":
+        result["error_category"] = _low_cardinality_label(evt.get("errorCategory"), "other")
+        result["outcome"] = "error"
+    return result
+
+
+def _tool_execution_blocked_labels(evt: dict[str, Any]) -> dict[str, str]:
     return {
-        "from_model": low_cardinality_label(evt.get("fromModel")),
-        "from_provider": low_cardinality_label(evt.get("fromProvider")),
-        "lane": low_cardinality_queue_lane_label(evt.get("lane")),
-        "reason": low_cardinality_label(evt.get("reason"), "other"),
-        "suspended": "unknown" if suspended is None else str(suspended).lower(),
-        "to_model": low_cardinality_label(evt.get("toModel")),
-        "to_provider": low_cardinality_label(evt.get("toProvider")),
+        "denied_reason": _low_cardinality_label(evt.get("deniedReason"), "other"),
+        "params_kind": _low_cardinality_label(evt.get("paramsSummary", {}).get("kind") if isinstance(evt.get("paramsSummary"), dict) else None),
+        "tool": _low_cardinality_label(evt.get("toolName"), "tool"),
+        "tool_owner": _low_cardinality_label(evt.get("toolOwner"), "none"),
+        "tool_source": _low_cardinality_label(evt.get("toolSource"), "core"),
     }
 
 
-def tool_execution_labels(evt: dict[str, Any]) -> LabelSet:
-    params_summary = evt.get("paramsSummary") or {}
+def _skill_labels(evt: dict[str, Any]) -> dict[str, str]:
     return {
-        "error_category": (
-            low_cardinality_label(evt.get("errorCategory"), "other")
-            if evt.get("type") == "tool.execution.error"
-            else "none"
-        ),
-        "outcome": "error" if evt.get("type") == "tool.execution.error" else "completed",
-        "params_kind": low_cardinality_label(params_summary.get("kind")),
-        "tool": low_cardinality_label(evt.get("toolName"), "tool"),
-        "tool_owner": low_cardinality_label(evt.get("toolOwner"), "none"),
-        "tool_source": low_cardinality_label(evt.get("toolSource"), "core"),
+        "activation": _low_cardinality_label(evt.get("activation"), "unknown"),
+        "agent": _low_cardinality_label(evt.get("agentId")),
+        "skill": _low_cardinality_label(evt.get("skillName"), "skill"),
+        "source": _low_cardinality_label(evt.get("skillSource")),
     }
 
 
-def tool_execution_blocked_labels(evt: dict[str, Any]) -> LabelSet:
-    params_summary = evt.get("paramsSummary") or {}
+def _harness_labels(evt: dict[str, Any]) -> dict[str, str]:
+    result = {
+        "channel": _low_cardinality_label(evt.get("channel")),
+        "error_category": "none",
+        "harness": _low_cardinality_label(evt.get("harnessId")),
+        "model": _low_cardinality_label(evt.get("model")),
+        "outcome": _low_cardinality_label(evt.get("outcome")),
+        "phase": "none",
+        "plugin": _low_cardinality_label(evt.get("pluginId")),
+        "provider": _low_cardinality_label(evt.get("provider")),
+    }
+    if evt.get("type") == "harness.run.error":
+        result["error_category"] = _low_cardinality_label(evt.get("errorCategory"), "other")
+        result["outcome"] = "error"
+        result["phase"] = _low_cardinality_label(evt.get("phase"))
+    return result
+
+
+def _webhook_labels(evt: dict[str, Any]) -> dict[str, str]:
     return {
-        "denied_reason": low_cardinality_label(evt.get("deniedReason"), "other"),
-        "params_kind": low_cardinality_label(params_summary.get("kind")),
-        "tool": low_cardinality_label(evt.get("toolName"), "tool"),
-        "tool_owner": low_cardinality_label(evt.get("toolOwner"), "none"),
-        "tool_source": low_cardinality_label(evt.get("toolSource"), "core"),
+        "channel": _low_cardinality_label(evt.get("channel")),
+        "webhook": _low_cardinality_label(evt.get("updateType")),
     }
 
 
-def skill_labels(evt: dict[str, Any]) -> LabelSet:
+def _session_stuck_labels(evt: dict[str, Any]) -> dict[str, str]:
     return {
-        "activation": low_cardinality_label(evt.get("activation"), "unknown"),
-        "agent": low_cardinality_label(evt.get("agentId")),
-        "skill": low_cardinality_label(evt.get("skillName"), "skill"),
-        "source": low_cardinality_label(evt.get("skillSource")),
+        "reason": _low_cardinality_label(evt.get("reason"), "none"),
+        "state": evt.get("state", "unknown"),
     }
 
 
-def harness_labels(evt: dict[str, Any]) -> LabelSet:
-    return {
-        "channel": low_cardinality_label(evt.get("channel")),
-        "error_category": (
-            low_cardinality_label(evt.get("errorCategory"), "other")
-            if evt.get("type") == "harness.run.error"
-            else "none"
-        ),
-        "harness": low_cardinality_label(evt.get("harnessId")),
-        "model": low_cardinality_label(evt.get("model")),
-        "outcome": (
-            "error"
-            if evt.get("type") == "harness.run.error"
-            else low_cardinality_label(evt.get("outcome"))
-        ),
-        "phase": (
-            low_cardinality_label(evt.get("phase"))
-            if evt.get("type") == "harness.run.error"
-            else "none"
-        ),
-        "plugin": low_cardinality_label(evt.get("pluginId")),
-        "provider": low_cardinality_label(evt.get("provider")),
-    }
-
-
-def webhook_labels(evt: dict[str, Any]) -> LabelSet:
-    return {
-        "channel": low_cardinality_label(evt.get("channel")),
-        "webhook": low_cardinality_label(evt.get("updateType")),
-    }
-
-
-def session_stuck_labels(evt: dict[str, Any]) -> LabelSet:
-    return {
-        "reason": low_cardinality_label(evt.get("reason"), "none"),
-        "state": str(evt.get("state", "")),
-    }
-
-
-def session_recovery_labels(evt: dict[str, Any]) -> LabelSet:
+def _session_recovery_labels(evt: dict[str, Any]) -> dict[str, str]:
     if evt.get("type") == "session.recovery.completed":
-        action = low_cardinality_label(evt.get("action"), "unknown")
+        action = _low_cardinality_label(evt.get("action"), "unknown")
+        status = evt.get("status", "completed")
     else:
         action = "abort" if evt.get("allowActiveAbort") else "recover"
+        status = "requested"
     return {
         "action": action,
-        "active_work_kind": low_cardinality_label(evt.get("activeWorkKind"), "none"),
-        "state": str(evt.get("state", "")),
-        "status": evt.get("status") if evt.get("type") == "session.recovery.completed" else "requested",
+        "active_work_kind": _low_cardinality_label(evt.get("activeWorkKind"), "none"),
+        "state": evt.get("state", "unknown"),
+        "status": status,
     }
 
 
-def liveness_labels(evt: dict[str, Any]) -> LabelSet:
-    reasons = evt.get("reasons") or []
+def _liveness_labels(evt: dict[str, Any]) -> dict[str, str]:
     return {
-        "reason": low_cardinality_label(":".join(str(reason) for reason in reasons), "unknown"),
+        "reason": _low_cardinality_label(":".join(evt.get("reasons", [])), "unknown"),
     }
 
 
-def payload_large_labels(evt: dict[str, Any]) -> LabelSet:
+def _payload_large_labels(evt: dict[str, Any]) -> dict[str, str]:
     return {
-        "action": str(evt.get("action", "")),
-        "channel": low_cardinality_label(evt.get("channel"), "none"),
-        "plugin": low_cardinality_label(evt.get("pluginId"), "none"),
-        "reason": low_cardinality_label(evt.get("reason"), "none"),
-        "surface": low_cardinality_label(evt.get("surface"), "unknown"),
+        "action": evt.get("action", "unknown"),
+        "channel": _low_cardinality_label(evt.get("channel"), "none"),
+        "plugin": _low_cardinality_label(evt.get("pluginId"), "none"),
+        "reason": _low_cardinality_label(evt.get("reason"), "none"),
+        "surface": _low_cardinality_label(evt.get("surface"), "unknown"),
     }
 
 
-def talk_labels(evt: dict[str, Any]) -> LabelSet:
+def _talk_labels(evt: dict[str, Any]) -> dict[str, str]:
     return {
-        "brain": low_cardinality_label(evt.get("brain")),
-        "event_type": low_cardinality_label(evt.get("talkEventType")),
-        "mode": low_cardinality_label(evt.get("mode")),
-        "provider": low_cardinality_label(evt.get("provider")),
-        "transport": low_cardinality_label(evt.get("transport")),
+        "brain": _low_cardinality_label(evt.get("brain")),
+        "event_type": _low_cardinality_label(evt.get("talkEventType")),
+        "mode": _low_cardinality_label(evt.get("mode")),
+        "provider": _low_cardinality_label(evt.get("provider")),
+        "transport": _low_cardinality_label(evt.get("transport")),
     }
 
 
-def record_model_usage(store: PrometheusMetricStore, evt: dict[str, Any]) -> None:
+def _record_model_usage(store: dict[str, Any], evt: dict[str, Any]) -> None:
     labels = {
-        "agent": low_cardinality_label(evt.get("agentId")),
-        "channel": low_cardinality_label(evt.get("channel")),
-        "model": low_cardinality_label(evt.get("model")),
-        "provider": low_cardinality_label(evt.get("provider")),
+        "agent": _low_cardinality_label(evt.get("agentId")),
+        "channel": _low_cardinality_label(evt.get("channel")),
+        "model": _low_cardinality_label(evt.get("model")),
+        "provider": _low_cardinality_label(evt.get("provider")),
     }
-    usage = evt.get("usage") or {}
+    usage = evt.get("usage", {})
 
-    def record_tokens(token_type: str, value: float | None) -> None:
-        amount = numeric_value(value)
+    def _record_tokens(token_type: str, value: int | float | None) -> None:
+        amount = _numeric_value(value)
         if amount is None or amount == 0:
             return
-        store.counter(
+        store["counter"](
             "openclaw_model_tokens_total",
             "Model tokens reported by diagnostic usage events.",
             {**labels, "token_type": token_type},
             amount,
         )
         if token_type in ("input", "output"):
-            store.histogram(
+            store["histogram"](
                 "openclaw_gen_ai_client_token_usage",
                 "GenAI token usage distribution for input and output tokens.",
                 {
@@ -507,485 +436,513 @@ def record_model_usage(store: PrometheusMetricStore, evt: dict[str, Any]) -> Non
                 TOKEN_BUCKETS,
             )
 
-    record_tokens("input", usage.get("input"))
-    record_tokens("output", usage.get("output"))
-    record_tokens("cache_read", usage.get("cacheRead"))
-    record_tokens("cache_write", usage.get("cacheWrite"))
-    record_tokens("prompt", usage.get("promptTokens"))
-    record_tokens("total", usage.get("total"))
+    _record_tokens("input", usage.get("input"))
+    _record_tokens("output", usage.get("output"))
+    _record_tokens("cache_read", usage.get("cacheRead"))
+    _record_tokens("cache_write", usage.get("cacheWrite"))
+    _record_tokens("prompt", usage.get("promptTokens"))
+    _record_tokens("total", usage.get("total"))
 
-    store.counter(
+    store["counter"](
         "openclaw_model_cost_usd_total",
         "Estimated model cost in USD reported by diagnostic usage events.",
         labels,
-        numeric_value(evt.get("costUsd")) or 0,
+        _numeric_value(evt.get("costUsd")) or 0,
     )
-    store.histogram(
+    store["histogram"](
         "openclaw_model_usage_duration_seconds",
         "Model usage event duration in seconds.",
         labels,
-        seconds(evt.get("durationMs")),
+        _seconds(evt.get("durationMs")),
     )
 
 
 def record_diagnostic_event(
-    store: PrometheusMetricStore,
+    store: dict[str, Any],
     evt: DiagnosticEventPayload,
     metadata: DiagnosticEventMetadata,
 ) -> None:
-    if not should_record_diagnostic_event(metadata):
+    if not _should_record_diagnostic_event(metadata):
         return
 
-    event_type = evt.get("type")
-    if event_type == "model.usage":
-        record_model_usage(store, evt)
+    evt_type = evt.get("type", "")
+
+    if evt_type == "model.usage":
+        _record_model_usage(store, evt)
         return
-    if event_type == "run.completed":
-        store.histogram(
+
+    if evt_type == "run.completed":
+        store["histogram"](
             "openclaw_run_duration_seconds",
             "Agent run duration in seconds.",
-            run_labels(evt),
-            seconds(evt.get("durationMs")),
+            _run_labels(evt),
+            _seconds(evt.get("durationMs")),
         )
-        store.counter(
+        store["counter"](
             "openclaw_run_completed_total",
             "Agent runs completed by outcome.",
-            run_labels(evt),
+            _run_labels(evt),
         )
         return
-    if event_type in ("model.call.completed", "model.call.error"):
-        store.histogram(
+
+    if evt_type in ("model.call.completed", "model.call.error"):
+        store["histogram"](
             "openclaw_model_call_duration_seconds",
             "Provider model call duration in seconds.",
-            model_call_labels(evt),
-            seconds(evt.get("durationMs")),
+            _model_call_labels(evt),
+            _seconds(evt.get("durationMs")),
         )
-        store.counter(
+        store["counter"](
             "openclaw_model_call_total",
             "Provider model calls completed by outcome.",
-            model_call_labels(evt),
+            _model_call_labels(evt),
         )
         return
-    if event_type == "model.failover":
-        store.counter(
+
+    if evt_type == "model.failover":
+        store["counter"](
             "openclaw_model_failover_total",
             "Model failovers by source, destination, lane, and reason.",
-            model_failover_labels(evt),
+            _model_failover_labels(evt),
         )
         return
-    if event_type in ("tool.execution.completed", "tool.execution.error"):
-        store.histogram(
+
+    if evt_type in ("tool.execution.completed", "tool.execution.error"):
+        store["histogram"](
             "openclaw_tool_execution_duration_seconds",
             "Tool execution duration in seconds.",
-            tool_execution_labels(evt),
-            seconds(evt.get("durationMs")),
+            _tool_execution_labels(evt),
+            _seconds(evt.get("durationMs")),
         )
-        store.counter(
+        store["counter"](
             "openclaw_tool_execution_total",
             "Tool executions completed by outcome.",
-            tool_execution_labels(evt),
+            _tool_execution_labels(evt),
         )
         return
-    if event_type == "tool.execution.blocked":
-        store.counter(
+
+    if evt_type == "tool.execution.blocked":
+        store["counter"](
             "openclaw_tool_execution_blocked_total",
             "Tool executions blocked by policy or sandbox diagnostics.",
-            tool_execution_blocked_labels(evt),
+            _tool_execution_blocked_labels(evt),
         )
         return
-    if event_type == "skill.used":
-        store.counter(
+
+    if evt_type == "skill.used":
+        store["counter"](
             "openclaw_skill_used_total",
             "Skills used by agent runs.",
-            skill_labels(evt),
+            _skill_labels(evt),
         )
         return
-    if event_type in ("harness.run.completed", "harness.run.error"):
-        store.histogram(
+
+    if evt_type in ("harness.run.completed", "harness.run.error"):
+        store["histogram"](
             "openclaw_harness_run_duration_seconds",
             "Agent harness run duration in seconds.",
-            harness_labels(evt),
-            seconds(evt.get("durationMs")),
+            _harness_labels(evt),
+            _seconds(evt.get("durationMs")),
         )
-        store.counter(
+        store["counter"](
             "openclaw_harness_run_total",
             "Agent harness runs completed by outcome.",
-            harness_labels(evt),
+            _harness_labels(evt),
         )
         return
-    if event_type == "message.processed":
-        labels = {
-            "channel": low_cardinality_label(evt.get("channel")),
-            "outcome": str(evt.get("outcome", "")),
-            "reason": low_cardinality_label(evt.get("reason"), "none"),
-        }
-        store.counter(
+
+    if evt_type == "message.processed":
+        channel = _low_cardinality_label(evt.get("channel"))
+        outcome = evt.get("outcome", "unknown")
+        reason = _low_cardinality_label(evt.get("reason"), "none")
+        store["counter"](
             "openclaw_message_processed_total",
             "Inbound messages processed by outcome.",
-            labels,
+            {"channel": channel, "outcome": outcome, "reason": reason},
         )
-        store.histogram(
+        store["histogram"](
             "openclaw_message_processed_duration_seconds",
             "Inbound message processing duration in seconds.",
-            labels,
-            seconds(evt.get("durationMs")),
+            {"channel": channel, "outcome": outcome, "reason": reason},
+            _seconds(evt.get("durationMs")),
         )
         return
-    if event_type == "webhook.received":
-        store.counter(
+
+    if evt_type == "webhook.received":
+        store["counter"](
             "openclaw_webhook_received_total",
             "Webhook requests received by channel and update type.",
-            webhook_labels(evt),
+            _webhook_labels(evt),
         )
         return
-    if event_type == "webhook.processed":
-        store.histogram(
+
+    if evt_type == "webhook.processed":
+        store["histogram"](
             "openclaw_webhook_duration_seconds",
             "Webhook processing duration in seconds.",
-            webhook_labels(evt),
-            seconds(evt.get("durationMs")),
+            _webhook_labels(evt),
+            _seconds(evt.get("durationMs")),
         )
         return
-    if event_type == "webhook.error":
-        store.counter(
+
+    if evt_type == "webhook.error":
+        store["counter"](
             "openclaw_webhook_error_total",
             "Webhook processing errors by channel and update type.",
-            webhook_labels(evt),
+            _webhook_labels(evt),
         )
         return
-    if event_type == "message.delivery.started":
-        store.counter(
+
+    if evt_type == "message.delivery.started":
+        store["counter"](
             "openclaw_message_delivery_started_total",
             "Outbound message delivery attempts started.",
             {
-                "channel": low_cardinality_label(evt.get("channel")),
-                "delivery_kind": low_cardinality_label(evt.get("deliveryKind"), "other"),
+                "channel": _low_cardinality_label(evt.get("channel")),
+                "delivery_kind": _low_cardinality_label(evt.get("deliveryKind"), "other"),
             },
         )
         return
-    if event_type == "message.received":
-        store.counter(
+
+    if evt_type == "message.received":
+        store["counter"](
             "openclaw_message_received_total",
             "Inbound messages received by channel.",
             {
-                "channel": low_cardinality_label(evt.get("channel")),
-                "source": low_cardinality_label(evt.get("source")),
+                "channel": _low_cardinality_label(evt.get("channel")),
+                "source": _low_cardinality_label(evt.get("source")),
             },
         )
         return
-    if event_type == "message.dispatch.started":
-        store.counter(
+
+    if evt_type == "message.dispatch.started":
+        store["counter"](
             "openclaw_message_dispatch_started_total",
             "Inbound message dispatch attempts started by channel.",
             {
-                "channel": low_cardinality_label(evt.get("channel")),
-                "source": low_cardinality_label(evt.get("source")),
+                "channel": _low_cardinality_label(evt.get("channel")),
+                "source": _low_cardinality_label(evt.get("source")),
             },
         )
         return
-    if event_type == "message.dispatch.completed":
-        labels = {
-            "channel": low_cardinality_label(evt.get("channel")),
-            "outcome": str(evt.get("outcome", "")),
-            "reason": low_cardinality_label(evt.get("reason"), "none"),
-            "source": low_cardinality_label(evt.get("source")),
-        }
-        store.counter(
+
+    if evt_type == "message.dispatch.completed":
+        channel = _low_cardinality_label(evt.get("channel"))
+        outcome = evt.get("outcome", "unknown")
+        reason = _low_cardinality_label(evt.get("reason"), "none")
+        source = _low_cardinality_label(evt.get("source"))
+        store["counter"](
             "openclaw_message_dispatch_completed_total",
             "Inbound message dispatch attempts completed by outcome.",
-            labels,
+            {"channel": channel, "outcome": outcome, "reason": reason, "source": source},
         )
-        store.histogram(
+        store["histogram"](
             "openclaw_message_dispatch_duration_seconds",
             "Inbound message dispatch duration in seconds.",
-            labels,
-            seconds(evt.get("durationMs")),
+            {"channel": channel, "outcome": outcome, "reason": reason, "source": source},
+            _seconds(evt.get("durationMs")),
         )
         return
-    if event_type in ("message.delivery.completed", "message.delivery.error"):
+
+    if evt_type in ("message.delivery.completed", "message.delivery.error"):
+        channel = _low_cardinality_label(evt.get("channel"))
+        delivery_kind = _low_cardinality_label(evt.get("deliveryKind"), "other")
+        error_category = "none"
+        outcome = "completed"
+        if evt_type == "message.delivery.error":
+            error_category = _low_cardinality_label(evt.get("errorCategory"), "other")
+            outcome = "error"
         labels = {
-            "channel": low_cardinality_label(evt.get("channel")),
-            "delivery_kind": low_cardinality_label(evt.get("deliveryKind"), "other"),
-            "error_category": (
-                low_cardinality_label(evt.get("errorCategory"), "other")
-                if event_type == "message.delivery.error"
-                else "none"
-            ),
-            "outcome": "error" if event_type == "message.delivery.error" else "completed",
+            "channel": channel,
+            "delivery_kind": delivery_kind,
+            "error_category": error_category,
+            "outcome": outcome,
         }
-        store.counter(
+        store["counter"](
             "openclaw_message_delivery_total",
             "Outbound message delivery attempts by outcome.",
             labels,
         )
-        store.histogram(
+        store["histogram"](
             "openclaw_message_delivery_duration_seconds",
             "Outbound message delivery duration in seconds.",
             labels,
-            seconds(evt.get("durationMs")),
+            _seconds(evt.get("durationMs")),
         )
         return
-    if event_type == "talk.event":
-        labels = talk_labels(evt)
-        store.counter(
+
+    if evt_type == "talk.event":
+        labels = _talk_labels(evt)
+        store["counter"](
             "openclaw_talk_event_total",
             "Talk events emitted by type.",
             labels,
         )
-        store.histogram(
+        store["histogram"](
             "openclaw_talk_event_duration_seconds",
             "Talk event duration in seconds when reported.",
             labels,
-            seconds(evt.get("durationMs")),
+            _seconds(evt.get("durationMs")),
         )
-        store.histogram(
+        store["histogram"](
             "openclaw_talk_audio_bytes",
             "Talk audio frame byte lengths.",
             labels,
-            numeric_value(evt.get("byteLength")),
+            _numeric_value(evt.get("byteLength")),
             BYTE_BUCKETS,
         )
         return
-    if event_type in ("session.recovery.requested", "session.recovery.completed"):
-        labels = session_recovery_labels(evt)
-        store.counter(
+
+    if evt_type in ("session.recovery.requested", "session.recovery.completed"):
+        labels = _session_recovery_labels(evt)
+        store["counter"](
             "openclaw_session_recovery_total",
             "Session recovery observations by status and action.",
             labels,
         )
-        store.histogram(
+        store["histogram"](
             "openclaw_session_recovery_age_seconds",
             "Age of sessions selected for recovery in seconds.",
             labels,
-            seconds(evt.get("ageMs")),
+            _seconds(evt.get("ageMs")),
         )
         return
-    if event_type in ("queue.lane.enqueue", "queue.lane.dequeue"):
-        lane_labels = {"lane": low_cardinality_queue_lane_label(evt.get("lane"))}
-        store.gauge(
+
+    if evt_type in ("queue.lane.enqueue", "queue.lane.dequeue"):
+        lane = _low_cardinality_queue_lane_label(evt.get("lane"))
+        store["gauge"](
             "openclaw_queue_lane_size",
             "Current diagnostic queue lane size.",
-            lane_labels,
-            numeric_value(evt.get("queueSize")),
+            {"lane": lane},
+            _numeric_value(evt.get("queueSize")),
         )
-        if event_type == "queue.lane.dequeue":
-            store.histogram(
+        if evt_type == "queue.lane.dequeue":
+            store["histogram"](
                 "openclaw_queue_lane_wait_seconds",
                 "Queue lane wait time in seconds.",
-                lane_labels,
-                seconds(evt.get("waitMs")),
+                {"lane": lane},
+                _seconds(evt.get("waitMs")),
             )
         return
-    if event_type == "session.state":
-        store.counter(
+
+    if evt_type == "session.state":
+        store["counter"](
             "openclaw_session_state_total",
             "Session state observations.",
             {
-                "reason": low_cardinality_label(evt.get("reason"), "none"),
-                "state": str(evt.get("state", "")),
+                "reason": _low_cardinality_label(evt.get("reason"), "none"),
+                "state": evt.get("state", "unknown"),
             },
         )
         if evt.get("queueDepth") is not None:
-            store.gauge(
+            store["gauge"](
                 "openclaw_session_queue_depth",
                 "Latest observed session queue depth.",
-                {"state": str(evt.get("state", ""))},
-                numeric_value(evt.get("queueDepth")),
+                {"state": evt.get("state", "unknown")},
+                _numeric_value(evt.get("queueDepth")),
             )
         return
-    if event_type == "session.stuck":
-        labels = session_stuck_labels(evt)
-        store.counter(
+
+    if evt_type == "session.stuck":
+        labels = _session_stuck_labels(evt)
+        store["counter"](
             "openclaw_session_stuck_total",
             "Stale session bookkeeping observations with no active work.",
             labels,
         )
-        store.histogram(
+        store["histogram"](
             "openclaw_session_stuck_age_seconds",
             "Age of stale session bookkeeping observations in seconds.",
             labels,
-            seconds(evt.get("ageMs")),
+            _seconds(evt.get("ageMs")),
         )
         return
-    if event_type == "session.turn.created":
-        store.counter(
+
+    if evt_type == "session.turn.created":
+        store["counter"](
             "openclaw_session_turn_created_total",
             "Agent session turns created.",
             {
-                "agent": low_cardinality_label(evt.get("agentId")),
-                "channel": low_cardinality_label(evt.get("channel")),
-                "trigger": str(evt.get("trigger", "")),
+                "agent": _low_cardinality_label(evt.get("agentId")),
+                "channel": _low_cardinality_label(evt.get("channel")),
+                "trigger": evt.get("trigger", "unknown"),
             },
         )
         return
-    if event_type == "diagnostic.memory.sample":
-        memory = evt.get("memory") or {}
-        store.gauge(
+
+    if evt_type == "diagnostic.memory.sample":
+        store["gauge"](
             "openclaw_memory_bytes",
             "Latest process memory usage by memory kind.",
             {"kind": "rss"},
-            memory.get("rssBytes"),
+            _numeric_value(evt.get("memory", {}).get("rssBytes")),
         )
-        store.gauge(
+        store["gauge"](
             "openclaw_memory_bytes",
             "Latest process memory usage by memory kind.",
             {"kind": "heap_total"},
-            memory.get("heapTotalBytes"),
+            _numeric_value(evt.get("memory", {}).get("heapTotalBytes")),
         )
-        store.gauge(
+        store["gauge"](
             "openclaw_memory_bytes",
             "Latest process memory usage by memory kind.",
             {"kind": "heap_used"},
-            memory.get("heapUsedBytes"),
+            _numeric_value(evt.get("memory", {}).get("heapUsedBytes")),
         )
-        store.histogram(
+        store["histogram"](
             "openclaw_memory_rss_bytes",
             "RSS memory sample distribution in bytes.",
             {},
-            numeric_value(memory.get("rssBytes")),
+            _numeric_value(evt.get("memory", {}).get("rssBytes")),
             BYTE_BUCKETS,
         )
         return
-    if event_type == "diagnostic.memory.pressure":
-        store.counter(
+
+    if evt_type == "diagnostic.memory.pressure":
+        store["counter"](
             "openclaw_memory_pressure_total",
             "Memory pressure events by level and reason.",
             {
-                "level": str(evt.get("level", "")),
-                "reason": str(evt.get("reason", "")),
+                "level": evt.get("level", "unknown"),
+                "reason": evt.get("reason", "unknown"),
             },
         )
         return
-    if event_type == "diagnostic.liveness.warning":
-        labels = liveness_labels(evt)
-        store.counter(
+
+    if evt_type == "diagnostic.liveness.warning":
+        labels = _liveness_labels(evt)
+        store["counter"](
             "openclaw_liveness_warning_total",
             "Diagnostic liveness warning events.",
             labels,
         )
-        store.gauge(
+        store["gauge"](
             "openclaw_liveness_sessions",
             "Latest session counts reported with diagnostic liveness warnings.",
             {"state": "active"},
-            numeric_value(evt.get("active")),
+            _numeric_value(evt.get("active")),
         )
-        store.gauge(
+        store["gauge"](
             "openclaw_liveness_sessions",
             "Latest session counts reported with diagnostic liveness warnings.",
             {"state": "waiting"},
-            numeric_value(evt.get("waiting")),
+            _numeric_value(evt.get("waiting")),
         )
-        store.gauge(
+        store["gauge"](
             "openclaw_liveness_sessions",
             "Latest session counts reported with diagnostic liveness warnings.",
             {"state": "queued"},
-            numeric_value(evt.get("queued")),
+            _numeric_value(evt.get("queued")),
         )
-        store.histogram(
+        store["histogram"](
             "openclaw_liveness_event_loop_delay_p99_seconds",
             "P99 event-loop delay reported by diagnostic liveness warnings in seconds.",
             labels,
-            seconds(evt.get("eventLoopDelayP99Ms")),
+            _seconds(evt.get("eventLoopDelayP99Ms")),
         )
-        store.histogram(
+        store["histogram"](
             "openclaw_liveness_event_loop_delay_max_seconds",
             "Maximum event-loop delay reported by diagnostic liveness warnings in seconds.",
             labels,
-            seconds(evt.get("eventLoopDelayMaxMs")),
+            _seconds(evt.get("eventLoopDelayMaxMs")),
         )
-        store.histogram(
+        store["histogram"](
             "openclaw_liveness_event_loop_utilization_ratio",
             "Event-loop utilization reported by diagnostic liveness warnings.",
             labels,
-            numeric_value(evt.get("eventLoopUtilization")),
+            _numeric_value(evt.get("eventLoopUtilization")),
             RATIO_BUCKETS,
         )
-        store.histogram(
+        store["histogram"](
             "openclaw_liveness_cpu_core_ratio",
             "CPU core ratio reported by diagnostic liveness warnings.",
             labels,
-            numeric_value(evt.get("cpuCoreRatio")),
+            _numeric_value(evt.get("cpuCoreRatio")),
             RATIO_BUCKETS,
         )
         return
-    if event_type == "diagnostic.async_queue.dropped":
-        store.counter(
+
+    if evt_type == "diagnostic.async_queue.dropped":
+        store["counter"](
             "openclaw_diagnostic_async_queue_dropped_total",
             "Async diagnostic queue drops by dropped event class.",
             {"drop_class": "total"},
-            numeric_value(evt.get("droppedEvents")),
+            _numeric_value(evt.get("droppedEvents")),
         )
         if evt.get("droppedTrustedEvents") is not None:
-            store.counter(
+            store["counter"](
                 "openclaw_diagnostic_async_queue_dropped_total",
                 "Async diagnostic queue drops by dropped event class.",
                 {"drop_class": "trusted"},
-                numeric_value(evt.get("droppedTrustedEvents")),
+                _numeric_value(evt.get("droppedTrustedEvents")),
             )
         if evt.get("droppedUntrustedEvents") is not None:
-            store.counter(
+            store["counter"](
                 "openclaw_diagnostic_async_queue_dropped_total",
                 "Async diagnostic queue drops by dropped event class.",
                 {"drop_class": "untrusted"},
-                numeric_value(evt.get("droppedUntrustedEvents")),
+                _numeric_value(evt.get("droppedUntrustedEvents")),
             )
         if evt.get("droppedPriorityEvents") is not None:
-            store.counter(
+            store["counter"](
                 "openclaw_diagnostic_async_queue_dropped_total",
                 "Async diagnostic queue drops by dropped event class.",
                 {"drop_class": "priority"},
-                numeric_value(evt.get("droppedPriorityEvents")),
+                _numeric_value(evt.get("droppedPriorityEvents")),
             )
-        store.gauge(
+        store["gauge"](
             "openclaw_diagnostic_async_queue_length",
             "Latest async diagnostic queue length after a drop summary.",
             {},
-            numeric_value(evt.get("queueLength")),
+            _numeric_value(evt.get("queueLength")),
         )
         return
-    if event_type == "diagnostic.heartbeat":
+
+    if evt_type == "diagnostic.heartbeat":
         return
-    if event_type == "telemetry.exporter":
-        store.counter(
+
+    if evt_type == "telemetry.exporter":
+        store["counter"](
             "openclaw_telemetry_exporter_total",
-            "Telemetry exporter lifecycle events.",
+            "Telemetry exporter lifecycle and failure events.",
             {
-                "exporter": low_cardinality_label(evt.get("exporter")),
-                "reason": low_cardinality_label(evt.get("reason"), "none"),
-                "signal": str(evt.get("signal", "")),
-                "status": str(evt.get("status", "")),
+                "exporter": _low_cardinality_label(evt.get("exporter"), "unknown"),
+                "reason": _low_cardinality_label(evt.get("reason"), "none"),
+                "signal": evt.get("signal", "unknown"),
+                "status": evt.get("status", "unknown"),
             },
         )
         return
-    if event_type == "payload.large":
-        labels = payload_large_labels(evt)
-        store.counter(
+
+    if evt_type == "payload.large":
+        labels = _payload_large_labels(evt)
+        store["counter"](
             "openclaw_payload_large_total",
             "Oversized payload diagnostics by surface and action.",
             labels,
         )
-        store.histogram(
+        store["histogram"](
             "openclaw_payload_large_bytes",
             "Oversized payload byte sizes by surface and action.",
             labels,
-            numeric_value(evt.get("bytes")),
+            _numeric_value(evt.get("bytes")),
             BYTE_BUCKETS,
         )
 
 
-def create_metrics_handler(store: PrometheusMetricStore) -> OpenClawPluginHttpRouteHandler:
+def _create_metrics_handler(store: dict[str, Any]) -> OpenClawPluginHttpRouteHandler:
     def handler(req: Any, res: Any) -> bool:
-        method = getattr(req, "method", "GET") or "GET"
+        method = req.method if hasattr(req, "method") else req.get("method", "")
         if method not in ("GET", "HEAD"):
-            res.statusCode = 405
-            res.setHeader("Allow", "GET, HEAD")
+            res.status_code = 405
+            res.headers["Allow"] = "GET, HEAD"
             res.end("Method Not Allowed")
             return True
 
         body = render_prometheus_metrics(store)
-        res.statusCode = 200
-        res.setHeader("Cache-Control", "no-store")
-        res.setHeader("Content-Type", "text/plain; version=0.0.4; charset=utf-8")
+        res.status_code = 200
+        res.headers["Cache-Control"] = "no-store"
+        res.headers["Content-Type"] = "text/plain; version=0.0.4; charset=utf-8"
         if method == "HEAD":
             res.end()
             return True
@@ -995,59 +952,52 @@ def create_metrics_handler(store: PrometheusMetricStore) -> OpenClawPluginHttpRo
     return handler
 
 
-class DiagnosticsPrometheusService:
-    id = "diagnostics-prometheus"
+def create_diagnostics_prometheus_exporter() -> dict[str, Any]:
+    store = create_prometheus_metric_store()
+    unsubscribe: Callable[[], None] | None = None
 
-    def __init__(self, store: PrometheusMetricStore) -> None:
-        self._store = store
-        self._unsubscribe: Any | None = None
+    service: OpenClawPluginService = {
+        "id": "diagnostics-prometheus",
+        "start": lambda ctx: _start_service(ctx, store, lambda u: setattr(service, "_unsubscribe", u)),
+        "stop": lambda ctx: _stop_service(ctx, store),
+    }
 
-    def start(self, ctx: OpenClawPluginServiceContext) -> None:
-        internal_diagnostics = getattr(ctx, "internal_diagnostics", None)
-        subscribe = getattr(internal_diagnostics, "on_event", None) if internal_diagnostics else None
-        if not subscribe:
+    def _start_service(ctx: OpenClawPluginServiceContext) -> None:
+        subscribe = ctx.get("internal_diagnostics", {}).get("onEvent") if isinstance(ctx.get("internal_diagnostics"), dict) else None
+        if subscribe is None:
             ctx.logger.error("diagnostics-prometheus: internal diagnostics capability unavailable")
             return
 
-        def on_event(
-            event: DiagnosticEventPayload,
-            metadata: DiagnosticEventMetadata,
-            _private_data: Any = None,
-        ) -> None:
+        def _on_event(evt: DiagnosticEventPayload, metadata: DiagnosticEventMetadata) -> None:
             try:
-                record_diagnostic_event(self._store, event, metadata)
-            except Exception as err:  # noqa: BLE001
+                record_diagnostic_event(store, evt, metadata)
+            except Exception as err:
                 ctx.logger.error(
-                    "diagnostics-prometheus: event handler failed "
-                    f"({event.get('type')}): {safe_error_message(err)}"
+                    f"diagnostics-prometheus: event handler failed ({evt.get('type', '?')}): {_safe_error_message(err)}"
                 )
 
-        self._unsubscribe = subscribe(on_event)
-        emit = getattr(internal_diagnostics, "emit", None)
-        if emit:
-            emit(
-                {
-                    "type": "telemetry.exporter",
-                    "exporter": "diagnostics-prometheus",
-                    "signal": "metrics",
-                    "status": "started",
-                    "reason": "configured",
-                }
-            )
+        unsubscribe_ref = subscribe(_on_event)
+        unsubscribe = unsubscribe_ref
 
-    def stop(self, ctx: OpenClawPluginServiceContext | None = None) -> None:
-        del ctx
-        if self._unsubscribe:
-            self._unsubscribe()
-        self._unsubscribe = None
-        self._store.reset()
+        internal_diag = ctx.get("internal_diagnostics")
+        if isinstance(internal_diag, dict) and internal_diag.get("emit"):
+            internal_diag.emit({
+                "type": "telemetry.exporter",
+                "exporter": "diagnostics-prometheus",
+                "signal": "metrics",
+                "status": "started",
+                "reason": "configured",
+            })
 
+    def _stop_service(ctx: OpenClawPluginServiceContext) -> None:
+        nonlocal unsubscribe
+        if unsubscribe is not None:
+            unsubscribe()
+            unsubscribe = None
+        store["reset"]()
 
-def create_diagnostics_prometheus_exporter() -> dict[str, Any]:
-    store = create_prometheus_metric_store()
-    service = DiagnosticsPrometheusService(store)
     return {
-        "handler": create_metrics_handler(store),
+        "handler": _create_metrics_handler(store),
         "render": lambda: render_prometheus_metrics(store),
         "service": service,
     }
@@ -1058,13 +1008,5 @@ test_api = {
     "record_diagnostic_event": record_diagnostic_event,
     "render_prometheus_metrics": render_prometheus_metrics,
 }
-__test__ = test_api
 
-__all__ = [
-    "__test__",
-    "create_diagnostics_prometheus_exporter",
-    "create_prometheus_metric_store",
-    "record_diagnostic_event",
-    "render_prometheus_metrics",
-    "test_api",
-]
+__test__ = test_api

@@ -1,38 +1,25 @@
-"""Content block type definitions for agent messages."""
-
 from __future__ import annotations
 
-from typing import Any, Literal, TypedDict
+from typing import Any
 
 
-class TextContentBlock(TypedDict):
-    type: Literal["text"]
-    text: str
+def build_content_block(
+    block_type: str,
+    content: Any = None,
+    **metadata: Any,
+) -> dict[str, Any]:
+    return {
+        "type": block_type,
+        "content": content,
+        "metadata": metadata,
+    }
 
 
-class ImageContentBlock(TypedDict, total=False):
-    type: Literal["image"]
-    mimeType: str
-    data: str
-
-
-class ToolCallBlock(TypedDict, total=False):
-    type: Literal["toolCall"]
-    name: str
-    arguments: Any
-    toolCallId: str
-
-
-class ToolResultBlock(TypedDict, total=False):
-    type: Literal["toolResult"]
-    toolCallId: str
-    content: list[Any]
-    isError: bool
-
-
-class ThinkingBlock(TypedDict, total=False):
-    type: Literal["thinking"]
-    thinking: str
-
-
-ContentBlock = Any  # Union of all block types above
+def parse_content_blocks(raw: Any) -> list[dict[str, Any]]:
+    if isinstance(raw, list):
+        return [b for b in raw if isinstance(b, dict)]
+    if isinstance(raw, dict):
+        return [raw]
+    if isinstance(raw, str):
+        return [{"type": "text", "content": raw}]
+    return []

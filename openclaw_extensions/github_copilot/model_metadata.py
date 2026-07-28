@@ -1,15 +1,24 @@
-from typing import Dict, List, Optional, Set
+from __future__ import annotations
 
+import re
+from typing import Any
 
-COPILOT_CHAT_COMPLETIONS_COMPAT = {
+from openclaw.plugin_sdk.provider_model_shared import supports_claude_adaptive_thinking
+from openclaw.plugin_sdk.string_coerce_runtime import normalize_optional_lowercase_string
+
+CopilotRuntimeApi = str
+CopilotReasoningCompat = dict[str, Any] | None
+
+COPILOT_CHAT_COMPLETIONS_COMPAT: dict[str, Any] = {
     "supportsStore": False,
     "supportsDeveloperRole": False,
     "supportsUsageInStreaming": False,
     "maxTokensField": "max_tokens",
 }
+
 COPILOT_XHIGH_MODEL_IDS = {"gpt-5.4", "gpt-5.3-codex"}
 
-STATIC_MODEL_OVERRIDES = {
+STATIC_MODEL_OVERRIDES: dict[str, dict[str, Any]] = {
     "claude-opus-4.6-1m": {
         "name": "Claude Opus 4.6 (1M context)",
         "api": "anthropic-messages",
@@ -37,73 +46,83 @@ STATIC_MODEL_OVERRIDES = {
 }
 
 
-def normalize_optional_lowercase_string(value: Optional[str]) -> Optional[str]:
-    if value is None:
-        return None
-    return value.strip().lower()
+def _is_copilot_gemini_model_id(model_id: str) -> bool:
+    return bool(re.search(r"(?:^|[-_.])gemini(?:$|[-_.])", model_id))
 
 
-def isCopilotGeminiModelId(modelId: str) -> bool:
-    return "gemini" in normalize_optional_lowercase_string(modelId)
+def _is_copilot_claude45_model_id(model_id: str) -> bool:
+    return bool(re.search(r"^claude-(?:haiku|opus|sonnet)-4[.-]5(?:$|[-.])", model_id))
 
 
-def isCopilotClaude45ModelId(modelId: str) -> bool:
-    normalized = normalize_optional_lowercase_string(modelId) or ""
-    return normalized.startswith("claude-haiku-4.5") or normalized.startswith("claude-opus-4.5") or normalized.startswith("claude-sonnet-4.5")
-
-
-def resolveCopilotTransportApi(modelId: str) -> str:
-    normalized = normalize_optional_lowercase_string(modelId) or ""
+def resolve_copilot_transport_api(model_id: str) -> str:
+    normalized = normalize_optional_lowercase_string(model_id) or ""
     if "claude" in normalized:
         return "anthropic-messages"
-    if isCopilotGeminiModelId(normalized):
+    if _is_copilot_gemini_model_id(normalized):
         return "openai-completions"
     return "openai-responses"
 
 
-def resolveCopilotModelCompat(modelId: str) -> Optional[Dict]:
-    normalized = normalize_optional_lowercase_string(modelId) or ""
-    if isCopilotGeminiModelId(normalized):
-        return COPILOT_CHAT_COMPLETIONS_COMPAT.copy()
-    if isCopilotClaude45ModelId(normalized):
+def resolve_copilot_model_compat(model_id: str) -> dict[str, Any] | None:
+    normalized = normalize_optional_lowercase_string(model_id) or ""
+    if _is_copilot_gemini_model_id(normalized):
+        return dict(COPILOT_CHAT_COMPLETIONS_COMPAT)
+    if _is_copilot_claude45_model_id(normalized):
         return {"supportsEagerToolInputStreaming": False}
     return None
 
 
-def compatSupportsEffort(compat: Optional[Dict], effort: str) -> bool:
+def _compat_supports_effort(
+    compat: CopilotReasoningCompat,
+    effort: str,
+) -> bool:
     efforts = compat.get("supportedReasoningEfforts") if compat else None
-    return isinstance(efforts, list) and normalize_optional_lowercase_string(effort) in [normalize_optional_lowercase_string(e) for e in efforts]
+    if not isinstance(efforts, list):
+        return False
+    normalized_effort = normalize_optional_lowercase_string(effort)
+    return any(
+        normalize_optional_lowercase_string(candidate) == normalized_effort
+        for candidate in efforts
+    )
 
 
-def resolveCopilotExtendedThinkingLevels(modelId: str, compat: Optional[Dict] = None) -> List[str]:
-    normalizedModelId = normalize_optional_lowercase_string(modelId) or ""
-    staticCompat = resolveStaticCopilotModelOverride(normalizedModelId).get("compat") if resolveStaticCopilotModelOverride(normalizedModelId) else None
-    isClaudeModel = "claude" in normalizedModelId
-    supportsAdaptiveClaudeEffort = not isClaudeModel
-    levels = []
+def resolve_copilot_extended_thinking_levels(
+    model_id: str,
+    compat: CopilotReasoningCompat = None,
+) -> list[str]:
+    normalized_model_id = normalize_optional_lowercase_string(model_id) or ""
+    static_compat = resolve_static_copilot_model_override(normalized_model_id)
+    if static_compat:
+        static_compat = static_compat.get("compat")
+    is_claude_model = "claude" in normalized_model_id
+    supports_adaptive_claude_effort = (
+        not is_claude_model
+        or supports_claude_adaptive_thinking({"id": normalized_model_id})
+    )
+    levels: list[str] = []
     if (
-        supportsAdaptiveClaudeEffort
-        and (normalizedModelId in COPILOT_XHIGH_MODEL_IDS or compatSupportsEffort(compat, "xhigh") or compatSupportsEffort(staticCompat, "xhigh"))
+        supports_adaptive_claude_effort
+        and (
+            normalized_model_id in COPILOT_XHIGH_MODEL_IDS
+            or _compat_supports_effort(compat, "xhigh")
+            or _compat_supports_effort(static_compat, "xhigh")
+        )
     ):
         levels.append("xhigh")
     if (
-        isClaudeModel
-        and supportsAdaptiveClaudeEffort
-        and (compatSupportsEffort(compat, "max") or compatSupportsEffort(staticCompat, "max"))
+        is_claude_model
+        and supports_adaptive_claude_effort
+        and (
+            _compat_supports_effort(compat, "max")
+            or _compat_supports_effort(static_compat, "max")
+        )
     ):
         levels.append("max")
     return levels
 
 
-def resolveStaticCopilotModelOverride(modelId: str) -> Dict:
-    return STATIC_MODEL_OVERRIDES.get(normalize_optional_lowercase_string(modelId) or "", {})
-
-__all__ = [
-    "COPILOT_CHAT_COMPLETIONS_COMPAT",
-    "COPILOT_XHIGH_MODEL_IDS",
-    "STATIC_MODEL_OVERRIDES",
-    "resolveCopilotTransportApi",
-    "resolveCopilotModelCompat",
-    "resolveCopilotExtendedThinkingLevels",
-    "resolveStaticCopilotModelOverride",
-]
+def resolve_static_copilot_model_override(
+    model_id: str,
+) -> dict[str, Any] | None:
+    normalized = normalize_optional_lowercase_string(model_id) or ""
+    return STATIC_MODEL_OVERRIDES.get(normalized)

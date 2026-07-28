@@ -1,1 +1,0 @@
-"""Copilot Proxy provider extension."""

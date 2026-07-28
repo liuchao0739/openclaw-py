@@ -1,5 +1,3 @@
-"""Diagnostics Prometheus plugin entrypoint registers its OpenClaw integration."""
-
 from __future__ import annotations
 
 from openclaw.plugin_sdk.plugin_entry import OpenClawPluginApi, define_plugin_entry
@@ -11,14 +9,14 @@ _exporter = create_diagnostics_prometheus_exporter()
 
 
 def _register(api: OpenClawPluginApi) -> None:
-    api.register_service(_exporter["service"])
+    api.register_service(_exporter.service)
     api.register_http_route(
         {
             "path": "/api/diagnostics/prometheus",
             "auth": "gateway",
             "match": "exact",
-            "gateway_runtime_scope_surface": "trusted-operator",
-            "handler": _exporter["handler"],
+            "gatewayRuntimeScopeSurface": "trusted-operator",
+            "handler": _exporter.handler,
         }
     )
 

@@ -5,7 +5,7 @@ Mirrors src/infra/format-time/format-datetime.ts.
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from typing import Any, TypedDict
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
@@ -35,7 +35,7 @@ def format_utc_timestamp(
 ) -> str:
     """Format a datetime as a UTC timestamp string."""
     opts = options or {}
-    utc = date.astimezone(UTC) if date.tzinfo is not None else date.replace(tzinfo=UTC)
+    utc = date.astimezone(timezone.utc) if date.tzinfo is not None else date.replace(tzinfo=timezone.utc)
     yyyy = f"{utc.year:04d}"
     mm = f"{utc.month:02d}"
     dd = f"{utc.day:02d}"
@@ -79,7 +79,7 @@ def format_zoned_timestamp(
         return None
     try:
         if date.tzinfo is None:
-            aware = date.replace(tzinfo=UTC)
+            aware = date.replace(tzinfo=timezone.utc)
         else:
             aware = date
         parts = _get_zoned_format_parts(aware, time_zone, display_seconds)

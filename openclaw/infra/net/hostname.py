@@ -1,20 +1,28 @@
-"""Hostname normalization helpers keep SSRF and proxy policy comparisons stable
-across case, trailing dots, and bracketed IPv6 literals.
-
-Mirrors src/infra/net/hostname.ts.
-"""
-
 from __future__ import annotations
 
-import re
+from typing import Any
 
 
-def normalize_hostname(hostname: str) -> str:
-    """Normalize a hostname for policy comparisons."""
-    if not isinstance(hostname, str):
-        return ""
-    normalized = hostname.strip().lower()
-    normalized = re.sub(r"\.+$", "", normalized)
-    if normalized.startswith("[") and normalized.endswith("]"):
-        return normalized[1:-1]
-    return normalized
+def hostname_from_url(url: str) -> str | None:
+    from urllib.parse import urlparse
+    try:
+        parsed = urlparse(url)
+        return parsed.hostname
+    except Exception:
+        return None
+
+
+def is_local_hostname(hostname: str | None) -> bool:
+    if not hostname:
+        return False
+    hostname_lower = hostname.lower()
+    if hostname_lower in ("localhost", "127.0.0.1", "0.0.0.0", "::1"):
+        return True
+    if hostname_lower.endswith(".local"):
+        return True
+    try:
+        import ipaddress
+        addr = ipaddress.ip_address(hostname)
+        return addr.is_loopback or addr.is_private or addr.is_link_local
+    except ValueError:
+        return False

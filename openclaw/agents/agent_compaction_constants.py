@@ -1,4 +1,16 @@
-"""Compaction budget constants (ported from agent-compaction-constants.ts)."""
+from __future__ import annotations
 
-MIN_PROMPT_BUDGET_TOKENS = 8_000
-MIN_PROMPT_BUDGET_RATIO = 0.5
+from typing import Any
+
+
+class AgentCompactionConstants:
+    DEFAULT_MAX_TOKENS = 128000
+    COMPACTION_TRIGGER_TOKENS = 100000
+    SAFETY_MARGIN_TOKENS = 20000
+    MIN_COMPACTION_TOKENS = 8000
+
+
+DEFAULT_MAX_TOKENS = AgentCompactionConstants.DEFAULT_MAX_TOKENS
+COMPACTION_TRIGGER_TOKENS = AgentCompactionConstants.COMPACTION_TRIGGER_TOKENS
+SAFETY_MARGIN_TOKENS = AgentCompactionConstants.SAFETY_MARGIN_TOKENS
+MIN_COMPACTION_TOKENS = AgentCompactionConstants.MIN_COMPACTION_TOKENS

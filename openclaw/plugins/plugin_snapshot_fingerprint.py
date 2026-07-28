@@ -1,23 +1,20 @@
-"""Plugin snapshot fingerprint helpers.
-
-Mirrors src/plugins/plugin-snapshot-fingerprint.ts.
-"""
-
 from __future__ import annotations
 
-import os
+import hashlib
+import json
 from typing import Any
 
 
-def file_fingerprint(file_path: str) -> list[Any]:
-    """Return a fingerprint tuple for a file path.
+def compute_plugin_snapshot_fingerprint(
+    snapshot: dict[str, Any],
+) -> str:
+    content = json.dumps(snapshot, sort_keys=True, default=str)
+    return hashlib.sha256(content.encode()).hexdigest()[:16]
 
-    Returns [path, kind, size, mtime_ns, ctime_ns] for existing files,
-    or [path, "missing"] for non-existent paths.
-    """
-    try:
-        stat = os.stat(file_path)
-        kind = "file" if os.path.isfile(file_path) else ("dir" if os.path.isdir(file_path) else "other")
-        return [file_path, kind, str(stat.st_size), str(stat.st_mtime_ns), str(stat.st_ctime_ns)]
-    except OSError:
-        return [file_path, "missing"]
+
+def verify_plugin_snapshot(
+    snapshot: dict[str, Any],
+    expected_fingerprint: str,
+) -> bool:
+    actual = compute_plugin_snapshot_fingerprint(snapshot)
+    return actual == expected_fingerprint

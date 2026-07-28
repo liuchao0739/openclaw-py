@@ -8,7 +8,7 @@ from __future__ import annotations
 import math
 import re
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 OFFSETLESS_ISO_DATETIME_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?(\.\d+)?$")
@@ -37,7 +37,7 @@ def parse_offsetless_iso_date_time_in_time_zone(raw: str, time_zone: str) -> str
     if expected_parts is None:
         return None
     try:
-        _get_zoned_date_time_parts(datetime.now(tz=UTC).timestamp() * 1000, time_zone)
+        _get_zoned_date_time_parts(datetime.now(tz=timezone.utc).timestamp() * 1000, time_zone)
 
         naive = datetime.fromisoformat(f"{raw}Z")
         naive_ms = naive.timestamp() * 1000
@@ -50,14 +50,14 @@ def parse_offsetless_iso_date_time_in_time_zone(raw: str, time_zone: str) -> str
         resolved_ms = naive_ms - final_offset_ms
         if not _matches_offsetless_iso_date_time_parts(resolved_ms, time_zone, expected_parts):
             return None
-        resolved = datetime.fromtimestamp(resolved_ms / 1000, tz=UTC)
+        resolved = datetime.fromtimestamp(resolved_ms / 1000, tz=timezone.utc)
         return _to_utc_iso_string(resolved)
     except (ZoneInfoNotFoundError, ValueError, OSError, OverflowError):
         return None
 
 
 def _to_utc_iso_string(date: datetime) -> str:
-    utc = date.astimezone(UTC)
+    utc = date.astimezone(timezone.utc)
     millis = utc.microsecond // 1000
     return f"{utc.strftime('%Y-%m-%dT%H:%M:%S')}.{millis:03d}Z"
 
@@ -110,7 +110,7 @@ def _get_time_zone_offset_ms(utc_ms: float, time_zone: str) -> float:
             parts.minute,
             parts.second,
             parts.millisecond * 1000,
-            tzinfo=UTC,
+            tzinfo=timezone.utc,
         ).timestamp()
         * 1000
     )
@@ -118,7 +118,7 @@ def _get_time_zone_offset_ms(utc_ms: float, time_zone: str) -> float:
 
 
 def _get_zoned_date_time_parts(utc_ms: float, time_zone: str) -> _OffsetlessIsoDateTimeParts:
-    utc_date = datetime.fromtimestamp(utc_ms / 1000, tz=UTC)
+    utc_date = datetime.fromtimestamp(utc_ms / 1000, tz=timezone.utc)
     local = utc_date.astimezone(ZoneInfo(time_zone))
     millisecond = utc_date.microsecond // 1000
     return _OffsetlessIsoDateTimeParts(

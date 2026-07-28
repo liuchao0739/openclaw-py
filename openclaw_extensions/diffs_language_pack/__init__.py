@@ -1,0 +1,1 @@
+"""Diffs Language Pack extension package."""

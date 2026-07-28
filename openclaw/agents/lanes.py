@@ -1,5 +1,17 @@
-"""Agent command queue lane names."""
+from __future__ import annotations
 
-AGENT_LANE_SUBAGENT = "subagent"
-AGENT_LANE_NESTED = "nested"
-AGENT_LANE_CRON_NESTED = "cron:nested"
+from typing import Any
+
+
+def build_lanes() -> dict[str, Any]:
+    return {
+        "lanes": {},
+        "activeLane": None,
+    }
+
+
+def resolve_lane(
+    lanes: dict[str, Any],
+    lane_id: str,
+) -> dict[str, Any] | None:
+    return lanes.get("lanes", {}).get(lane_id)

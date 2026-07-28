@@ -1,5 +1,3 @@
-"""Diagnostics Otel API module exposes the plugin public contract."""
-
 from __future__ import annotations
 
 from openclaw.plugin_sdk.diagnostic_runtime import (

@@ -1,9 +1,6 @@
-"""Method allowlist for Admin HTTP RPC.
-
-Only methods listed here can cross the trusted operator HTTP surface.
-"""
-
 from __future__ import annotations
+
+from typing import Any
 
 ADMIN_HTTP_RPC_ALLOWED_METHOD_GROUPS: dict[str, tuple[str, ...]] = {
     "gateway": (
@@ -62,18 +59,14 @@ ADMIN_HTTP_RPC_ALLOWED_METHOD_GROUPS: dict[str, tuple[str, ...]] = {
     "diagnostics": ("doctor.memory.status", "update.status"),
 }
 
-ADMIN_HTTP_RPC_ALLOWED_METHODS: frozenset[str] = frozenset(
-    method for methods in ADMIN_HTTP_RPC_ALLOWED_METHOD_GROUPS.values() for method in methods
-)
+ADMIN_HTTP_RPC_ALLOWED_METHODS: set[str] = set()
+for group in ADMIN_HTTP_RPC_ALLOWED_METHOD_GROUPS.values():
+    ADMIN_HTTP_RPC_ALLOWED_METHODS.update(group)
 
 
 def is_admin_http_rpc_allowed_method(method: str) -> bool:
-    """Return whether an admin RPC method is exposed over HTTP."""
     return method in ADMIN_HTTP_RPC_ALLOWED_METHODS
 
 
 def list_admin_http_rpc_allowed_methods() -> list[str]:
-    """List all admin RPC methods exposed over HTTP."""
-    return [
-        method for methods in ADMIN_HTTP_RPC_ALLOWED_METHOD_GROUPS.values() for method in methods
-    ]
+    return sorted(ADMIN_HTTP_RPC_ALLOWED_METHODS)

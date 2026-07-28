@@ -1,8 +1,3 @@
-"""Copilot Proxy API module exposes the plugin public contract."""
+from openclaw.plugin_sdk.plugin_entry import define_plugin_entry
 
-from openclaw.plugin_sdk.plugin_entry import OpenClawPluginApi, define_plugin_entry
-
-__all__ = [
-    "OpenClawPluginApi",
-    "define_plugin_entry",
-]
+__all__ = ["define_plugin_entry"]

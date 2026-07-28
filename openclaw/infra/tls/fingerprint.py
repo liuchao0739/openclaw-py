@@ -1,24 +1,38 @@
-"""TLS fingerprint normalization accepts common SHA-256 display formats and
-stores lowercase hex for config comparisons.
-
-Mirrors src/infra/tls/fingerprint.ts.
-"""
-
 from __future__ import annotations
 
+import hashlib
+import os
 import re
+from typing import Any
 
-# Pattern to strip SHA-256 label/prefix.
-_SHA256_PREFIX_RE = re.compile(r"^sha-?256\s*:?\s*", re.IGNORECASE)
-# Pattern to keep only hex characters.
-_NON_HEX_RE = re.compile(r"[^a-fA-F0-9]")
+
+def compute_file_sha256(file_path: str) -> str:
+    sha256 = hashlib.sha256()
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(8192), b""):
+            sha256.update(chunk)
+    return sha256.hexdigest()
+
+
+def compute_string_sha256(s: str) -> str:
+    return hashlib.sha256(s.encode("utf-8")).hexdigest()
+
+
+def compute_bytes_sha256(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def fingerprint_cert(cert_path: str) -> str | None:
+    try:
+        with open(cert_path, "r") as f:
+            content = f.read()
+        return compute_string_sha256(content)
+    except (OSError, IOError):
+        return None
 
 
 def normalize_fingerprint(input: str) -> str:
-    """Normalize a TLS fingerprint to lowercase hex without labels or separators."""
-    if not isinstance(input, str):
-        return ""
     trimmed = input.strip()
-    without_prefix = _SHA256_PREFIX_RE.sub("", trimmed)
-    hex_only = _NON_HEX_RE.sub("", without_prefix)
+    without_prefix = re.sub(r"^sha-?256\s*:?\s*", "", trimmed, flags=re.IGNORECASE)
+    hex_only = re.sub(r"[^a-fA-F0-9]", "", without_prefix)
     return hex_only.lower()

@@ -1,46 +1,68 @@
-"""Provider/model failover error classification."""
-
 from __future__ import annotations
 
-from openclaw.agents.embedded_agent_helpers.types import FailoverReason
+from typing import Any
 
 
-class FailoverError(Exception):
-    def __init__(
-        self,
-        message: str,
-        *,
-        reason: FailoverReason,
-        provider: str | None = None,
-        model: str | None = None,
-        profile_id: str | None = None,
-        status: int | None = None,
-        cause: BaseException | None = None,
-    ) -> None:
-        super().__init__(message)
-        if cause is not None:
-            self.__cause__ = cause
-        self.name = "FailoverError"
-        self.reason = reason
-        self.provider = provider
-        self.model = model
-        self.profile_id = profile_id
-        self.status = status
+class FailoverErrorReason:
+    AUTH = "auth"
+    AUTH_PERMANENT = "auth_permanent"
+    BILLING = "billing"
+    RATE_LIMIT = "rate_limit"
+    OVERLOADED = "overloaded"
+    TIMEOUT = "timeout"
+    MODEL_NOT_FOUND = "model_not_found"
+    SERVER_ERROR = "server_error"
+    SESSION_EXPIRED = "session_expired"
+    FORMAT = "format"
+    EMPTY_RESPONSE = "empty_response"
+    NO_ERROR_DETAILS = "no_error_details"
+    UNCLASSIFIED = "unclassified"
+    UNKNOWN = "unknown"
 
 
-def is_failover_error(err: object) -> bool:
-    return isinstance(err, FailoverError)
+def classify_failover_error(error: Any) -> str:
+    if error is None:
+        return FailoverErrorReason.UNKNOWN
+    message = str(error).lower()
 
+    keywords: dict[str, list[str]] = {
+        FailoverErrorReason.AUTH_PERMANENT: [
+            "invalid api key", "unauthorized", "authentication failed",
+            "invalid api_key", "401", "bad request.*api key",
+        ],
+        FailoverErrorReason.BILLING: [
+            "billing", "insufficient", "quota exceeded", "payment",
+            "out of credits", "402",
+        ],
+        FailoverErrorReason.RATE_LIMIT: [
+            "rate limit", "too many requests", "429", "throttl",
+        ],
+        FailoverErrorReason.OVERLOADED: [
+            "overloaded", "capacity", "503", "service unavailable",
+        ],
+        FailoverErrorReason.TIMEOUT: [
+            "timeout", "timed out", "connection error", "504",
+        ],
+        FailoverErrorReason.SERVER_ERROR: [
+            "500", "internal server error", "server error",
+        ],
+        FailoverErrorReason.MODEL_NOT_FOUND: [
+            "model not found", "no such model", "404.*model",
+        ],
+        FailoverErrorReason.SESSION_EXPIRED: [
+            "session expired", "token expired", "refresh token",
+            "oauth.*expired",
+        ],
+        FailoverErrorReason.FORMAT: [
+            "invalid response", "parse error", "malformed",
+            "json.*error", "validation error",
+        ],
+    }
 
-def resolve_failover_status(reason: FailoverReason) -> int:
-    if reason in ("auth", "auth_permanent"):
-        return 401
-    if reason == "rate_limit":
-        return 429
-    if reason == "billing":
-        return 402
-    if reason in ("overloaded", "server_error"):
-        return 503
-    if reason == "timeout":
-        return 504
-    return 500
+    for reason, patterns in keywords.items():
+        for pattern in patterns:
+            import re
+            if re.search(pattern, message):
+                return reason
+
+    return FailoverErrorReason.UNCLASSIFIED

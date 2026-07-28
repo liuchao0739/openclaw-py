@@ -1,10 +1,20 @@
-"""Plugin kind labels for non-provider plugin capability groups.
-
-Mirrors src/plugins/plugin-kind.types.ts.
-"""
-
 from __future__ import annotations
 
-from typing import Literal
+from typing import Any
 
-PluginKind = Literal["memory", "context-engine"]
+
+class PluginKind:
+    BUNDLED = "bundled"
+    EXTERNAL = "external"
+    OVERLAY = "overlay"
+
+
+def resolve_plugin_kind(
+    plugin_id: str,
+    config: dict[str, Any] | None = None,
+) -> str:
+    config = config or {}
+    bundled = config.get("bundledPlugins", [])
+    if plugin_id in bundled:
+        return PluginKind.BUNDLED
+    return PluginKind.EXTERNAL

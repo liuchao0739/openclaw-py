@@ -2,27 +2,27 @@
 
 from __future__ import annotations
 
-from typing import Any, Literal
+from typing import Any, Literal, Optional, List, Dict
 
 from pydantic import BaseModel, Field
 
 
 class GatewayAuthConfig(BaseModel):
-    token: str | None = None
-    password: str | None = None
+    token: Optional[str] = None
+    password: Optional[str] = None
 
 
 class GatewayServerConfig(BaseModel):
     port: int = 18789
     bind: str = "loopback"
-    auth: GatewayAuthConfig | None = None
+    auth: Optional[GatewayAuthConfig] = None
 
 
 class GatewayConfig(BaseModel):
-    port: int | None = None
-    bind: str | None = None
-    auth: GatewayAuthConfig | None = None
-    server: GatewayServerConfig | None = None
+    port: Optional[int] = None
+    bind: Optional[str] = None
+    auth: Optional[GatewayAuthConfig] = None
+    server: Optional[GatewayServerConfig] = None
 
     def resolved_port(self) -> int:
         if self.server and self.server.port:
@@ -31,53 +31,53 @@ class GatewayConfig(BaseModel):
 
 
 class AgentsDefaultsConfig(BaseModel):
-    model: str | None = None
-    workspace: str | None = None
+    model: Optional[str] = None
+    workspace: Optional[str] = None
 
 
 class AgentsConfig(BaseModel):
-    defaults: AgentsDefaultsConfig | None = None
+    defaults: Optional[AgentsDefaultsConfig] = None
 
 
 class AcpDispatchConfig(BaseModel):
-    enabled: bool | None = None
+    enabled: Optional[bool] = None
 
 
 class AcpStreamConfig(BaseModel):
-    coalesce_idle_ms: int | None = Field(default=None, alias="coalesceIdleMs")
-    max_chunk_chars: int | None = Field(default=None, alias="maxChunkChars")
-    repeat_suppression: bool | None = Field(default=None, alias="repeatSuppression")
-    delivery_mode: Literal["live", "final_only"] | None = Field(default=None, alias="deliveryMode")
-    hidden_boundary_separator: Literal["none", "space", "newline", "paragraph"] | None = Field(
+    coalesce_idle_ms: Optional[int] = Field(default=None, alias="coalesceIdleMs")
+    max_chunk_chars: Optional[int] = Field(default=None, alias="maxChunkChars")
+    repeat_suppression: Optional[bool] = Field(default=None, alias="repeatSuppression")
+    delivery_mode: Optional[Literal["live", "final_only"]] = Field(default=None, alias="deliveryMode")
+    hidden_boundary_separator: Optional[Literal["none", "space", "newline", "paragraph"]] = Field(
         default=None, alias="hiddenBoundarySeparator"
     )
-    max_output_chars: int | None = Field(default=None, alias="maxOutputChars")
-    max_session_update_chars: int | None = Field(default=None, alias="maxSessionUpdateChars")
-    tag_visibility: dict[str, bool] | None = Field(default=None, alias="tagVisibility")
+    max_output_chars: Optional[int] = Field(default=None, alias="maxOutputChars")
+    max_session_update_chars: Optional[int] = Field(default=None, alias="maxSessionUpdateChars")
+    tag_visibility: Optional[Dict[str, bool]] = Field(default=None, alias="tagVisibility")
 
     model_config = {"populate_by_name": True, "extra": "allow"}
 
 
 class AcpRuntimeConfig(BaseModel):
-    ttl_minutes: int | None = Field(default=None, alias="ttlMinutes")
+    ttl_minutes: Optional[int] = Field(default=None, alias="ttlMinutes")
     """Operator install/setup command shown by `/acp install` and `/acp doctor`."""
-    install_command: str | None = Field(default=None, alias="installCommand")
+    install_command: Optional[str] = Field(default=None, alias="installCommand")
 
     model_config = {"populate_by_name": True, "extra": "allow"}
 
 
 class AcpConfig(BaseModel):
-    enabled: bool | None = None
-    dispatch: AcpDispatchConfig | None = None
+    enabled: Optional[bool] = None
+    dispatch: Optional[AcpDispatchConfig] = None
     """Backend id registered by an ACP runtime plugin (for example: acpx)."""
-    backend: str | None = None
+    backend: Optional[str] = None
     """Backend ids tried when the primary backend fails with UNAVAILABLE."""
-    fallbacks: list[str] | None = None
-    default_agent: str | None = Field(default=None, alias="defaultAgent")
-    allowed_agents: list[str] | None = Field(default=None, alias="allowedAgents")
-    max_concurrent_sessions: int | None = Field(default=None, alias="maxConcurrentSessions")
-    stream: AcpStreamConfig | None = None
-    runtime: AcpRuntimeConfig | None = None
+    fallbacks: Optional[List[str]] = None
+    default_agent: Optional[str] = Field(default=None, alias="defaultAgent")
+    allowed_agents: Optional[List[str]] = Field(default=None, alias="allowedAgents")
+    max_concurrent_sessions: Optional[int] = Field(default=None, alias="maxConcurrentSessions")
+    stream: Optional[AcpStreamConfig] = None
+    runtime: Optional[AcpRuntimeConfig] = None
 
     model_config = {"populate_by_name": True, "extra": "allow"}
 
@@ -85,12 +85,12 @@ class AcpConfig(BaseModel):
 class OpenClawConfig(BaseModel):
     """Top-level OpenClaw config (MVP subset; expands per migration phase."""
 
-    gateway: GatewayConfig | None = None
-    agents: AgentsConfig | None = None
-    acp: AcpConfig | None = None
-    models: dict[str, Any] | None = None
-    channels: dict[str, Any] | None = None
-    plugins: dict[str, Any] | None = None
-    skills: dict[str, Any] | None = None
+    gateway: Optional[GatewayConfig] = None
+    agents: Optional[AgentsConfig] = None
+    acp: Optional[AcpConfig] = None
+    models: Optional[Dict[str, Any]] = None
+    channels: Optional[Dict[str, Any]] = None
+    plugins: Optional[Dict[str, Any]] = None
+    skills: Optional[Dict[str, Any]] = None
 
     model_config = {"extra": "allow"}

@@ -1,9 +1,9 @@
-"""Diagnostics Otel plugin entrypoint registers its OpenClaw integration."""
-
 from __future__ import annotations
 
 from openclaw.plugin_sdk.plugin_entry import OpenClawPluginApi, define_plugin_entry
-from openclaw_extensions.diagnostics_otel.src.service import create_diagnostics_otel_service
+from openclaw_extensions.diagnostics_otel.src.service import (
+    create_diagnostics_otel_service,
+)
 
 
 def _register(api: OpenClawPluginApi) -> None:
