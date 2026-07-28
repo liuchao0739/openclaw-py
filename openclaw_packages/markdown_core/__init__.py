@@ -1,0 +1,100 @@
+from .types import MarkdownTableMode
+from .chunk_text import avoid_trailing_high_surrogate_break, chunk_text
+from .fences import (
+    FenceScanState,
+    FenceSpan,
+    find_fence_span_at,
+    is_safe_fence_break,
+    parse_fence_spans,
+    scan_fence_spans,
+)
+from .code_spans import (
+    InlineCodeState,
+    build_code_span_index,
+    create_inline_code_state,
+    parse_inline_code_spans,
+)
+from .frontmatter import (
+    parse_frontmatter_block,
+)
+from .ir import (
+    MarkdownIR,
+    MarkdownLinkSpan,
+    MarkdownParseOptions,
+    MarkdownStyle,
+    MarkdownStyleSpan,
+    MarkdownTableCell,
+    MarkdownTableData,
+    MarkdownTableMeta,
+    MarkdownTableAlignment,
+    chunk_markdown_ir,
+    clamp_style_spans,
+    markdown_to_ir,
+    markdown_to_ir_with_meta,
+    merge_style_spans,
+    slice_markdown_ir,
+    slice_style_spans,
+)
+from .render import (
+    RenderLink,
+    RenderOptions,
+    RenderStyleMap,
+    RenderStyleMarker,
+    render_markdown_with_markers,
+)
+from .render_aware_chunking import (
+    RenderedMarkdownChunk,
+    RenderMarkdownIRChunksWithinLimitOptions,
+    render_markdown_ir_chunks_within_limit,
+)
+from .tables import (
+    convert_markdown_tables,
+    convert_tables_in_ir,
+    detect_tables,
+    table_to_text,
+)
+
+__all__ = [
+    "MarkdownTableMode",
+    "chunk_text",
+    "avoid_trailing_high_surrogate_break",
+    "FenceSpan",
+    "FenceScanState",
+    "scan_fence_spans",
+    "parse_fence_spans",
+    "find_fence_span_at",
+    "is_safe_fence_break",
+    "InlineCodeState",
+    "create_inline_code_state",
+    "build_code_span_index",
+    "parse_inline_code_spans",
+    "parse_frontmatter_block",
+    "MarkdownStyle",
+    "MarkdownStyleSpan",
+    "MarkdownLinkSpan",
+    "MarkdownIR",
+    "MarkdownTableAlignment",
+    "MarkdownTableCell",
+    "MarkdownTableData",
+    "MarkdownTableMeta",
+    "MarkdownParseOptions",
+    "markdown_to_ir",
+    "markdown_to_ir_with_meta",
+    "chunk_markdown_ir",
+    "slice_markdown_ir",
+    "merge_style_spans",
+    "clamp_style_spans",
+    "slice_style_spans",
+    "RenderStyleMarker",
+    "RenderStyleMap",
+    "RenderLink",
+    "RenderOptions",
+    "render_markdown_with_markers",
+    "RenderedMarkdownChunk",
+    "RenderMarkdownIRChunksWithinLimitOptions",
+    "render_markdown_ir_chunks_within_limit",
+    "convert_markdown_tables",
+    "convert_tables_in_ir",
+    "detect_tables",
+    "table_to_text",
+]

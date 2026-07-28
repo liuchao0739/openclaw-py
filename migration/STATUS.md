@@ -1,25 +1,25 @@
 # Migration status
 
-Updated: 2026-07-28 00:00:00 UTC
+Updated: 2026-07-28 00:30:00 UTC
 
-- **Done:** 78 / 231
+- **Done:** 79 / 231
 - **Pending:** 0
-- **Partial:** 153
+- **Partial:** 152
 - **Blocked:** 0
 - **Remaining TypeScript lines:** 0
 
 ## Current
 
-- `P2-0167` 移植 packages/markdown-core (2398 lines)
+- `P2-0188` 移植 extension anthropic (2909 lines)
 
 ## Recently completed
 
+- `P2-0167` 移植 packages/markdown-core
 - `P2-0180` 移植 packages/tool-call-repair
 - `P2-0054` 移植 src/cli/send-runtime
 - `P2-0028` 移植 src/auto-reply/reply/test-fixtures
 - `P2-0058` 移植 src/commands/agent
 - `P2-0050` 移植 src/cli/node-cli
-- `P2-0026` 移植 src/auto-reply/reply/exec
 
 ## How to refresh
 
