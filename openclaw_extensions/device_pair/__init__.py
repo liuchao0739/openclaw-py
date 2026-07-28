@@ -1,0 +1,55 @@
+from .api import (
+    PAIRING_SETUP_BOOTSTRAP_PROFILE,
+    approveDevicePairing,
+    clearDeviceBootstrapTokens,
+    issueDeviceBootstrapToken,
+    listDevicePairing,
+    revokeDeviceBootstrapToken,
+    resolveGatewayBindUrl,
+    resolveGatewayPort,
+    resolveScheme,
+    normalizeUrl,
+    validateMobilePairingUrl,
+    pickLanIPv4,
+    pickTailnetIPv4,
+    resolvePreferredOpenClawTmpDir,
+    normalize_optional_string,
+    normalize_lowercase_string_or_empty,
+)
+from .qr_image import renderQrPngBase64, renderQrPngDataUrl, writeQrPngTempFile
+from .notify import formatPendingRequests, handleNotifyCommand, armPairNotifyOnce, createPairingNotifierService
+from .pair_command_auth import buildMissingPairingScopeReply, buildMissingSetupHandoffScopeReply, resolvePairingCommandAuthState
+from .pair_command_approve import approvePendingPairingRequest, selectPendingApprovalRequest
+from .index import load_device_pair_extension
+
+__all__ = [
+    "PAIRING_SETUP_BOOTSTRAP_PROFILE",
+    "approveDevicePairing",
+    "clearDeviceBootstrapTokens",
+    "issueDeviceBootstrapToken",
+    "listDevicePairing",
+    "revokeDeviceBootstrapToken",
+    "resolveGatewayBindUrl",
+    "resolveGatewayPort",
+    "resolveScheme",
+    "normalizeUrl",
+    "validateMobilePairingUrl",
+    "pickLanIPv4",
+    "pickTailnetIPv4",
+    "resolvePreferredOpenClawTmpDir",
+    "normalize_optional_string",
+    "normalize_lowercase_string_or_empty",
+    "renderQrPngBase64",
+    "renderQrPngDataUrl",
+    "writeQrPngTempFile",
+    "formatPendingRequests",
+    "handleNotifyCommand",
+    "armPairNotifyOnce",
+    "createPairingNotifierService",
+    "buildMissingPairingScopeReply",
+    "buildMissingSetupHandoffScopeReply",
+    "resolvePairingCommandAuthState",
+    "approvePendingPairingRequest",
+    "selectPendingApprovalRequest",
+    "load_device_pair_extension",
+]
