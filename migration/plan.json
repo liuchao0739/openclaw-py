@@ -1039,9 +1039,9 @@
     "order": 70,
     "cycle_size": 1,
     "depends_on": [],
-    "grade": "missing",
-    "status": "partial",
-    "verified_at": "2026-07-27T04:12:43.054042+00:00"
+    "grade": "ported",
+    "status": "done",
+    "verified_at": "2026-07-28T00:45:00.000000+00:00"
   },
   {
     "id": "P2-0186",
