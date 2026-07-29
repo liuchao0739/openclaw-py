@@ -1,0 +1,16 @@
+"""Finalizable draft stream controls.
+
+Mirrors src/channels/draft-stream-controls.ts.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+FinalizableDraftStreamState = Any
+
+def create_finalizable_draft_stream_controls(*args: Any, **kwargs: Any) -> Any: ...
+def create_finalizable_draft_stream_controls_for_state(*args: Any, **kwargs: Any) -> Any: ...
+def create_finalizable_draft_lifecycle(*args: Any, **kwargs: Any) -> Any: ...
+async def take_message_id_after_stop(*args: Any, **kwargs: Any) -> Any: ...
+async def clear_finalizable_draft_message(*args: Any, **kwargs: Any) -> Any: ...

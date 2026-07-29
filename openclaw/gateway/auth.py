@@ -1,0 +1,19 @@
+"""Gateway connection authorization.
+
+Mirrors src/gateway/auth.ts.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+GatewayAuthResult = Any
+GatewayAuthSurface = Any
+AuthorizeGatewayConnectParams = Any
+
+def has_forwarded_request_headers(*args: Any, **kwargs: Any) -> Any: ...
+def is_local_direct_request(*args: Any, **kwargs: Any) -> Any: ...
+def assert_gateway_auth_configured(*args: Any, **kwargs: Any) -> Any: ...
+async def authorize_gateway_connect(*args: Any, **kwargs: Any) -> Any: ...
+async def authorize_http_gateway_connect(*args: Any, **kwargs: Any) -> Any: ...
+async def authorize_ws_control_ui_gateway_connect(*args: Any, **kwargs: Any) -> Any: ...

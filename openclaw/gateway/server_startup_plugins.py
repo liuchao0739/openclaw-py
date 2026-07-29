@@ -1,0 +1,13 @@
+"""Gateway plugin startup bootstrap.
+
+Mirrors src/gateway/server-startup-plugins.ts.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+def resolve_gateway_startup_maintenance_config(*args: Any, **kwargs: Any) -> Any: ...
+def warn_unregistered_configured_memory_embedding_providers(*args: Any, **kwargs: Any) -> Any: ...
+async def prepare_gateway_plugin_bootstrap(*args: Any, **kwargs: Any) -> Any: ...
+async def load_gateway_startup_plugin_runtime(*args: Any, **kwargs: Any) -> Any: ...

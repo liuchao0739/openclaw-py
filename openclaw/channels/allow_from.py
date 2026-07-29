@@ -1,0 +1,16 @@
+"""Channel allowFrom policy helpers.
+
+Mirrors src/channels/allow-from.ts.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+ACCESS_GROUP_ALLOW_FROM_PREFIX: Any = None
+
+def parse_access_group_allow_from_entry(*args: Any, **kwargs: Any) -> Any: ...
+def merge_dm_allow_from_sources(*args: Any, **kwargs: Any) -> Any: ...
+def resolve_group_allow_from_sources(*args: Any, **kwargs: Any) -> Any: ...
+def first_defined(*args: Any, **kwargs: Any) -> Any: ...
+def is_sender_id_allowed(*args: Any, **kwargs: Any) -> Any: ...

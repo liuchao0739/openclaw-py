@@ -1,0 +1,13 @@
+"""Gateway node catalog builder.
+
+Mirrors src/gateway/node-catalog.ts.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+def create_known_node_catalog(*args: Any, **kwargs: Any) -> Any: ...
+def list_known_nodes(*args: Any, **kwargs: Any) -> Any: ...
+def get_known_node_entry(*args: Any, **kwargs: Any) -> Any: ...
+def get_known_node(*args: Any, **kwargs: Any) -> Any: ...

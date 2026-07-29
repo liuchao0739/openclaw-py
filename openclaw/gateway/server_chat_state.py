@@ -1,0 +1,29 @@
+"""Gateway chat run state registries.
+
+Mirrors src/gateway/server-chat-state.ts.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+ChatRunTiming = Any
+ChatRunRegistration = Any
+ChatRunEntry = Any
+ChatAbortMarker = Any
+BufferedAgentEvent = Any
+ChatRunRegistry = Any
+ChatRunState = Any
+ToolEventRecipientRegistry = Any
+SessionEventSubscriberRegistry = Any
+SessionMessageSubscriberRegistry = Any
+
+def create_chat_run_entry(*args: Any, **kwargs: Any) -> Any: ...
+def create_chat_abort_marker(*args: Any, **kwargs: Any) -> Any: ...
+def chat_abort_marker_timestamp_ms(*args: Any, **kwargs: Any) -> Any: ...
+def is_chat_abort_marker_current(*args: Any, **kwargs: Any) -> Any: ...
+def create_chat_run_registry(*args: Any, **kwargs: Any) -> Any: ...
+def create_chat_run_state(*args: Any, **kwargs: Any) -> Any: ...
+def create_session_event_subscriber_registry(*args: Any, **kwargs: Any) -> Any: ...
+def create_session_message_subscriber_registry(*args: Any, **kwargs: Any) -> Any: ...
+def create_tool_event_recipient_registry(*args: Any, **kwargs: Any) -> Any: ...

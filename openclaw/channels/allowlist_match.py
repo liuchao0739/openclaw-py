@@ -1,0 +1,19 @@
+"""Channel allowlist matching primitives.
+
+Mirrors src/channels/allowlist-match.ts.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+AllowlistMatchSource = Any
+AllowlistMatch = Any
+CompiledAllowlist = Any
+
+def format_allowlist_match_meta(*args: Any, **kwargs: Any) -> Any: ...
+def compile_allowlist(*args: Any, **kwargs: Any) -> Any: ...
+def resolve_allowlist_candidates(*args: Any, **kwargs: Any) -> Any: ...
+def resolve_compiled_allowlist_match(*args: Any, **kwargs: Any) -> Any: ...
+def resolve_allowlist_match_by_candidates(*args: Any, **kwargs: Any) -> Any: ...
+def resolve_allowlist_match_simple(*args: Any, **kwargs: Any) -> Any: ...

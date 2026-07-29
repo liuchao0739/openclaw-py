@@ -1,0 +1,13 @@
+"""Shared bounded JSONL metadata parsing for gateway transcript readers.
+
+Mirrors src/gateway/session-transcript-json.ts.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+def normalize_optional_string(*args: Any, **kwargs: Any) -> Any: ...
+def extract_json_string_field_prefix(*args: Any, **kwargs: Any) -> Any: ...
+def extract_json_nullable_string_field_prefix(*args: Any, **kwargs: Any) -> Any: ...
+def extract_json_number_field_prefix(*args: Any, **kwargs: Any) -> Any: ...

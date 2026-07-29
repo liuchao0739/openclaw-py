@@ -1,0 +1,13 @@
+"""Channel account summary helpers.
+
+Mirrors src/channels/account-summary.ts.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+def build_channel_account_snapshot(*args: Any, **kwargs: Any) -> Any: ...
+def format_channel_allow_from(*args: Any, **kwargs: Any) -> Any: ...
+def resolve_channel_account_enabled(*args: Any, **kwargs: Any) -> Any: ...
+async def resolve_channel_account_configured(*args: Any, **kwargs: Any) -> Any: ...

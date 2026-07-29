@@ -1,0 +1,13 @@
+"""Channel-neutral thread-binding message builders shared by plugins, ACP focus, and subagent flows.
+
+Mirrors src/channels/thread-bindings-messages.ts.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+def format_thread_binding_duration_label(*args: Any, **kwargs: Any) -> Any: ...
+def resolve_thread_binding_thread_name(*args: Any, **kwargs: Any) -> Any: ...
+def resolve_thread_binding_intro_text(*args: Any, **kwargs: Any) -> Any: ...
+def resolve_thread_binding_farewell_text(*args: Any, **kwargs: Any) -> Any: ...

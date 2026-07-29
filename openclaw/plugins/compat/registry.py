@@ -1,9 +1,3 @@
-"""Plugin compatibility registry exposes known plugin compatibility metadata
-to doctor/update flows.
-
-Mirrors src/plugins/compat/registry.ts.
-"""
-
 from __future__ import annotations
 
 from openclaw.plugins.compat.types import PluginCompatRecord

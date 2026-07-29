@@ -1,0 +1,13 @@
+"""Gateway model-pricing refresh and normalization.
+
+Mirrors src/gateway/model-pricing-cache.ts.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+def collect_configured_model_pricing_refs(*args: Any, **kwargs: Any) -> Any: ...
+def start_gateway_model_pricing_refresh(*args: Any, **kwargs: Any) -> Any: ...
+def reset_gateway_model_pricing_cache_for_test(*args: Any, **kwargs: Any) -> Any: ...
+async def refresh_gateway_model_pricing_cache(*args: Any, **kwargs: Any) -> Any: ...

@@ -1,5 +1,3 @@
-"""Plugin compatibility types and registry."""
-
 from .registry import (
     PLUGIN_COMPAT_RECORDS,
     get_plugin_compat_record,

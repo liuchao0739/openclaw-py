@@ -1,0 +1,16 @@
+"""Gateway path security canonicalizes repeatedly encoded paths and protects
+
+Mirrors src/gateway/security-path.ts.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+PROTECTED_PLUGIN_ROUTE_PREFIXES: Any = None
+
+def build_canonical_path_candidates(*args: Any, **kwargs: Any) -> Any: ...
+def canonicalize_path_variant(*args: Any, **kwargs: Any) -> Any: ...
+def canonicalize_path_for_security(*args: Any, **kwargs: Any) -> Any: ...
+def is_path_protected_by_prefixes(*args: Any, **kwargs: Any) -> Any: ...
+def is_protected_plugin_route_path(*args: Any, **kwargs: Any) -> Any: ...

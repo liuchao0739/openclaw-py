@@ -1,9 +1,3 @@
-"""Plugin compatibility types describe lifecycle status for plugin migration
-and deprecation checks.
-
-Mirrors src/plugins/compat/types.ts.
-"""
-
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -18,8 +12,6 @@ PluginCompatOwner = Literal[
 
 @dataclass
 class PluginCompatRecord:
-    """A plugin compatibility lifecycle record."""
-
     code: str
     status: str
     owner: str
