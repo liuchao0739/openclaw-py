@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import Any, Optional, Dict
+from typing import Any
 
 from pydantic import BaseModel, Field
 
 
 class ConfigWriteAfterWrite(BaseModel):
-    runtime_refresh: Optional[bool] = Field(default=None, alias="runtimeRefresh")
-    runtime_refresh_options: Optional[Dict[str, Any]] = Field(
+    runtime_refresh: bool | None = Field(default=None, alias="runtimeRefresh")
+    runtime_refresh_options: dict[str, Any] | None = Field(
         default=None, alias="runtimeRefreshOptions"
     )
 
@@ -15,26 +15,26 @@ class ConfigWriteAfterWrite(BaseModel):
 
 
 class ConfigWriteFollowUp(BaseModel):
-    action: Optional[str] = None
-    config_path: Optional[str] = Field(default=None, alias="configPath")
+    action: str | None = None
+    config_path: str | None = Field(default=None, alias="configPath")
 
     model_config = {"populate_by_name": True, "extra": "allow"}
 
 
 class RuntimeConfigSnapshotMetadata(BaseModel):
-    hash: Optional[str] = None
-    path: Optional[str] = None
-    written_at: Optional[str] = Field(default=None, alias="writtenAt")
+    hash: str | None = None
+    path: str | None = None
+    written_at: str | None = Field(default=None, alias="writtenAt")
 
     model_config = {"populate_by_name": True}
 
 
-_runtime_config_snapshot: Optional[Dict[str, Any]] = None
-_runtime_config_source_snapshot: Optional[Dict[str, Any]] = None
+_runtime_config_snapshot: dict[str, Any] | None = None
+_runtime_config_source_snapshot: dict[str, Any] | None = None
 _runtime_config_snapshot_refresh_handler: Any = None
 _runtime_config_write_listeners: list[Any] = []
 _runtime_config_cache: dict[str, Any] = {}
-_last_known_good_config: Optional[Dict[str, Any]] = None
+_last_known_good_config: dict[str, Any] | None = None
 
 
 def get_runtime_config():
@@ -53,7 +53,7 @@ def get_runtime_config_snapshot_metadata():
     return RuntimeConfigSnapshotMetadata()
 
 
-def set_runtime_config_snapshot(snapshot: Optional[Dict[str, Any]]):
+def set_runtime_config_snapshot(snapshot: dict[str, Any] | None):
     global _runtime_config_snapshot
     _runtime_config_snapshot = snapshot
 
@@ -102,7 +102,7 @@ def resolve_runtime_config_cache_key(config_path: str):
     return config_path
 
 
-def resolve_config_snapshot_hash(snapshot: Optional[Dict[str, Any]]) -> str | None:
+def resolve_config_snapshot_hash(snapshot: dict[str, Any] | None) -> str | None:
     if snapshot is None:
         return None
     return snapshot.get("hash")
@@ -119,7 +119,7 @@ def project_config_onto_runtime_source_snapshot(config: dict[str, Any]) -> dict[
     return config
 
 
-def resolve_config_write_after_write(after_write: Optional[ConfigWriteAfterWrite | dict]):
+def resolve_config_write_after_write(after_write: ConfigWriteAfterWrite | dict | None):
     if after_write is None:
         return ConfigWriteAfterWrite()
     if isinstance(after_write, dict):
@@ -127,5 +127,5 @@ def resolve_config_write_after_write(after_write: Optional[ConfigWriteAfterWrite
     return after_write
 
 
-def resolve_config_write_follow_up(after_write: Optional[ConfigWriteAfterWrite]):
+def resolve_config_write_follow_up(after_write: ConfigWriteAfterWrite | None):
     return ConfigWriteFollowUp()

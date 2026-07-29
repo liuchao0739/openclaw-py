@@ -1,8 +1,3 @@
-"""Public LLM runtime package surface for provider registry and stream helpers.
-
-Mirrors packages/llm-runtime/src/index.ts.
-"""
-
 from __future__ import annotations
 
 from .api_registry import (

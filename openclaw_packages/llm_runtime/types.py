@@ -1,5 +1,3 @@
-"""LLM runtime types mirrored from packages/llm-core contracts."""
-
 from __future__ import annotations
 
 from collections.abc import Callable

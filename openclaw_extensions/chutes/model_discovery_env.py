@@ -3,12 +3,11 @@
 from __future__ import annotations
 
 import os
-from collections.abc import Mapping
+from typing import Mapping
 
 
 def is_chutes_model_discovery_test_environment(
-    env: Mapping[str, str | None] | None = None,
+    env: Mapping[str, str] | None = None,
 ) -> bool:
-    """Return whether dynamic Chutes model discovery should use test behavior."""
-    resolved_env = env if env is not None else os.environ
-    return resolved_env.get("NODE_ENV") == "test" or resolved_env.get("VITEST") == "true"
+    source = env if env is not None else os.environ
+    return source.get("NODE_ENV") == "test" or source.get("VITEST") == "true"

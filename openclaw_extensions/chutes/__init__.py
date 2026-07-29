@@ -1,4 +1,4 @@
-"""Chutes.ai provider extension."""
+"""Chutes provider extension."""
 
 from openclaw_extensions.chutes.api import (
     CHUTES_BASE_URL,
