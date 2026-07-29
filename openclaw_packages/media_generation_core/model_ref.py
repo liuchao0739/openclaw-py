@@ -1,12 +1,6 @@
-"""Media generation model reference parsing."""
+from typing import Optional, TypedDict
 
-from __future__ import annotations
-
-from typing import TypedDict
-
-from openclaw.packages.normalization_core import normalize_optional_string
-
-__all__ = ["ParsedGenerationModelRef", "parse_generation_model_ref"]
+from .string import normalize_optional_string
 
 
 class ParsedGenerationModelRef(TypedDict):
@@ -14,8 +8,7 @@ class ParsedGenerationModelRef(TypedDict):
     model: str
 
 
-def parse_generation_model_ref(raw: str | None) -> ParsedGenerationModelRef | None:
-    """Parse strict generation model refs and reject missing provider or model segments."""
+def parse_generation_model_ref(raw: Optional[str]) -> Optional[ParsedGenerationModelRef]:
     trimmed = normalize_optional_string(raw)
     if not trimmed:
         return None
@@ -23,7 +16,7 @@ def parse_generation_model_ref(raw: str | None) -> ParsedGenerationModelRef | No
     if slash_index <= 0 or slash_index == len(trimmed) - 1:
         return None
     provider = normalize_optional_string(trimmed[:slash_index])
-    model = normalize_optional_string(trimmed[slash_index + 1 :])
+    model = normalize_optional_string(trimmed[slash_index + 1:])
     if provider and model:
         return {"provider": provider, "model": model}
     return None

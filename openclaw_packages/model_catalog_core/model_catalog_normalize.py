@@ -1,19 +1,5 @@
-"""Normalize raw provider model catalogs into stable rows for lookup and merging.
-
-Mirrors packages/model-catalog-core/src/model-catalog-normalize.ts.
-"""
-
-from __future__ import annotations
-
-from typing import Any
-
-from openclaw_packages.normalization_core import (
-    as_finite_number,
-    is_record,
-    normalize_optional_string,
-    normalize_optional_trimmed_string_list,
-    normalize_trimmed_string_list,
-)
+import copy
+from typing import Any, Dict, List, Optional, Set, Union
 
 from .model_catalog_refs import (
     build_model_catalog_merge_key,
@@ -29,35 +15,65 @@ from .model_catalog_types import (
     ModelCatalogCost,
     ModelCatalogDiscovery,
     ModelCatalogInput,
+    ModelCatalogMediaInputConfig,
     ModelCatalogModel,
+    ModelCatalogOpenRouterRouting,
     ModelCatalogProvider,
     ModelCatalogSource,
     ModelCatalogStatus,
     ModelCatalogSuppression,
     ModelCatalogTieredCost,
+    ModelCatalogVercelGatewayRouting,
     NormalizedModelCatalogRow,
     is_model_catalog_thinking_format,
 )
 
-_MODEL_CATALOG_INPUTS = frozenset({"text", "image", "document"})
-_MODEL_CATALOG_DISCOVERY_MODES = frozenset({"static", "refreshable", "runtime"})
-_MODEL_CATALOG_STATUSES = frozenset({"available", "preview", "deprecated", "disabled"})
-_MODEL_CATALOG_API_SET = frozenset(MODEL_CATALOG_APIS)
-_DEFAULT_MODEL_INPUT: list[ModelCatalogInput] = ["text"]
-_DEFAULT_MODEL_STATUS: ModelCatalogStatus = "available"
+MODEL_CATALOG_INPUTS: Set[str] = {"text", "image", "document"}
+MODEL_CATALOG_DISCOVERY_MODES: Set[str] = {"static", "refreshable", "runtime"}
+MODEL_CATALOG_STATUSES: Set[str] = {"available", "preview", "deprecated", "disabled"}
+MODEL_CATALOG_API_SET: Set[str] = set(MODEL_CATALOG_APIS)
+DEFAULT_MODEL_INPUT: List[ModelCatalogInput] = ["text"]
+DEFAULT_MODEL_STATUS: ModelCatalogStatus = "available"
+
+
+def _is_record(value: Any) -> bool:
+    return isinstance(value, dict) and not isinstance(value, list)
 
 
 def _is_blocked_object_key(key: str) -> bool:
-    return key in ("__proto__", "prototype", "constructor")
+    return key == "__proto__" or key == "prototype" or key == "constructor"
 
 
-def _normalize_safe_record_key(value: object) -> str:
-    key = normalize_optional_string(value) or ""
-    return key if key and not _is_blocked_object_key(key) else ""
+def _normalize_optional_string(value: Any) -> Optional[str]:
+    if not isinstance(value, str):
+        return None
+    trimmed = value.strip()
+    return trimmed if trimmed else None
 
 
-def _normalize_owned_provider_set(providers: set[str] | frozenset[str]) -> set[str]:
-    normalized: set[str] = set()
+def _normalize_trimmed_string_list(value: Any) -> List[str]:
+    if not isinstance(value, list):
+        return []
+    result: List[str] = []
+    for entry in value:
+        normalized = _normalize_optional_string(entry)
+        if normalized:
+            result.append(normalized)
+    return result
+
+
+def _normalize_optional_trimmed_string_list(value: Any) -> Optional[List[str]]:
+    normalized = _normalize_trimmed_string_list(value)
+    return normalized if len(normalized) > 0 else None
+
+
+def _normalize_safe_record_key(value: Any) -> str:
+    key = _normalize_optional_string(value) or ""
+    return key if (key and not _is_blocked_object_key(key)) else ""
+
+
+def _normalize_owned_provider_set(providers) -> Set[str]:
+    normalized: Set[str] = set()
     for provider in providers:
         provider_id = normalize_model_catalog_provider_id(provider)
         if provider_id:
@@ -65,311 +81,329 @@ def _normalize_owned_provider_set(providers: set[str] | frozenset[str]) -> set[s
     return normalized
 
 
-def _normalize_string_map(value: object) -> dict[str, str] | None:
-    if not is_record(value):
+def _normalize_string_map(value: Any) -> Optional[Dict[str, str]]:
+    if not _is_record(value):
         return None
-    normalized: dict[str, str] = {}
+    normalized: Dict[str, str] = {}
     for raw_key, raw_value in value.items():
         key = _normalize_safe_record_key(raw_key)
-        map_value = normalize_optional_string(raw_value) or ""
+        map_value = _normalize_optional_string(raw_value) or ""
         if key and map_value:
             normalized[key] = map_value
-    return normalized or None
+    return normalized if len(normalized) > 0 else None
 
 
 def _merge_string_maps(
-    base: dict[str, str] | None,
-    override: dict[str, str] | None,
-) -> dict[str, str] | None:
+    base: Optional[Dict[str, str]],
+    override: Optional[Dict[str, str]],
+) -> Optional[Dict[str, str]]:
     if not base and not override:
         return None
-    merged: dict[str, str] = {}
+    merged: Dict[str, str] = {}
     if base:
         merged.update(base)
     if override:
         merged.update(override)
-    return merged or None
+    return merged
 
 
-def _normalize_model_catalog_api(value: object) -> ModelCatalogApi | None:
-    api = normalize_optional_string(value) or ""
-    return api if api in _MODEL_CATALOG_API_SET else None
+def _normalize_model_catalog_api(value: Any) -> Optional[ModelCatalogApi]:
+    api = _normalize_optional_string(value) or ""
+    return api if api in MODEL_CATALOG_API_SET else None
 
 
-def _normalize_model_catalog_inputs(value: object) -> list[ModelCatalogInput] | None:
+def _normalize_model_catalog_inputs(value: Any) -> Optional[List[ModelCatalogInput]]:
     inputs = [
-        entry
-        for entry in normalize_trimmed_string_list(value)
-        if entry in _MODEL_CATALOG_INPUTS
+        input_val
+        for input_val in _normalize_trimmed_string_list(value)
+        if input_val in MODEL_CATALOG_INPUTS
     ]
-    return inputs or None
+    return inputs if len(inputs) > 0 else None
 
 
-def _normalize_non_negative_number(value: object) -> float | None:
-    num = as_finite_number(value)
-    return num if num is not None and num >= 0 else None
+def _normalize_non_negative_number(value: Any) -> Optional[float]:
+    if isinstance(value, (int, float)) and not isinstance(value, bool) and value == value and value >= 0:
+        return value
+    return None
 
 
-def _normalize_finite_number(value: object) -> float | None:
-    return as_finite_number(value)
+def _normalize_finite_number(value: Any) -> Optional[float]:
+    if isinstance(value, (int, float)) and not isinstance(value, bool) and value == value:
+        return value
+    return None
 
 
-def _normalize_string_or_number(value: object) -> str | float | None:
-    return normalize_optional_string(value) or _normalize_finite_number(value)
+def _normalize_string_or_number(value: Any) -> Optional[Union[str, float]]:
+    return _normalize_optional_string(value) or _normalize_finite_number(value)
 
 
-def _normalize_positive_number(value: object) -> float | None:
-    num = as_finite_number(value)
-    return num if num is not None and num > 0 else None
+def _normalize_positive_number(value: Any) -> Optional[float]:
+    if isinstance(value, (int, float)) and not isinstance(value, bool) and value == value and value > 0:
+        return value
+    return None
 
 
-def _normalize_positive_integer(value: object) -> int | None:
+def _normalize_positive_integer(value: Any) -> Optional[int]:
     if isinstance(value, int) and not isinstance(value, bool) and value > 0:
         return value
     return None
 
 
-def _normalize_model_catalog_tiered_cost(value: object) -> list[ModelCatalogTieredCost] | None:
+def _normalize_model_catalog_tiered_cost(value: Any) -> Optional[List[ModelCatalogTieredCost]]:
     if not isinstance(value, list):
         return None
-    normalized: list[ModelCatalogTieredCost] = []
+    normalized: List[ModelCatalogTieredCost] = []
     for entry in value:
-        if not is_record(entry) or not isinstance(entry.get("range"), list):
+        if not _is_record(entry) or not isinstance(entry.get("range"), list):
             continue
-        entry_range = entry["range"]
-        input_cost = _normalize_non_negative_number(entry.get("input"))
-        output_cost = _normalize_non_negative_number(entry.get("output"))
+        input_val = _normalize_non_negative_number(entry.get("input"))
+        output = _normalize_non_negative_number(entry.get("output"))
         cache_read = _normalize_non_negative_number(entry.get("cacheRead"))
         cache_write = _normalize_non_negative_number(entry.get("cacheWrite"))
         if (
-            input_cost is None
-            or output_cost is None
+            input_val is None
+            or output is None
             or cache_read is None
             or cache_write is None
-            or len(entry_range) < 1
-            or len(entry_range) > 2
+            or len(entry["range"]) < 1
+            or len(entry["range"]) > 2
         ):
             continue
-        range_values = [_normalize_non_negative_number(range_value) for range_value in entry_range]
-        if any(range_value is None for range_value in range_values):
+        range_values = [_normalize_non_negative_number(rv) for rv in entry["range"]]
+        if any(rv is None for rv in range_values):
             continue
-        assert all(range_value is not None for range_value in range_values)
-        typed_range: tuple[float, ...] = (
-            (range_values[0],)
-            if len(range_values) == 1
-            else (range_values[0], range_values[1])
-        )
-        normalized.append(
-            {
-                "input": input_cost,
-                "output": output_cost,
-                "cacheRead": cache_read,
-                "cacheWrite": cache_write,
-                "range": typed_range,
-            },
-        )
-    return normalized or None
+        tiered: ModelCatalogTieredCost = {
+            "input": input_val,
+            "output": output,
+            "cacheRead": cache_read,
+            "cacheWrite": cache_write,
+            "range": (range_values[0],) if len(range_values) == 1 else (range_values[0], range_values[1]),
+        }
+        normalized.append(tiered)
+    return normalized if len(normalized) > 0 else None
 
 
-def _normalize_model_catalog_cost(value: object) -> ModelCatalogCost | None:
-    if not is_record(value):
+def _normalize_model_catalog_cost(value: Any) -> Optional[ModelCatalogCost]:
+    if not _is_record(value):
         return None
-    cost: ModelCatalogCost = {}
-    input_cost = _normalize_non_negative_number(value.get("input"))
-    output_cost = _normalize_non_negative_number(value.get("output"))
+    input_val = _normalize_non_negative_number(value.get("input"))
+    output = _normalize_non_negative_number(value.get("output"))
     cache_read = _normalize_non_negative_number(value.get("cacheRead"))
     cache_write = _normalize_non_negative_number(value.get("cacheWrite"))
     tiered_pricing = _normalize_model_catalog_tiered_cost(value.get("tieredPricing"))
-    if input_cost is not None:
-        cost["input"] = input_cost
-    if output_cost is not None:
-        cost["output"] = output_cost
+    cost: ModelCatalogCost = {}
+    if input_val is not None:
+        cost["input"] = input_val
+    if output is not None:
+        cost["output"] = output
     if cache_read is not None:
         cost["cacheRead"] = cache_read
     if cache_write is not None:
         cost["cacheWrite"] = cache_write
     if tiered_pricing:
         cost["tieredPricing"] = tiered_pricing
-    return cost or None
+    return cost if len(cost) > 0 else None
 
 
-def _normalize_open_router_price(value: object) -> dict[str, str | float] | None:
-    if not is_record(value):
+def _normalize_open_router_price(value: Any) -> Optional[dict]:
+    if not _is_record(value):
         return None
-    max_price: dict[str, str | float] = {}
+    max_price: dict = {}
     for field in ("prompt", "completion", "image", "audio", "request"):
         normalized = _normalize_string_or_number(value.get(field))
         if normalized is not None:
             max_price[field] = normalized
-    return max_price or None
+    return max_price if len(max_price) > 0 else None
 
 
-def _normalize_open_router_percentile_cutoffs(value: object) -> dict[str, float] | None:
-    if not is_record(value):
+def _normalize_open_router_percentile_cutoffs(value: Any) -> Optional[dict]:
+    if not _is_record(value):
         return None
-    normalized: dict[str, float] = {}
+    normalized: dict = {}
     for field in ("p50", "p75", "p90", "p99"):
-        cutoff = _normalize_finite_number(value.get(field))
-        if cutoff is not None:
-            normalized[field] = cutoff
-    return normalized or None
+        val = _normalize_finite_number(value.get(field))
+        if val is not None:
+            normalized[field] = val
+    return normalized if len(normalized) > 0 else None
 
 
-def _normalize_open_router_metric_preference(
-    value: object,
-) -> float | dict[str, float] | None:
-    return _normalize_finite_number(value) or _normalize_open_router_percentile_cutoffs(value)
+def _normalize_open_router_metric_preference(value: Any) -> Optional[Union[float, dict]]:
+    finite = _normalize_finite_number(value)
+    if finite is not None:
+        return finite
+    return _normalize_open_router_percentile_cutoffs(value)
 
 
-def _normalize_open_router_sort(value: object) -> str | dict[str, str | None] | None:
-    sort = normalize_optional_string(value)
+def _normalize_open_router_sort(value: Any) -> Optional[Union[str, dict]]:
+    sort = _normalize_optional_string(value)
     if sort:
         return sort
-    if not is_record(value):
+    if not _is_record(value):
         return None
-    by = normalize_optional_string(value.get("by"))
-    normalized: dict[str, str | None] = {}
+    by = _normalize_optional_string(value.get("by"))
+    partition_raw = value.get("partition")
+    if partition_raw is None:
+        partition = None
+    else:
+        partition = _normalize_optional_string(partition_raw)
+    normalized: dict = {}
     if by:
         normalized["by"] = by
-    if "partition" in value:
-        partition_raw = value["partition"]
-        if partition_raw is None:
-            normalized["partition"] = None
-        else:
-            partition = normalize_optional_string(partition_raw)
-            if partition is not None:
-                normalized["partition"] = partition
-    return normalized or None
+    if partition is not None:
+        normalized["partition"] = partition
+    return normalized if len(normalized) > 0 else None
 
 
-def _normalize_open_router_routing(value: object) -> dict[str, Any] | None:
-    if not is_record(value):
+def _normalize_open_router_routing(value: Any) -> Optional[ModelCatalogOpenRouterRouting]:
+    if not _is_record(value):
         return None
-    routing: dict[str, Any] = {}
+    routing: ModelCatalogOpenRouterRouting = {}
     if isinstance(value.get("allow_fallbacks"), bool):
         routing["allow_fallbacks"] = value["allow_fallbacks"]
     if isinstance(value.get("require_parameters"), bool):
         routing["require_parameters"] = value["require_parameters"]
-    data_collection = value.get("data_collection")
-    if data_collection in ("deny", "allow"):
-        routing["data_collection"] = data_collection
+    if value.get("data_collection") in ("deny", "allow"):
+        routing["data_collection"] = value["data_collection"]
     if isinstance(value.get("zdr"), bool):
         routing["zdr"] = value["zdr"]
     if isinstance(value.get("enforce_distillable_text"), bool):
         routing["enforce_distillable_text"] = value["enforce_distillable_text"]
-    for field in ("order", "only", "ignore", "quantizations"):
-        normalized_list = normalize_optional_trimmed_string_list(value.get(field))
-        if normalized_list:
-            routing[field] = normalized_list
+    order = _normalize_optional_trimmed_string_list(value.get("order"))
+    if order:
+        routing["order"] = order
+    only = _normalize_optional_trimmed_string_list(value.get("only"))
+    if only:
+        routing["only"] = only
+    ignore = _normalize_optional_trimmed_string_list(value.get("ignore"))
+    if ignore:
+        routing["ignore"] = ignore
+    quantizations = _normalize_optional_trimmed_string_list(value.get("quantizations"))
+    if quantizations:
+        routing["quantizations"] = quantizations
     sort = _normalize_open_router_sort(value.get("sort"))
-    if sort is not None:
+    if sort:
         routing["sort"] = sort
     max_price = _normalize_open_router_price(value.get("max_price"))
     if max_price:
         routing["max_price"] = max_price
-    for field in ("preferred_min_throughput", "preferred_max_latency"):
-        metric = _normalize_open_router_metric_preference(value.get(field))
-        if metric is not None:
-            routing[field] = metric
-    return routing or None
+    min_throughput = _normalize_open_router_metric_preference(value.get("preferred_min_throughput"))
+    if min_throughput is not None:
+        routing["preferred_min_throughput"] = min_throughput
+    max_latency = _normalize_open_router_metric_preference(value.get("preferred_max_latency"))
+    if max_latency is not None:
+        routing["preferred_max_latency"] = max_latency
+    return routing if len(routing) > 0 else None
 
 
-def _normalize_vercel_gateway_routing(value: object) -> dict[str, list[str]] | None:
-    if not is_record(value):
+def _normalize_vercel_gateway_routing(value: Any) -> Optional[ModelCatalogVercelGatewayRouting]:
+    if not _is_record(value):
         return None
-    routing: dict[str, list[str]] = {}
-    for field in ("only", "order"):
-        normalized_list = normalize_optional_trimmed_string_list(value.get(field))
-        if normalized_list:
-            routing[field] = normalized_list
-    return routing or None
+    routing: ModelCatalogVercelGatewayRouting = {}
+    only = _normalize_optional_trimmed_string_list(value.get("only"))
+    if only:
+        routing["only"] = only
+    order = _normalize_optional_trimmed_string_list(value.get("order"))
+    if order:
+        routing["order"] = order
+    return routing if len(routing) > 0 else None
 
 
-def _normalize_model_catalog_compat(value: object) -> ModelCatalogCompatConfig | None:
-    if not is_record(value):
+_COMPAT_BOOLEAN_FIELDS = [
+    "supportsStore",
+    "supportsPromptCacheKey",
+    "supportsDeveloperRole",
+    "supportsReasoningEffort",
+    "supportsUsageInStreaming",
+    "supportsTools",
+    "supportsStrictMode",
+    "requiresStringContent",
+    "strictMessageKeys",
+    "requiresToolResultName",
+    "requiresAssistantAfterToolResult",
+    "requiresThinkingAsText",
+    "zaiToolStream",
+    "sendSessionAffinityHeaders",
+    "sendSessionIdHeader",
+    "supportsEagerToolInputStreaming",
+    "supportsLongCacheRetention",
+    "nativeWebSearchTool",
+    "requiresMistralToolIds",
+    "requiresOpenAiAnthropicToolPayload",
+]
+
+_COMPAT_STRING_FIELDS = ["toolSchemaProfile", "toolCallArgumentsEncoding"]
+
+_COMPAT_STRING_LIST_FIELDS = [
+    "visibleReasoningDetailTypes",
+    "supportedReasoningEfforts",
+    "unsupportedToolSchemaKeywords",
+]
+
+
+def _normalize_model_catalog_compat(value: Any) -> Optional[ModelCatalogCompatConfig]:
+    if not _is_record(value):
         return None
-    compat: dict[str, Any] = {}
-    boolean_fields = (
-        "supportsStore",
-        "supportsPromptCacheKey",
-        "supportsDeveloperRole",
-        "supportsReasoningEffort",
-        "supportsUsageInStreaming",
-        "supportsTools",
-        "supportsStrictMode",
-        "requiresStringContent",
-        "strictMessageKeys",
-        "requiresToolResultName",
-        "requiresAssistantAfterToolResult",
-        "requiresThinkingAsText",
-        "zaiToolStream",
-        "sendSessionAffinityHeaders",
-        "sendSessionIdHeader",
-        "supportsEagerToolInputStreaming",
-        "supportsLongCacheRetention",
-        "nativeWebSearchTool",
-        "requiresMistralToolIds",
-        "requiresOpenAiAnthropicToolPayload",
-    )
-    for field in boolean_fields:
+    compat: ModelCatalogCompatConfig = {}
+    for field in _COMPAT_BOOLEAN_FIELDS:
         if isinstance(value.get(field), bool):
             compat[field] = value[field]
-    for field in ("toolSchemaProfile", "toolCallArgumentsEncoding"):
-        normalized = normalize_optional_string(value.get(field)) or ""
+
+    for field in _COMPAT_STRING_FIELDS:
+        normalized = _normalize_optional_string(value.get(field)) or ""
         if normalized:
             compat[field] = normalized
-    for field in (
-        "visibleReasoningDetailTypes",
-        "supportedReasoningEfforts",
-        "unsupportedToolSchemaKeywords",
-    ):
-        normalized = normalize_trimmed_string_list(value.get(field))
-        if normalized:
+
+    for field in _COMPAT_STRING_LIST_FIELDS:
+        normalized = _normalize_trimmed_string_list(value.get(field))
+        if len(normalized) > 0:
             compat[field] = normalized
-    reasoning_effort_map_raw = value.get("reasoningEffortMap")
-    if is_record(reasoning_effort_map_raw):
-        reasoning_effort_map = {
-            key.strip(): mapped.strip()
-            for key, mapped in reasoning_effort_map_raw.items()
-            if isinstance(mapped, str)
-            and key.strip()
-            and mapped.strip()
-        }
-        if reasoning_effort_map:
+
+    if _is_record(value.get("reasoningEffortMap")):
+        reasoning_effort_map: Dict[str, str] = {}
+        for key, mapped in value["reasoningEffortMap"].items():
+            trimmed_key = key.strip()
+            trimmed_mapped = mapped.strip() if isinstance(mapped, str) else ""
+            if len(trimmed_key) > 0 and len(trimmed_mapped) > 0:
+                reasoning_effort_map[trimmed_key] = trimmed_mapped
+        if len(reasoning_effort_map) > 0:
             compat["reasoningEffortMap"] = reasoning_effort_map
-    max_tokens_field = normalize_optional_string(value.get("maxTokensField")) or ""
+
+    max_tokens_field = _normalize_optional_string(value.get("maxTokensField")) or ""
     if max_tokens_field in ("max_completion_tokens", "max_tokens"):
         compat["maxTokensField"] = max_tokens_field
-    thinking_format = normalize_optional_string(value.get("thinkingFormat")) or ""
+
+    thinking_format = _normalize_optional_string(value.get("thinkingFormat")) or ""
     if is_model_catalog_thinking_format(thinking_format):
         compat["thinkingFormat"] = thinking_format
+
     if value.get("cacheControlFormat") == "anthropic":
         compat["cacheControlFormat"] = "anthropic"
+
     open_router_routing = _normalize_open_router_routing(value.get("openRouterRouting"))
     if open_router_routing:
         compat["openRouterRouting"] = open_router_routing
-    vercel_gateway_routing = _normalize_vercel_gateway_routing(
-        value.get("vercelGatewayRouting"),
-    )
+
+    vercel_gateway_routing = _normalize_vercel_gateway_routing(value.get("vercelGatewayRouting"))
     if vercel_gateway_routing:
         compat["vercelGatewayRouting"] = vercel_gateway_routing
-    return compat or None
+
+    return compat if len(compat) > 0 else None
 
 
-def _normalize_model_catalog_status(value: object) -> ModelCatalogStatus | None:
-    status = normalize_optional_string(value) or ""
-    return status if status in _MODEL_CATALOG_STATUSES else None
+def _normalize_model_catalog_status(value: Any) -> Optional[ModelCatalogStatus]:
+    status = _normalize_optional_string(value) or ""
+    return status if status in MODEL_CATALOG_STATUSES else None
 
 
-def _normalize_model_catalog_image_token_mode(
-    value: object,
-) -> str | None:
-    token_mode = normalize_optional_string(value) or ""
-    return token_mode if token_mode in ("tile", "detail", "provider") else None
+def _normalize_model_catalog_image_token_mode(value: Any) -> Optional[str]:
+    token_mode = _normalize_optional_string(value) or ""
+    if token_mode in ("tile", "detail", "provider"):
+        return token_mode
+    return None
 
 
-def _normalize_model_catalog_media_input(value: object) -> dict[str, Any] | None:
-    if not is_record(value) or not is_record(value.get("image")):
+def _normalize_model_catalog_media_input(value: Any) -> Optional[ModelCatalogMediaInputConfig]:
+    if not _is_record(value) or not _is_record(value.get("image")):
         return None
     image = value["image"]
     max_bytes = _normalize_positive_integer(image.get("maxBytes"))
@@ -377,7 +411,7 @@ def _normalize_model_catalog_media_input(value: object) -> dict[str, Any] | None
     max_side_px = _normalize_positive_integer(image.get("maxSidePx"))
     preferred_side_px = _normalize_positive_integer(image.get("preferredSidePx"))
     token_mode = _normalize_model_catalog_image_token_mode(image.get("tokenMode"))
-    normalized_image: dict[str, Any] = {}
+    normalized_image: dict = {}
     if max_bytes is not None:
         normalized_image["maxBytes"] = max_bytes
     if max_pixels is not None:
@@ -388,21 +422,20 @@ def _normalize_model_catalog_media_input(value: object) -> dict[str, Any] | None
         normalized_image["preferredSidePx"] = preferred_side_px
     if token_mode:
         normalized_image["tokenMode"] = token_mode
-    return {"image": normalized_image} if normalized_image else None
+    return {"image": normalized_image} if len(normalized_image) > 0 else None
 
 
-def _normalize_model_catalog_model(value: object) -> ModelCatalogModel | None:
-    if not is_record(value):
+def _normalize_model_catalog_model(value: Any) -> Optional[ModelCatalogModel]:
+    if not _is_record(value):
         return None
-    model_id = normalize_optional_string(value.get("id")) or ""
-    if not model_id:
+    id = _normalize_optional_string(value.get("id")) or ""
+    if not id:
         return None
-    model: ModelCatalogModel = {"id": model_id}
-    name = normalize_optional_string(value.get("name")) or ""
+    name = _normalize_optional_string(value.get("name")) or ""
     api = _normalize_model_catalog_api(value.get("api"))
-    base_url = normalize_optional_string(value.get("baseUrl")) or ""
+    base_url = _normalize_optional_string(value.get("baseUrl")) or ""
     headers = _normalize_string_map(value.get("headers"))
-    input_modes = _normalize_model_catalog_inputs(value.get("input"))
+    input_val = _normalize_model_catalog_inputs(value.get("input"))
     reasoning = value.get("reasoning") if isinstance(value.get("reasoning"), bool) else None
     context_window = _normalize_positive_number(value.get("contextWindow"))
     context_tokens = _normalize_positive_integer(value.get("contextTokens"))
@@ -411,10 +444,11 @@ def _normalize_model_catalog_model(value: object) -> ModelCatalogModel | None:
     compat = _normalize_model_catalog_compat(value.get("compat"))
     media_input = _normalize_model_catalog_media_input(value.get("mediaInput"))
     status = _normalize_model_catalog_status(value.get("status"))
-    status_reason = normalize_optional_string(value.get("statusReason")) or ""
-    replaces = normalize_trimmed_string_list(value.get("replaces"))
-    replaced_by = normalize_optional_string(value.get("replacedBy")) or ""
-    tags = normalize_trimmed_string_list(value.get("tags"))
+    status_reason = _normalize_optional_string(value.get("statusReason")) or ""
+    replaces = _normalize_trimmed_string_list(value.get("replaces"))
+    replaced_by = _normalize_optional_string(value.get("replacedBy")) or ""
+    tags = _normalize_trimmed_string_list(value.get("tags"))
+    model: ModelCatalogModel = {"id": id}
     if name:
         model["name"] = name
     if api:
@@ -423,8 +457,8 @@ def _normalize_model_catalog_model(value: object) -> ModelCatalogModel | None:
         model["baseUrl"] = base_url
     if headers:
         model["headers"] = headers
-    if input_modes:
-        model["input"] = input_modes
+    if input_val:
+        model["input"] = input_val
     if reasoning is not None:
         model["reasoning"] = reasoning
     if context_window is not None:
@@ -443,30 +477,31 @@ def _normalize_model_catalog_model(value: object) -> ModelCatalogModel | None:
         model["status"] = status
     if status_reason:
         model["statusReason"] = status_reason
-    if replaces:
+    if len(replaces) > 0:
         model["replaces"] = replaces
     if replaced_by:
         model["replacedBy"] = replaced_by
-    if tags:
+    if len(tags) > 0:
         model["tags"] = tags
     return model
 
 
-def _normalize_model_catalog_provider(value: object) -> ModelCatalogProvider | None:
-    if not is_record(value):
+def _normalize_model_catalog_provider(value: Any) -> Optional[ModelCatalogProvider]:
+    if not _is_record(value):
         return None
     models_raw = value.get("models")
-    models = [
-        model
-        for entry in (models_raw if isinstance(models_raw, list) else [])
-        if (model := _normalize_model_catalog_model(entry))
-    ]
-    if not models:
+    models: List[ModelCatalogModel] = []
+    if isinstance(models_raw, list):
+        for entry in models_raw:
+            normalized = _normalize_model_catalog_model(entry)
+            if normalized:
+                models.append(normalized)
+    if len(models) == 0:
         return None
-    provider: ModelCatalogProvider = {"models": models}
-    base_url = normalize_optional_string(value.get("baseUrl")) or ""
+    base_url = _normalize_optional_string(value.get("baseUrl")) or ""
     api = _normalize_model_catalog_api(value.get("api"))
     headers = _normalize_string_map(value.get("headers"))
+    provider: ModelCatalogProvider = {"models": models}
     if base_url:
         provider["baseUrl"] = base_url
     if api:
@@ -477,118 +512,104 @@ def _normalize_model_catalog_provider(value: object) -> ModelCatalogProvider | N
 
 
 def _normalize_model_catalog_providers(
-    value: object,
-    owned_providers: set[str],
-) -> dict[str, ModelCatalogProvider] | None:
-    if not is_record(value):
+    value: Any,
+    owned_providers,
+) -> Optional[Dict[str, ModelCatalogProvider]]:
+    if not _is_record(value):
         return None
-    providers: dict[str, ModelCatalogProvider] = {}
+    providers: Dict[str, ModelCatalogProvider] = {}
     for raw_provider_id, raw_provider in value.items():
-        provider_id = normalize_model_catalog_provider_id(str(raw_provider_id))
+        provider_id = normalize_model_catalog_provider_id(raw_provider_id)
         if not provider_id or provider_id not in owned_providers:
             continue
         provider = _normalize_model_catalog_provider(raw_provider)
         if provider:
             providers[provider_id] = provider
-    return providers or None
+    return providers if len(providers) > 0 else None
 
 
 def _normalize_model_catalog_aliases(
-    value: object,
-    owned_providers: set[str],
-) -> dict[str, ModelCatalogAlias] | None:
-    if not is_record(value):
+    value: Any,
+    owned_providers,
+) -> Optional[Dict[str, ModelCatalogAlias]]:
+    if not _is_record(value):
         return None
-    aliases: dict[str, ModelCatalogAlias] = {}
+    aliases: Dict[str, ModelCatalogAlias] = {}
     for raw_alias, raw_target in value.items():
-        alias = normalize_model_catalog_provider_id(str(raw_alias))
-        if not alias or not is_record(raw_target):
+        alias = normalize_model_catalog_provider_id(raw_alias)
+        if not alias or not _is_record(raw_target):
             continue
-        provider = normalize_model_catalog_provider_id(
-            normalize_optional_string(raw_target.get("provider")) or "",
-        )
+        provider = normalize_model_catalog_provider_id(_normalize_optional_string(raw_target.get("provider")) or "")
         if not provider or provider not in owned_providers:
             continue
         api = _normalize_model_catalog_api(raw_target.get("api"))
-        base_url = normalize_optional_string(raw_target.get("baseUrl")) or ""
+        base_url = _normalize_optional_string(raw_target.get("baseUrl")) or ""
         alias_entry: ModelCatalogAlias = {"provider": provider}
         if api:
             alias_entry["api"] = api
         if base_url:
             alias_entry["baseUrl"] = base_url
         aliases[alias] = alias_entry
-    return aliases or None
+    return aliases if len(aliases) > 0 else None
 
 
-def _normalize_model_catalog_suppressions(value: object) -> list[ModelCatalogSuppression] | None:
+def _normalize_model_catalog_suppressions(value: Any) -> Optional[List[ModelCatalogSuppression]]:
     if not isinstance(value, list):
         return None
-    suppressions: list[ModelCatalogSuppression] = []
+    suppressions: List[ModelCatalogSuppression] = []
     for entry in value:
-        if not is_record(entry):
+        if not _is_record(entry):
             continue
-        provider = normalize_model_catalog_provider_id(
-            normalize_optional_string(entry.get("provider")) or "",
-        )
-        model = normalize_optional_string(entry.get("model")) or ""
+        provider = normalize_model_catalog_provider_id(_normalize_optional_string(entry.get("provider")) or "")
+        model = _normalize_optional_string(entry.get("model")) or ""
         if not provider or not model:
             continue
-        reason = normalize_optional_string(entry.get("reason")) or ""
-        raw_when = entry.get("when")
-        raw_when = raw_when if is_record(raw_when) else None
-        base_url_hosts = [
-            host.lower()
-            for host in normalize_trimmed_string_list(
-                raw_when.get("baseUrlHosts") if raw_when else None,
-            )
-        ]
-        provider_config_api_in = [
-            api.lower()
-            for api in normalize_trimmed_string_list(
-                raw_when.get("providerConfigApiIn") if raw_when else None,
-            )
-        ]
-        when: dict[str, list[str]] = {}
-        if base_url_hosts:
-            when["baseUrlHosts"] = base_url_hosts
-        if provider_config_api_in:
-            when["providerConfigApiIn"] = provider_config_api_in
+        reason = _normalize_optional_string(entry.get("reason")) or ""
+        raw_when = entry.get("when") if _is_record(entry.get("when")) else None
+        base_url_hosts = [h.lower() for h in _normalize_trimmed_string_list(raw_when.get("baseUrlHosts") if raw_when else None)]
+        provider_config_api_in = [a.lower() for a in _normalize_trimmed_string_list(raw_when.get("providerConfigApiIn") if raw_when else None)]
+        when: Optional[dict] = None
+        if len(base_url_hosts) > 0 or len(provider_config_api_in) > 0:
+            when = {}
+            if len(base_url_hosts) > 0:
+                when["baseUrlHosts"] = base_url_hosts
+            if len(provider_config_api_in) > 0:
+                when["providerConfigApiIn"] = provider_config_api_in
         suppression: ModelCatalogSuppression = {"provider": provider, "model": model}
         if reason:
             suppression["reason"] = reason
         if when:
             suppression["when"] = when
         suppressions.append(suppression)
-    return suppressions or None
+    return suppressions if len(suppressions) > 0 else None
 
 
 def _normalize_model_catalog_discovery(
-    value: object,
-    owned_providers: set[str],
-) -> dict[str, ModelCatalogDiscovery] | None:
-    if not is_record(value):
+    value: Any,
+    owned_providers,
+) -> Optional[Dict[str, ModelCatalogDiscovery]]:
+    if not _is_record(value):
         return None
-    discovery: dict[str, ModelCatalogDiscovery] = {}
+    discovery: Dict[str, ModelCatalogDiscovery] = {}
     for raw_provider_id, raw_mode in value.items():
-        provider_id = normalize_model_catalog_provider_id(str(raw_provider_id))
-        mode = normalize_optional_string(raw_mode) or ""
-        if provider_id and provider_id in owned_providers and mode in _MODEL_CATALOG_DISCOVERY_MODES:
-            discovery[provider_id] = mode  # type: ignore[assignment]
-    return discovery or None
+        provider_id = normalize_model_catalog_provider_id(raw_provider_id)
+        mode = _normalize_optional_string(raw_mode) or ""
+        if provider_id and provider_id in owned_providers and mode in MODEL_CATALOG_DISCOVERY_MODES:
+            discovery[provider_id] = mode
+    return discovery if len(discovery) > 0 else None
 
 
 def normalize_model_catalog(
-    value: object,
-    *,
-    owned_providers: set[str] | frozenset[str],
-) -> ModelCatalog | None:
-    if not is_record(value):
+    value: Any,
+    params: dict,
+) -> Optional[ModelCatalog]:
+    if not _is_record(value):
         return None
-    owned = _normalize_owned_provider_set(owned_providers)
-    providers = _normalize_model_catalog_providers(value.get("providers"), owned)
-    aliases = _normalize_model_catalog_aliases(value.get("aliases"), owned)
+    owned_providers = _normalize_owned_provider_set(params["ownedProviders"])
+    providers = _normalize_model_catalog_providers(value.get("providers"), owned_providers)
+    aliases = _normalize_model_catalog_aliases(value.get("aliases"), owned_providers)
     suppressions = _normalize_model_catalog_suppressions(value.get("suppressions"))
-    discovery = _normalize_model_catalog_discovery(value.get("discovery"), owned)
+    discovery = _normalize_model_catalog_discovery(value.get("discovery"), owned_providers)
     runtime_augment = value.get("runtimeAugment") is True
     catalog: ModelCatalog = {}
     if providers:
@@ -600,30 +621,26 @@ def normalize_model_catalog(
     if discovery:
         catalog["discovery"] = discovery
     if runtime_augment:
-        catalog["runtimeAugment"] = True
-    return catalog or None
+        catalog["runtimeAugment"] = runtime_augment
+    return catalog if len(catalog) > 0 else None
 
 
-def normalize_model_catalog_provider_rows(
-    *,
-    provider: str,
-    provider_catalog: ModelCatalogProvider,
-    source: ModelCatalogSource,
-) -> list[NormalizedModelCatalogRow]:
-    normalized_provider = normalize_model_catalog_provider_id(provider)
-    models = provider_catalog.get("models")
-    if not normalized_provider or not isinstance(models, list):
+def normalize_model_catalog_provider_rows(params: dict) -> List[NormalizedModelCatalogRow]:
+    provider = normalize_model_catalog_provider_id(params["provider"])
+    provider_catalog = params["providerCatalog"]
+    if not provider or not isinstance(provider_catalog.get("models"), list):
         return []
     provider_api = _normalize_model_catalog_api(provider_catalog.get("api"))
-    provider_base_url = normalize_optional_string(provider_catalog.get("baseUrl")) or ""
+    provider_base_url = _normalize_optional_string(provider_catalog.get("baseUrl")) or ""
     provider_headers = _normalize_string_map(provider_catalog.get("headers"))
-    rows: list[NormalizedModelCatalogRow] = []
-    for model in models:
-        model_id = normalize_optional_string(model.get("id")) or ""
-        if not model_id:
+    rows: List[NormalizedModelCatalogRow] = []
+
+    for model in provider_catalog["models"]:
+        id = _normalize_optional_string(model.get("id")) or ""
+        if not id:
             continue
         api = _normalize_model_catalog_api(model.get("api")) or provider_api
-        base_url = normalize_optional_string(model.get("baseUrl")) or provider_base_url
+        base_url = _normalize_optional_string(model.get("baseUrl")) or provider_base_url
         headers = _merge_string_maps(provider_headers, _normalize_string_map(model.get("headers")))
         context_window = _normalize_positive_number(model.get("contextWindow"))
         context_tokens = _normalize_positive_integer(model.get("contextTokens"))
@@ -631,20 +648,20 @@ def normalize_model_catalog_provider_rows(
         cost = _normalize_model_catalog_cost(model.get("cost"))
         compat = _normalize_model_catalog_compat(model.get("compat"))
         media_input = _normalize_model_catalog_media_input(model.get("mediaInput"))
-        status_reason = normalize_optional_string(model.get("statusReason")) or ""
-        replaced_by = normalize_optional_string(model.get("replacedBy")) or ""
-        replaces = normalize_optional_trimmed_string_list(model.get("replaces"))
-        tags = normalize_optional_trimmed_string_list(model.get("tags"))
+        status_reason = _normalize_optional_string(model.get("statusReason")) or ""
+        replaced_by = _normalize_optional_string(model.get("replacedBy")) or ""
+        replaces = _normalize_optional_trimmed_string_list(model.get("replaces"))
+        tags = _normalize_optional_trimmed_string_list(model.get("tags"))
         row: NormalizedModelCatalogRow = {
-            "provider": normalized_provider,
-            "id": model_id,
-            "ref": build_model_catalog_ref(normalized_provider, model_id),
-            "mergeKey": build_model_catalog_merge_key(normalized_provider, model_id),
-            "name": normalize_optional_string(model.get("name")) or model_id,
-            "source": source,
-            "input": _normalize_model_catalog_inputs(model.get("input")) or list(_DEFAULT_MODEL_INPUT),
-            "reasoning": model.get("reasoning") is True,
-            "status": _normalize_model_catalog_status(model.get("status")) or _DEFAULT_MODEL_STATUS,
+            "provider": provider,
+            "id": id,
+            "ref": build_model_catalog_ref(provider, id),
+            "mergeKey": build_model_catalog_merge_key(provider, id),
+            "name": _normalize_optional_string(model.get("name")) or id,
+            "source": params["source"],
+            "input": _normalize_model_catalog_inputs(model.get("input")) or list(DEFAULT_MODEL_INPUT),
+            "reasoning": model.get("reasoning") if isinstance(model.get("reasoning"), bool) else False,
+            "status": _normalize_model_catalog_status(model.get("status")) or DEFAULT_MODEL_STATUS,
         }
         if api:
             row["api"] = api
@@ -673,28 +690,20 @@ def normalize_model_catalog_provider_rows(
         if tags:
             row["tags"] = tags
         rows.append(row)
-    return sorted(rows, key=lambda entry: (entry["provider"], entry["id"]))
+
+    rows.sort(key=lambda r: (r["provider"], r["id"]))
+    return rows
 
 
-def normalize_model_catalog_rows(
-    *,
-    providers: dict[str, ModelCatalogProvider],
-    source: ModelCatalogSource,
-) -> list[NormalizedModelCatalogRow]:
-    rows = [
-        row
-        for provider, provider_catalog in providers.items()
-        for row in normalize_model_catalog_provider_rows(
-            provider=provider,
-            provider_catalog=provider_catalog,
-            source=source,
+def normalize_model_catalog_rows(params: dict) -> List[NormalizedModelCatalogRow]:
+    rows: List[NormalizedModelCatalogRow] = []
+    for provider, provider_catalog in params["providers"].items():
+        rows.extend(
+            normalize_model_catalog_provider_rows({
+                "provider": provider,
+                "providerCatalog": provider_catalog,
+                "source": params["source"],
+            })
         )
-    ]
-    return sorted(rows, key=lambda entry: (entry["provider"], entry["id"]))
-
-
-__all__ = [
-    "normalize_model_catalog",
-    "normalize_model_catalog_provider_rows",
-    "normalize_model_catalog_rows",
-]
+    rows.sort(key=lambda r: (r["provider"], r["id"]))
+    return rows

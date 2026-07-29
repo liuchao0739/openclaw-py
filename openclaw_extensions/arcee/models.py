@@ -1,14 +1,41 @@
-"""Arcee model catalog metadata for direct and OpenRouter-routed providers."""
+from copy import deepcopy
+from typing import List, TypedDict
 
-from __future__ import annotations
 
-from typing import Any
+class ModelCost(TypedDict, total=False):
+    input: float
+    output: float
+    cacheRead: float
+    cacheWrite: float
 
-from openclaw.plugin_sdk.provider_catalog_shared import ModelDefinitionConfig
+
+class ModelCompat(TypedDict, total=False):
+    supportsTools: bool
+    supportsReasoningEffort: bool
+
+
+class ModelDefinitionConfig(TypedDict, total=False):
+    id: str
+    name: str
+    api: str
+    reasoning: bool
+    input: List[str]
+    contextWindow: int
+    maxTokens: int
+    cost: ModelCost
+    compat: ModelCompat
+
+
+class ModelProviderConfig(TypedDict, total=False):
+    providerId: str
+    api: str
+    baseUrl: str
+    models: List[ModelDefinitionConfig]
+
 
 ARCEE_BASE_URL = "https://api.arcee.ai/api/v1"
 
-ARCEE_MODEL_CATALOG: list[dict[str, Any]] = [
+ARCEE_MODEL_CATALOG: List[ModelDefinitionConfig] = [
     {
         "id": "trinity-mini",
         "name": "Trinity Mini 26B",
@@ -58,18 +85,17 @@ ARCEE_MODEL_CATALOG: list[dict[str, Any]] = [
 ]
 
 
-def build_arcee_model_definition(model: dict[str, Any]) -> ModelDefinitionConfig:
+def build_arcee_model_definition(model: ModelDefinitionConfig) -> ModelDefinitionConfig:
     result: ModelDefinitionConfig = {
         "id": model["id"],
         "name": model["name"],
         "api": "openai-completions",
-        "reasoning": model["reasoning"],
+        "reasoning": model.get("reasoning", False),
         "input": model["input"],
         "cost": model["cost"],
         "contextWindow": model["contextWindow"],
         "maxTokens": model["maxTokens"],
     }
-    compat = model.get("compat")
-    if compat:
-        result["compat"] = compat
+    if "compat" in model:
+        result["compat"] = deepcopy(model["compat"])
     return result

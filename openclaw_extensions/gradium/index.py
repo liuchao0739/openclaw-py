@@ -1,13 +1,17 @@
-"""Gradium plugin entrypoint registers its OpenClaw integration."""
-
-from __future__ import annotations
-
-from openclaw.plugin_sdk.plugin_entry import OpenClawPluginApi, define_plugin_entry
-from openclaw_extensions.gradium.speech_provider import build_gradium_speech_provider
+from .speech_provider import build_gradium_speech_provider
 
 
-def _register(api: OpenClawPluginApi) -> None:
-    api.register_speech_provider(build_gradium_speech_provider())  # type: ignore[attr-defined]
+def define_plugin_entry(*, id: str, name: str, description: str, register):
+    return {
+        "id": id,
+        "name": name,
+        "description": description,
+        "register": register,
+    }
+
+
+def _register(api):
+    api["registerSpeechProvider"](build_gradium_speech_provider())
 
 
 default = define_plugin_entry(

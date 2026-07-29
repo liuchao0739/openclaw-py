@@ -1,8 +1,4 @@
-"""Codex provider catalog constants and model definition helpers."""
-
-from __future__ import annotations
-
-from typing import Any
+from typing import List
 
 CODEX_PROVIDER_ID = "codex"
 CODEX_BASE_URL = "https://chatgpt.com/backend-api"
@@ -11,7 +7,7 @@ CODEX_APP_SERVER_AUTH_MARKER = "codex-app-server"
 DEFAULT_CONTEXT_WINDOW = 272_000
 DEFAULT_MAX_TOKENS = 128_000
 
-FALLBACK_CODEX_MODELS: list[dict[str, Any]] = [
+FALLBACK_CODEX_MODELS = [
     {
         "id": "gpt-5.5",
         "model": "gpt-5.5",
@@ -34,34 +30,36 @@ FALLBACK_CODEX_MODELS: list[dict[str, Any]] = [
 
 def _should_default_to_reasoning_model(model_id: str) -> bool:
     lower = model_id.lower()
-    return lower.startswith(("gpt-5", "o1", "o3", "o4"))
+    return (
+        lower.startswith("gpt-5")
+        or lower.startswith("o1")
+        or lower.startswith("o3")
+        or lower.startswith("o4")
+    )
 
 
-def build_codex_model_definition(model: dict[str, Any]) -> dict[str, Any]:
-    """Convert a Codex app-server model record into OpenClaw provider model config."""
-    model_id = (str(model.get("id") or "")).strip() or (str(model.get("model") or "")).strip()
-    display_name = model.get("displayName")
-    name = display_name.strip() if isinstance(display_name, str) and display_name.strip() else model_id
-    supported_reasoning = model.get("supportedReasoningEfforts") or []
+def build_codex_model_definition(model: dict) -> dict:
+    model_id = (model.get("id") or "").strip() or (model.get("model") or "").strip()
+    display_name = (model.get("displayName") or "").strip() or model_id
     input_modalities = model.get("inputModalities") or []
+    supported_reasoning_efforts = model.get("supportedReasoningEfforts") or []
     return {
         "id": model_id,
-        "name": name,
+        "name": display_name,
         "api": "openai-chatgpt-responses",
-        "reasoning": len(supported_reasoning) > 0 or _should_default_to_reasoning_model(model_id),
+        "reasoning": len(supported_reasoning_efforts) > 0 or _should_default_to_reasoning_model(model_id),
         "input": ["text", "image"] if "image" in input_modalities else ["text"],
         "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0},
         "contextWindow": DEFAULT_CONTEXT_WINDOW,
         "maxTokens": DEFAULT_MAX_TOKENS,
         "compat": {
-            "supportsReasoningEffort": len(supported_reasoning) > 0,
+            "supportsReasoningEffort": len(supported_reasoning_efforts) > 0,
             "supportsUsageInStreaming": True,
         },
     }
 
 
-def build_codex_provider_config(models: list[dict[str, Any]]) -> dict[str, Any]:
-    """Build the synthetic Codex provider config for a model list."""
+def build_codex_provider_config(models: List[dict]) -> dict:
     return {
         "baseUrl": CODEX_BASE_URL,
         "apiKey": CODEX_APP_SERVER_AUTH_MARKER,

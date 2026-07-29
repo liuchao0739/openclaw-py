@@ -1,25 +1,10 @@
-"""Collects configured model references from OpenClaw config-shaped objects.
-
-Mirrors packages/model-catalog-core/src/configured-model-refs.ts.
-"""
-
-from __future__ import annotations
-
-from typing import TypedDict
-
-from openclaw_packages.normalization_core import is_record
+from typing import Any, List, Optional, TypedDict
 
 from .provider_id import normalize_provider_id
 
-AGENT_MODEL_CONFIG_KEYS: tuple[str, ...] = (
-    "model",
-    "imageModel",
-    "imageGenerationModel",
-    "videoGenerationModel",
-    "musicGenerationModel",
-    "voiceModel",
-    "pdfModel",
-)
+
+def _is_record(value: Any) -> bool:
+    return isinstance(value, dict) and not isinstance(value, list)
 
 
 class ConfiguredModelRef(TypedDict):
@@ -27,22 +12,33 @@ class ConfiguredModelRef(TypedDict):
     value: str
 
 
-def collect_configured_model_refs(
-    config: object,
-    *,
-    include_channel_model_overrides: bool = True,
-) -> list[ConfiguredModelRef]:
-    refs: list[ConfiguredModelRef] = []
+AGENT_MODEL_CONFIG_KEYS: List[str] = [
+    "model",
+    "imageModel",
+    "imageGenerationModel",
+    "videoGenerationModel",
+    "musicGenerationModel",
+    "voiceModel",
+    "pdfModel",
+]
 
-    def push_model_ref(path: str, value: object) -> None:
+
+def collect_configured_model_refs(
+    config: Any,
+    options: Optional[dict] = None,
+) -> List[ConfiguredModelRef]:
+    options = options or {}
+    refs: List[ConfiguredModelRef] = []
+
+    def push_model_ref(path: str, value: Any) -> None:
         if isinstance(value, str) and value.strip():
             refs.append({"path": path, "value": value.strip()})
 
-    def collect_model_config(path: str, value: object) -> None:
+    def collect_model_config(path: str, value: Any) -> None:
         if isinstance(value, str):
             push_model_ref(path, value)
             return
-        if not is_record(value):
+        if not _is_record(value):
             return
         push_model_ref(f"{path}.primary", value.get("primary"))
         fallbacks = value.get("fallbacks")
@@ -50,108 +46,80 @@ def collect_configured_model_refs(
             for index, entry in enumerate(fallbacks):
                 push_model_ref(f"{path}.fallbacks.{index}", entry)
 
-    def collect_from_agent(path: str, agent: object) -> None:
-        if not is_record(agent):
+    def collect_from_agent(path: str, agent: Any) -> None:
+        if not _is_record(agent):
             return
         for key in AGENT_MODEL_CONFIG_KEYS:
             collect_model_config(f"{path}.{key}", agent.get(key))
-        heartbeat = agent.get("heartbeat")
         push_model_ref(
             f"{path}.heartbeat.model",
-            heartbeat.get("model") if is_record(heartbeat) else None,
+            agent.get("heartbeat", {}).get("model") if _is_record(agent.get("heartbeat")) else None,
         )
-        subagents = agent.get("subagents")
         collect_model_config(
             f"{path}.subagents.model",
-            subagents.get("model") if is_record(subagents) else None,
+            agent.get("subagents", {}).get("model") if _is_record(agent.get("subagents")) else None,
         )
-        compaction = agent.get("compaction")
-        if is_record(compaction):
-            push_model_ref(f"{path}.compaction.model", compaction.get("model"))
-            memory_flush = compaction.get("memoryFlush")
+        if _is_record(agent.get("compaction")):
+            push_model_ref(f"{path}.compaction.model", agent.get("compaction", {}).get("model"))
+            memory_flush = agent.get("compaction", {}).get("memoryFlush")
             push_model_ref(
                 f"{path}.compaction.memoryFlush.model",
-                memory_flush.get("model") if is_record(memory_flush) else None,
+                memory_flush.get("model") if _is_record(memory_flush) else None,
             )
-        models = agent.get("models")
-        if is_record(models):
-            for model_ref in models:
+        if _is_record(agent.get("models")):
+            for model_ref in agent.get("models", {}).keys():
                 push_model_ref(f"{path}.models.{model_ref}", model_ref)
 
-    root = config if is_record(config) else {}
-    agents = root.get("agents")
-    agents = agents if is_record(agents) else {}
+    root = config if _is_record(config) else {}
+    agents = root.get("agents") if _is_record(root.get("agents")) else {}
     collect_from_agent("agents.defaults", agents.get("defaults"))
-    agent_list = agents.get("list")
-    if isinstance(agent_list, list):
-        for index, entry in enumerate(agent_list):
+    agents_list = agents.get("list")
+    if isinstance(agents_list, list):
+        for index, entry in enumerate(agents_list):
             collect_from_agent(f"agents.list.{index}", entry)
-    if include_channel_model_overrides:
-        channels = root.get("channels")
-        channels = channels if is_record(channels) else {}
-        model_by_channel = channels.get("modelByChannel")
-        model_by_channel = model_by_channel if is_record(model_by_channel) else {}
+    if options.get("includeChannelModelOverrides", True):
+        channels = root.get("channels") if _is_record(root.get("channels")) else {}
+        model_by_channel = channels.get("modelByChannel") if _is_record(channels.get("modelByChannel")) else {}
         for channel_id, channel_map in model_by_channel.items():
-            if not is_record(channel_map):
+            if not _is_record(channel_map):
                 continue
             for target_id, model_ref in channel_map.items():
-                push_model_ref(
-                    f"channels.modelByChannel.{channel_id}.{target_id}",
-                    model_ref,
-                )
-    hooks = root.get("hooks")
-    hooks = hooks if is_record(hooks) else {}
-    mappings = hooks.get("mappings")
-    if isinstance(mappings, list):
-        for index, mapping in enumerate(mappings):
+                push_model_ref(f"channels.modelByChannel.{channel_id}.{target_id}", model_ref)
+    hooks = root.get("hooks") if _is_record(root.get("hooks")) else {}
+    hooks_mappings = hooks.get("mappings")
+    if isinstance(hooks_mappings, list):
+        for index, mapping in enumerate(hooks_mappings):
             push_model_ref(
                 f"hooks.mappings.{index}.model",
-                mapping.get("model") if is_record(mapping) else None,
+                mapping.get("model") if _is_record(mapping) else None,
             )
-    gmail = hooks.get("gmail")
-    push_model_ref("hooks.gmail.model", gmail.get("model") if is_record(gmail) else None)
+    push_model_ref("hooks.gmail.model", hooks.get("gmail", {}).get("model") if _is_record(hooks.get("gmail")) else None)
     messages = root.get("messages")
-    tts = messages.get("tts") if is_record(messages) else None
+    messages_tts = messages.get("tts") if _is_record(messages) else None
     push_model_ref(
         "messages.tts.summaryModel",
-        tts.get("summaryModel") if is_record(tts) else None,
+        messages_tts.get("summaryModel") if _is_record(messages_tts) else None,
     )
-    channels = root.get("channels")
-    discord = channels.get("discord") if is_record(channels) else None
-    voice = discord.get("voice") if is_record(discord) else None
+    channels = root.get("channels") if _is_record(root.get("channels")) else {}
+    channels_discord = channels.get("discord") if _is_record(channels.get("discord")) else None
+    channels_discord_voice = channels_discord.get("voice") if _is_record(channels_discord) else None
     push_model_ref(
         "channels.discord.voice.model",
-        voice.get("model") if is_record(voice) else None,
+        channels_discord_voice.get("model") if _is_record(channels_discord_voice) else None,
     )
     return refs
 
 
 def collect_configured_model_ref_values(
-    config: object,
-    *,
-    include_channel_model_overrides: bool = True,
-) -> list[str]:
-    return [
-        ref["value"]
-        for ref in collect_configured_model_refs(
-            config,
-            include_channel_model_overrides=include_channel_model_overrides,
-        )
-    ]
+    config: Any,
+    options: Optional[dict] = None,
+) -> List[str]:
+    return [ref["value"] for ref in collect_configured_model_refs(config, options)]
 
 
-def extract_provider_from_model_ref(value: str) -> str | None:
+def extract_provider_from_model_ref(value: str) -> Optional[str]:
     trimmed = value.strip()
     slash = trimmed.find("/")
     if slash <= 0:
         return None
     return normalize_provider_id(trimmed[:slash])
-
-
-__all__ = [
-    "AGENT_MODEL_CONFIG_KEYS",
-    "ConfiguredModelRef",
-    "collect_configured_model_ref_values",
-    "collect_configured_model_refs",
-    "extract_provider_from_model_ref",
-]

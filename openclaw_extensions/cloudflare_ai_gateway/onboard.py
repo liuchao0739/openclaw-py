@@ -1,25 +1,14 @@
-"""Config patch helpers for Cloudflare AI Gateway onboarding flows."""
-
-from __future__ import annotations
-
 from copy import deepcopy
-from typing import Any
+from typing import Any, Optional
 
-from openclaw.packages.normalization_core import is_record
-from openclaw.plugin_sdk.provider_onboard import (
-    OpenClawConfig,
-    apply_agent_default_model_primary,
-    apply_provider_config_with_default_models,
-)
-from openclaw_extensions.cloudflare_ai_gateway.models import (
-    CLOUDFLARE_AI_GATEWAY_DEFAULT_MODEL_ID,
+from .models import (
     CLOUDFLARE_AI_GATEWAY_DEFAULT_MODEL_REF,
     build_cloudflare_ai_gateway_model_definition,
     resolve_cloudflare_ai_gateway_base_url,
 )
 
 
-def build_cloudflare_ai_gateway_config_patch(params: dict[str, str]) -> dict[str, Any]:
+def build_cloudflare_ai_gateway_config_patch(params: dict) -> dict:
     base_url = resolve_cloudflare_ai_gateway_base_url(params)
     return {
         "models": {
@@ -43,60 +32,81 @@ def build_cloudflare_ai_gateway_config_patch(params: dict[str, str]) -> dict[str
     }
 
 
-def apply_cloudflare_ai_gateway_provider_config(
-    cfg: OpenClawConfig,
-    params: dict[str, str | None] | None = None,
-) -> OpenClawConfig:
-    params = params or {}
-    defaults_models = cfg.get("agents", {}).get("defaults", {}).get("models")
-    models = dict(defaults_models) if is_record(defaults_models) else {}
-    existing = models.get(CLOUDFLARE_AI_GATEWAY_DEFAULT_MODEL_REF)
-    if is_record(existing):
-        models[CLOUDFLARE_AI_GATEWAY_DEFAULT_MODEL_REF] = {
-            **existing,
-            "alias": existing.get("alias") or "Cloudflare AI Gateway",
-        }
-    else:
-        models[CLOUDFLARE_AI_GATEWAY_DEFAULT_MODEL_REF] = {"alias": "Cloudflare AI Gateway"}
+def _apply_provider_config_with_default_model(
+    cfg: dict, params: dict
+) -> dict:
+    cfg = deepcopy(cfg)
+    providers = cfg.setdefault("models", {}).setdefault("providers", {})
+    provider_id = params["providerId"]
+    provider_entry = providers.setdefault(provider_id, {})
+    provider_entry["api"] = params["api"]
+    provider_entry["baseUrl"] = params["baseUrl"]
+    provider_entry["models"] = params["defaultModel"]
+    return cfg
 
-    providers = cfg.get("models", {}).get("providers")
-    existing_provider = (
-        providers.get("cloudflare-ai-gateway") if is_record(providers) else None
-    )
-    account_id = params.get("accountId")
-    gateway_id = params.get("gatewayId")
-    if account_id and gateway_id:
-        base_url = resolve_cloudflare_ai_gateway_base_url(
-            {"accountId": account_id, "gatewayId": gateway_id}
-        )
-    elif is_record(existing_provider) and isinstance(existing_provider.get("baseUrl"), str):
+
+def apply_cloudflare_ai_gateway_provider_config(
+    cfg: Any, params: Optional[dict] = None
+) -> Any:
+    if not isinstance(cfg, dict):
+        cfg = {}
+    params = params or {}
+    cfg = deepcopy(cfg)
+
+    agents_cfg = cfg.get("agents", {})
+    if not isinstance(agents_cfg, dict):
+        agents_cfg = {}
+    defaults_cfg = agents_cfg.get("defaults", {})
+    if not isinstance(defaults_cfg, dict):
+        defaults_cfg = {}
+    models = dict(defaults_cfg.get("models", {}))
+    existing = models.get(CLOUDFLARE_AI_GATEWAY_DEFAULT_MODEL_REF, {})
+    merged = dict(existing) if isinstance(existing, dict) else {}
+    merged.setdefault("alias", "Cloudflare AI Gateway")
+    models[CLOUDFLARE_AI_GATEWAY_DEFAULT_MODEL_REF] = merged
+    defaults_cfg["models"] = models
+    agents_cfg["defaults"] = defaults_cfg
+    cfg["agents"] = agents_cfg
+
+    existing_provider = cfg.get("models", {}).get("providers", {}).get("cloudflare-ai-gateway", {})
+    base_url: Optional[str] = None
+    if params.get("accountId") and params.get("gatewayId"):
+        base_url = resolve_cloudflare_ai_gateway_base_url({
+            "accountId": params["accountId"],
+            "gatewayId": params["gatewayId"],
+        })
+    elif isinstance(existing_provider.get("baseUrl"), str):
         base_url = existing_provider["baseUrl"]
-    else:
-        base_url = None
 
     if not base_url:
-        next_cfg = deepcopy(cfg)
-        agents = next_cfg.setdefault("agents", {})
-        defaults = agents.setdefault("defaults", {})
-        defaults["models"] = models
-        return next_cfg
+        return cfg
 
-    return apply_provider_config_with_default_models(
-        cfg,
-        agent_models=models,
-        provider_id="cloudflare-ai-gateway",
-        api="anthropic-messages",
-        base_url=base_url,
-        default_models=[build_cloudflare_ai_gateway_model_definition()],
-        default_model_id=CLOUDFLARE_AI_GATEWAY_DEFAULT_MODEL_ID,
-    )
+    return _apply_provider_config_with_default_model(cfg, {
+        "agentModels": models,
+        "providerId": "cloudflare-ai-gateway",
+        "api": "anthropic-messages",
+        "baseUrl": base_url,
+        "defaultModel": build_cloudflare_ai_gateway_model_definition(),
+    })
+
+
+def _apply_agent_default_model_primary(cfg: Any, model_ref: str) -> Any:
+    if not isinstance(cfg, dict):
+        cfg = {}
+    agents_cfg = cfg.get("agents", {})
+    if not isinstance(agents_cfg, dict):
+        agents_cfg = {}
+    defaults_cfg = agents_cfg.get("defaults", {})
+    if not isinstance(defaults_cfg, dict):
+        defaults_cfg = {}
+    defaults_cfg["model"] = model_ref
+    agents_cfg["defaults"] = defaults_cfg
+    cfg["agents"] = agents_cfg
+    return cfg
 
 
 def apply_cloudflare_ai_gateway_config(
-    cfg: OpenClawConfig,
-    params: dict[str, str | None] | None = None,
-) -> OpenClawConfig:
-    return apply_agent_default_model_primary(
-        apply_cloudflare_ai_gateway_provider_config(cfg, params),
-        CLOUDFLARE_AI_GATEWAY_DEFAULT_MODEL_REF,
-    )
+    cfg: Any, params: Optional[dict] = None
+) -> Any:
+    cfg = apply_cloudflare_ai_gateway_provider_config(cfg, params)
+    return _apply_agent_default_model_primary(cfg, CLOUDFLARE_AI_GATEWAY_DEFAULT_MODEL_REF)

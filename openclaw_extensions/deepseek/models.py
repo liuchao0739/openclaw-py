@@ -1,48 +1,168 @@
-"""DeepSeek model catalog helpers derived from the plugin manifest."""
-
-from __future__ import annotations
-
-import json
-from pathlib import Path
-from typing import Any
-
-from openclaw.plugin_sdk.provider_catalog_shared import (
-    ModelDefinitionConfig,
-    build_manifest_model_provider_config,
-)
-
-_MANIFEST_PATH = Path(__file__).resolve().parent / "openclaw.plugin.json"
-_MANIFEST = json.loads(_MANIFEST_PATH.read_text(encoding="utf-8"))
-_DEEPSEEK_MANIFEST_CATALOG = _MANIFEST["modelCatalog"]["providers"]["deepseek"]
-
-_DEEPSEEK_MANIFEST_PROVIDER = build_manifest_model_provider_config(
-    provider_id="deepseek",
-    catalog=_DEEPSEEK_MANIFEST_CATALOG,
-)
-
-DEEPSEEK_BASE_URL = _DEEPSEEK_MANIFEST_PROVIDER["baseUrl"]
-DEEPSEEK_MODEL_CATALOG: list[ModelDefinitionConfig] = _DEEPSEEK_MANIFEST_PROVIDER["models"]
-
-_DEEPSEEK_V4_MODEL_IDS = frozenset({"deepseek-v4-flash", "deepseek-v4-pro"})
+from copy import deepcopy
+from typing import TypedDict, List, Optional, Any
 
 
-def build_deep_seek_model_definition(
-    model: ModelDefinitionConfig,
-) -> ModelDefinitionConfig:
+class ModelCost(TypedDict, total=False):
+    input: float
+    output: float
+    cacheRead: float
+    cacheWrite: float
+
+
+class ModelCompat(TypedDict, total=False):
+    supportsUsageInStreaming: bool
+    supportsReasoningEffort: bool
+    maxTokensField: str
+
+
+class ModelDefinitionConfig(TypedDict, total=False):
+    id: str
+    name: str
+    reasoning: bool
+    input: List[str]
+    contextWindow: int
+    maxTokens: int
+    cost: ModelCost
+    compat: ModelCompat
+    api: str
+
+
+class ModelProviderConfig(TypedDict, total=False):
+    providerId: str
+    api: str
+    baseUrl: str
+    models: List[ModelDefinitionConfig]
+
+
+MANIFEST: dict = {
+    "id": "deepseek",
+    "modelCatalog": {
+        "providers": {
+            "deepseek": {
+                "baseUrl": "https://api.deepseek.com",
+                "api": "openai-completions",
+                "models": [
+                    {
+                        "id": "deepseek-v4-flash",
+                        "name": "DeepSeek V4 Flash",
+                        "reasoning": True,
+                        "input": ["text"],
+                        "contextWindow": 1000000,
+                        "maxTokens": 384000,
+                        "cost": {
+                            "input": 0.14,
+                            "output": 0.28,
+                            "cacheRead": 0.028,
+                            "cacheWrite": 0,
+                        },
+                        "compat": {
+                            "supportsUsageInStreaming": True,
+                            "supportsReasoningEffort": True,
+                            "maxTokensField": "max_tokens",
+                        },
+                    },
+                    {
+                        "id": "deepseek-v4-pro",
+                        "name": "DeepSeek V4 Pro",
+                        "reasoning": True,
+                        "input": ["text"],
+                        "contextWindow": 1000000,
+                        "maxTokens": 384000,
+                        "cost": {
+                            "input": 1.74,
+                            "output": 3.48,
+                            "cacheRead": 0.145,
+                            "cacheWrite": 0,
+                        },
+                        "compat": {
+                            "supportsUsageInStreaming": True,
+                            "supportsReasoningEffort": True,
+                            "maxTokensField": "max_tokens",
+                        },
+                    },
+                    {
+                        "id": "deepseek-chat",
+                        "name": "DeepSeek Chat",
+                        "input": ["text"],
+                        "contextWindow": 131072,
+                        "maxTokens": 8192,
+                        "cost": {
+                            "input": 0.28,
+                            "output": 0.42,
+                            "cacheRead": 0.028,
+                            "cacheWrite": 0,
+                        },
+                        "compat": {
+                            "supportsUsageInStreaming": True,
+                            "maxTokensField": "max_tokens",
+                        },
+                    },
+                    {
+                        "id": "deepseek-reasoner",
+                        "name": "DeepSeek Reasoner",
+                        "reasoning": True,
+                        "input": ["text"],
+                        "contextWindow": 131072,
+                        "maxTokens": 65536,
+                        "cost": {
+                            "input": 0.28,
+                            "output": 0.42,
+                            "cacheRead": 0.028,
+                            "cacheWrite": 0,
+                        },
+                        "compat": {
+                            "supportsUsageInStreaming": True,
+                            "supportsReasoningEffort": False,
+                            "maxTokensField": "max_tokens",
+                        },
+                    },
+                ],
+            },
+        },
+        "discovery": {
+            "deepseek": "static",
+        },
+    },
+}
+
+
+def _build_manifest_model_provider_config(provider_id: str, catalog: dict) -> ModelProviderConfig:
+    provider_catalog = catalog["providers"][provider_id]
     return {
-        **model,
-        "api": "openai-completions",
+        "providerId": provider_id,
+        "api": provider_catalog.get("api", "openai-completions"),
+        "baseUrl": provider_catalog.get("baseUrl", ""),
+        "models": provider_catalog.get("models", []),
     }
 
 
-def is_deep_seek_v4_model_id(model_id: str) -> bool:
-    return model_id.lower() in _DEEPSEEK_V4_MODEL_IDS
+_DEEPSEEK_MANIFEST_PROVIDER = _build_manifest_model_provider_config(
+    "deepseek", MANIFEST["modelCatalog"]
+)
+
+DEEPSEEK_BASE_URL: str = _DEEPSEEK_MANIFEST_PROVIDER["baseUrl"]
+
+DEEPSEEK_MODEL_CATALOG: List[ModelDefinitionConfig] = _DEEPSEEK_MANIFEST_PROVIDER["models"]
 
 
-def is_deep_seek_v4_model_ref(model: dict[str, Any]) -> bool:
-    model_id = model.get("id")
+def build_deepseek_model_definition(model: ModelDefinitionConfig) -> ModelDefinitionConfig:
+    merged: ModelDefinitionConfig = deepcopy(model)
+    merged["api"] = "openai-completions"
+    return merged
+
+
+_V4_MODEL_IDS = {"deepseek-v4-flash", "deepseek-v4-pro"}
+
+
+def is_deepseek_v4_model_id(model_id: str) -> bool:
+    return model_id.lower() in _V4_MODEL_IDS
+
+
+def is_deepseek_v4_model_ref(model: Any) -> bool:
+    if not isinstance(model, dict):
+        return False
     return (
         model.get("provider") == "deepseek"
-        and isinstance(model_id, str)
-        and is_deep_seek_v4_model_id(model_id)
+        and isinstance(model.get("id"), str)
+        and is_deepseek_v4_model_id(model["id"])
     )

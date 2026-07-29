@@ -1,27 +1,25 @@
-"""Output extractors for media-understanding provider CLI responses."""
-
-from __future__ import annotations
-
 import json
 import re
+from typing import Any, List, Optional
 
 
-def _extract_last_json_object(raw: str) -> object | None:
+def _extract_last_json_object(raw: str) -> Any:
     trimmed = raw.strip()
-    ranges: list[tuple[int, int]] = []
-    starts: list[int] = []
+    ranges: List[dict] = []
+    starts: List[int] = []
     in_string = False
     escaped = False
-    preamble_quote: str | None = None
+    preamble_quote: Optional[str] = None
     preamble_escaped = False
-    previous_significant: str | None = None
+    previous_significant: Optional[str] = None
     line_has_non_whitespace = False
     array_depth = 0
     candidate_has_content = False
 
-    for index, character in enumerate(trimmed):
+    for index in range(len(trimmed)):
+        character = trimmed[index]
         if in_string:
-            if character in ("\n", "\r"):
+            if character in "\n\r":
                 starts.clear()
                 in_string = False
                 escaped = False
@@ -33,9 +31,9 @@ def _extract_last_json_object(raw: str) -> object | None:
                 in_string = False
             continue
 
-        if not starts:
+        if len(starts) == 0:
             if preamble_quote is not None:
-                if character in ("\n", "\r"):
+                if character in "\n\r":
                     preamble_quote = None
                     preamble_escaped = False
                 elif preamble_escaped:
@@ -45,9 +43,9 @@ def _extract_last_json_object(raw: str) -> object | None:
                 elif character == preamble_quote:
                     preamble_quote = None
                 continue
-            if character in ('"', "'", "`"):
+            if character in "\"'`":
                 previous = trimmed[index - 1] if index > 0 else None
-                if previous is None or re.search(r"[\s:([{]", previous):
+                if previous is None or re.match(r"[\s:([\{]", previous):
                     preamble_quote = character
                     preamble_escaped = False
                     continue
@@ -55,10 +53,10 @@ def _extract_last_json_object(raw: str) -> object | None:
                 array_depth = 0
                 candidate_has_content = False
                 starts.append(index)
-            if not character.isspace():
+            if not re.match(r"\s", character):
                 previous_significant = character
                 line_has_non_whitespace = True
-            elif character in ("\n", "\r"):
+            elif character in "\n\r":
                 line_has_non_whitespace = False
             continue
 
@@ -70,45 +68,43 @@ def _extract_last_json_object(raw: str) -> object | None:
                 previous_significant == ":"
                 or previous_significant == "["
                 or previous_significant == '"'
-                or (
-                    previous_significant == ","
-                    and (line_has_non_whitespace or array_depth > 0)
-                )
+                or (previous_significant == "," and (line_has_non_whitespace or array_depth > 0))
             ):
                 starts.append(index)
             elif not line_has_non_whitespace and not had_candidate_content:
-                starts[:] = [index]
+                starts.clear()
+                starts.append(index)
                 array_depth = 0
                 candidate_has_content = False
-        elif character == "}" and starts:
+        elif character == "}" and len(starts) > 0:
             start = starts.pop()
-            if not starts:
-                ranges.append((start, index))
+            if len(starts) == 0:
+                ranges.append({"start": start, "end": index})
         elif character == "[":
             array_depth += 1
         elif character == "]" and array_depth > 0:
             array_depth -= 1
 
-        if not character.isspace():
+        if not re.match(r"\s", character):
             candidate_has_content = True
             previous_significant = character
             line_has_non_whitespace = True
-        elif character in ("\n", "\r"):
+        elif character in "\n\r":
             line_has_non_whitespace = False
 
-    for start, end in reversed(ranges):
+    for index in range(len(ranges) - 1, -1, -1):
+        r = ranges[index]
         try:
-            return json.loads(trimmed[start : end + 1])
-        except json.JSONDecodeError:
-            continue
+            return json.loads(trimmed[r["start"]:r["end"] + 1])
+        except Exception:
+            pass
 
     return None
 
 
-def extract_gemini_response(raw: str) -> str | None:
-    """Extract Gemini CLI-style response text from the last JSON object in output."""
+def extract_gemini_response(raw: str) -> Optional[str]:
     payload = _extract_last_json_object(raw)
-    if not isinstance(payload, dict):
+    if not payload or not isinstance(payload, dict):
         return None
     response = payload.get("response")
     if not isinstance(response, str):

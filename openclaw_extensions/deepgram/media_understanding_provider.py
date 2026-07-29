@@ -1,12 +1,6 @@
-"""Deepgram provider module implements model/runtime integration."""
+from .audio import transcribe_deepgram_audio
 
-from __future__ import annotations
-
-from typing import Any
-
-from openclaw_extensions.deepgram.audio import transcribe_deepgram_audio
-
-deepgram_media_understanding_provider: dict[str, Any] = {
+deepgram_media_understanding_provider: dict = {
     "id": "deepgram",
     "capabilities": ["audio"],
     "defaultModels": {"audio": "nova-3"},

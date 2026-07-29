@@ -1,33 +1,21 @@
-"""Speaker-selection compatibility helpers for plugins that renamed voice fields.
+from typing import Any, Dict, Optional
 
-Mirrors packages/speech-core/speaker.ts.
-"""
-
-from __future__ import annotations
-
-from typing import Any
-
-from openclaw.packages.normalization_core import normalize_optional_string
-
-__all__ = [
-    "SpeakerSelectionConfig",
-    "with_speaker_selection_compat",
-    "with_speaker_selection_fallback_compat",
-]
-
-SpeakerSelectionConfig = dict[str, Any]
+SpeakerSelectionConfig = Dict[str, Any]
 
 
-def with_speaker_selection_compat(
-    config: SpeakerSelectionConfig | None,
-) -> SpeakerSelectionConfig:
-    """Populate canonical and legacy speaker voice fields together."""
+def _read_string(value: Any) -> Optional[str]:
+    if isinstance(value, str) and value.strip():
+        return value.strip()
+    return None
+
+
+def with_speaker_selection_compat(config: Optional[SpeakerSelectionConfig]) -> SpeakerSelectionConfig:
     next_config: SpeakerSelectionConfig = dict(config) if config else {}
-    speaker_voice = normalize_optional_string(next_config.get("speakerVoice"))
-    speaker_voice_id = normalize_optional_string(next_config.get("speakerVoiceId"))
-    voice = normalize_optional_string(next_config.get("voice"))
-    voice_name = normalize_optional_string(next_config.get("voiceName"))
-    voice_id = normalize_optional_string(next_config.get("voiceId"))
+    speaker_voice = _read_string(next_config.get("speakerVoice"))
+    speaker_voice_id = _read_string(next_config.get("speakerVoiceId"))
+    voice = _read_string(next_config.get("voice"))
+    voice_name = _read_string(next_config.get("voiceName"))
+    voice_id = _read_string(next_config.get("voiceId"))
     canonical_voice = speaker_voice or voice or voice_name
     canonical_voice_id = speaker_voice_id or voice_id
     if canonical_voice:
@@ -40,18 +28,16 @@ def with_speaker_selection_compat(
     return next_config
 
 
-def with_speaker_selection_fallback_compat(
-    config: SpeakerSelectionConfig | None,
-) -> SpeakerSelectionConfig:
-    """Fill legacy speaker fields only when callers have not set them explicitly."""
+def with_speaker_selection_fallback_compat(config: Optional[SpeakerSelectionConfig]) -> SpeakerSelectionConfig:
     next_config: SpeakerSelectionConfig = dict(config) if config else {}
-    speaker_voice = normalize_optional_string(next_config.get("speakerVoice"))
-    speaker_voice_id = normalize_optional_string(next_config.get("speakerVoiceId"))
+    speaker_voice = _read_string(next_config.get("speakerVoice"))
+    speaker_voice_id = _read_string(next_config.get("speakerVoiceId"))
     if speaker_voice:
         if next_config.get("voice") is None:
             next_config["voice"] = speaker_voice
         if next_config.get("voiceName") is None:
             next_config["voiceName"] = speaker_voice
-    if speaker_voice_id and next_config.get("voiceId") is None:
-        next_config["voiceId"] = speaker_voice_id
+    if speaker_voice_id:
+        if next_config.get("voiceId") is None:
+            next_config["voiceId"] = speaker_voice_id
     return next_config

@@ -1,16 +1,16 @@
-"""Codex hosted web search provider."""
+from openclaw.plugin_sdk.plugin_config_runtime import resolve_plugin_config_object
 
-from __future__ import annotations
+from .web_search_provider_shared import create_codex_web_search_provider_base
 
-from typing import Any
+_codex_web_search_runtime = None
 
-from openclaw.packages.normalization_core import is_record
-from openclaw_extensions.codex.src.web_search_provider_runtime import (
-    execute_codex_web_search_provider_tool,
-)
-from openclaw_extensions.codex.src.web_search_provider_shared import (
-    create_codex_web_search_provider_base,
-)
+
+def _load_codex_web_search_runtime():
+    global _codex_web_search_runtime
+    if _codex_web_search_runtime is None:
+        from . import web_search_provider_runtime as _codex_web_search_runtime
+    return _codex_web_search_runtime
+
 
 CODEX_WEB_SEARCH_SCHEMA = {
     "type": "object",
@@ -18,67 +18,44 @@ CODEX_WEB_SEARCH_SCHEMA = {
         "query": {
             "type": "string",
             "description": "Search query. Include the desired region, time range, and constraints.",
-        }
+        },
     },
     "required": ["query"],
     "additionalProperties": False,
 }
 
 
-def _resolve_plugin_config_object(config: dict[str, Any] | None, plugin_id: str) -> dict[str, Any] | None:
-    if not is_record(config):
-        return None
-    plugins = config.get("plugins")
-    if not is_record(plugins):
-        return None
-    entries = plugins.get("entries")
-    if not is_record(entries):
-        return None
-    entry = entries.get(plugin_id)
-    if not is_record(entry):
-        return None
-    plugin_config = entry.get("config")
-    return plugin_config if is_record(plugin_config) else None
-
-
-def create_codex_web_search_provider(options: dict[str, Any] | None = None) -> dict[str, Any]:
+def create_codex_web_search_provider(options: dict = None) -> dict:
     options = options or {}
+    base = create_codex_web_search_provider_base()
 
-    def create_tool(ctx: dict[str, Any]) -> dict[str, Any] | None:
+    def _create_tool(ctx):
         native_config = (ctx.get("searchConfig") or {}).get("openaiCodex")
         if (
-            is_record(native_config)
+            native_config
+            and isinstance(native_config, dict)
+            and not isinstance(native_config, list)
             and native_config.get("enabled") is False
         ):
             return None
 
-        async def execute(args: dict[str, Any], execution_context: dict[str, Any]) -> Any:
-            plugin_config = options.get("resolvePluginConfig")
-            resolved_plugin_config = (
-                plugin_config()
-                if callable(plugin_config)
-                else _resolve_plugin_config_object(ctx.get("config"), "codex")
+        async def _execute(args, execution_context):
+            runtime = _load_codex_web_search_runtime()
+            plugin_config = (
+                options["resolvePluginConfig"]()
+                if options.get("resolvePluginConfig")
+                else resolve_plugin_config_object(ctx.get("config"), "codex")
             )
-            return await execute_codex_web_search_provider_tool(
-                ctx,
-                args,
-                execution_context,
-                {
-                    "pluginConfig": resolved_plugin_config,
-                    "clientFactory": options.get("clientFactory"),
-                },
-            )
+            return await runtime.execute_codex_web_search_provider_tool(ctx, args, execution_context, {
+                "pluginConfig": plugin_config,
+                "clientFactory": options.get("clientFactory"),
+            })
 
         return {
-            "description": (
-                "Search the current web through Codex hosted search and return a grounded answer "
-                "with source URLs."
-            ),
+            "description": "Search the current web through Codex hosted search and return a grounded answer with source URLs.",
             "parameters": CODEX_WEB_SEARCH_SCHEMA,
-            "execute": execute,
+            "execute": _execute,
         }
 
-    return {
-        **create_codex_web_search_provider_base(),
-        "createTool": create_tool,
-    }
+    base["createTool"] = _create_tool
+    return base

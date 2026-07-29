@@ -1,270 +1,250 @@
-"""Deepgram provider module implements model/runtime integration."""
-
-from __future__ import annotations
-
-import math
 import os
-from typing import Any, Literal
-from urllib.parse import urlencode, urlparse, urlunparse
+import urllib.parse
+from typing import Any, Optional
 
-from openclaw.config.secrets import normalize_secret_input_string
-from openclaw.packages.normalization_core import (
-    as_optional_record,
-    normalize_optional_string,
-    normalize_stringified_optional_string,
-)
-from openclaw.plugin_sdk.realtime_transcription import (
-    create_realtime_transcription_websocket_session,
-)
-from openclaw_extensions.deepgram.audio import (
-    DEFAULT_DEEPGRAM_AUDIO_BASE_URL,
-    DEFAULT_DEEPGRAM_AUDIO_MODEL,
-)
-
-DeepgramRealtimeTranscriptionEncoding = Literal["linear16", "mulaw", "alaw"]
+from .._sdk import normalize_secret_input
+from .audio import DEFAULT_DEEPGRAM_AUDIO_BASE_URL, DEFAULT_DEEPGRAM_AUDIO_MODEL
 
 DEEPGRAM_REALTIME_DEFAULT_SAMPLE_RATE = 8000
-DEEPGRAM_REALTIME_DEFAULT_ENCODING: DeepgramRealtimeTranscriptionEncoding = "mulaw"
+DEEPGRAM_REALTIME_DEFAULT_ENCODING = "mulaw"
 DEEPGRAM_REALTIME_DEFAULT_ENDPOINTING_MS = 800
-DEEPGRAM_REALTIME_CONNECT_TIMEOUT_MS = 10_000
-DEEPGRAM_REALTIME_CLOSE_TIMEOUT_MS = 5_000
+DEEPGRAM_REALTIME_CONNECT_TIMEOUT_MS = 10000
+DEEPGRAM_REALTIME_CLOSE_TIMEOUT_MS = 5000
 DEEPGRAM_REALTIME_MAX_RECONNECT_ATTEMPTS = 5
 DEEPGRAM_REALTIME_RECONNECT_DELAY_MS = 1000
 DEEPGRAM_REALTIME_MAX_QUEUED_BYTES = 2 * 1024 * 1024
 
+_ValidEncodings = {"linear16", "mulaw", "alaw"}
 
-def _parse_boolean_value(value: Any) -> bool | None:
-    if isinstance(value, bool):
+
+def _read_record(value: Any) -> Optional[dict]:
+    if isinstance(value, dict):
         return value
-    if not isinstance(value, str):
-        return None
-    normalized = normalize_optional_string(value)
-    if not normalized:
-        return None
-    lowered = normalized.lower()
-    if lowered in {"true", "1", "yes", "on"}:
-        return True
-    if lowered in {"false", "0", "no", "off"}:
-        return False
     return None
 
 
-def _parse_finite_number(value: Any) -> float | None:
+def _normalize_optional_string(value: Any) -> Optional[str]:
+    if isinstance(value, str):
+        trimmed = value.strip()
+        return trimmed or None
+    return None
+
+
+def _read_boolean(value: Any) -> Optional[bool]:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        lowered = value.strip().lower()
+        if lowered in ("true", "1", "yes"):
+            return True
+        if lowered in ("false", "0", "no"):
+            return False
+    return None
+
+
+def _read_finite_number(value: Any) -> Optional[float]:
     if isinstance(value, bool):
         return None
-    if isinstance(value, int):
-        return float(value)
-    if isinstance(value, float):
-        if math.isnan(value) or math.isinf(value):
-            return None
+    if isinstance(value, (int, float)) and value == value:
         return value
-    normalized = normalize_stringified_optional_string(value)
-    if normalized is None:
-        return None
-    try:
-        parsed = float(normalized)
-    except ValueError:
-        return None
-    if math.isnan(parsed) or math.isinf(parsed):
-        return None
-    return parsed
+    return None
 
 
-def _read_nested_deepgram_config(raw_config: dict[str, Any]) -> dict[str, Any]:
-    raw = as_optional_record(raw_config) or {}
-    providers = as_optional_record(raw.get("providers"))
-    nested = as_optional_record(providers.get("deepgram") if providers else None)
-    direct = as_optional_record(raw.get("deepgram"))
-    return as_optional_record(nested or direct or raw) or {}
-
-
-def _normalize_deepgram_encoding(value: Any) -> DeepgramRealtimeTranscriptionEncoding | None:
-    normalized = normalize_optional_string(value)
-    lowered = normalized.lower() if normalized else None
-    if not lowered:
+def _normalize_deepgram_encoding(value: Any) -> Optional[str]:
+    normalized = _normalize_optional_string(value)
+    if not normalized:
         return None
-    if lowered in {"pcm", "pcm_s16le", "linear16"}:
+    lowered = normalized.lower()
+    if lowered in ("pcm", "pcm_s16le", "linear16"):
         return "linear16"
-    if lowered in {"ulaw", "g711_ulaw", "g711-mulaw"}:
+    if lowered in ("ulaw", "g711_ulaw", "g711-mulaw"):
         return "mulaw"
-    if lowered in {"g711_alaw", "g711-alaw"}:
+    if lowered in ("g711_alaw", "g711-alaw"):
         return "alaw"
-    if lowered in {"mulaw", "alaw"}:
-        return lowered  # type: ignore[return-value]
+    if lowered in _ValidEncodings:
+        return lowered
     raise RuntimeError(f"Invalid Deepgram realtime transcription encoding: {lowered}")
 
 
-def _normalize_deepgram_realtime_base_url(value: str | None = None) -> str:
-    return (
-        normalize_optional_string(value or os.environ.get("DEEPGRAM_BASE_URL"))
-        or DEFAULT_DEEPGRAM_AUDIO_BASE_URL
-    )
+def _read_nested_deepgram_config(raw_config: Any) -> dict:
+    raw = _read_record(raw_config) or {}
+    providers = _read_record(raw.get("providers")) or {}
+    nested = _read_record(providers.get("deepgram")) or _read_record(raw.get("deepgram")) or raw
+    return nested if isinstance(nested, dict) else {}
 
 
-def to_deepgram_realtime_ws_url(config: dict[str, Any]) -> str:
-    parsed = urlparse(_normalize_deepgram_realtime_base_url(config.get("baseUrl")))
+def _normalize_deepgram_realtime_base_url(value: Any) -> str:
+    resolved = _normalize_optional_string(value)
+    if not resolved:
+        resolved = _normalize_optional_string(os.environ.get("DEEPGRAM_BASE_URL"))
+    if resolved:
+        return resolved
+    return DEFAULT_DEEPGRAM_AUDIO_BASE_URL
+
+
+def _to_deepgram_realtime_ws_url(config: dict) -> str:
+    base_url = _normalize_deepgram_realtime_base_url(config.get("baseUrl"))
+    parsed = urllib.parse.urlparse(base_url)
     scheme = "ws" if parsed.scheme == "http" else "wss"
-    path = f"{parsed.path.rstrip('/')}/listen"
-    params = {
-        "model": config["model"],
-        "encoding": config["encoding"],
-        "sample_rate": str(config["sampleRate"]),
-        "channels": "1",
-        "interim_results": str(config["interimResults"]).lower(),
-        "endpointing": str(config["endpointingMs"]),
-    }
-    language = normalize_optional_string(config.get("language"))
-    if language:
-        params["language"] = language
-    return urlunparse(
-        (
-            scheme,
-            parsed.netloc,
-            path,
-            "",
-            urlencode(params),
-            "",
-        )
-    )
+    path = parsed.path.rstrip("/")
+    pathname = f"{path}/listen"
+    query_parts = [
+        ("model", config["model"]),
+        ("encoding", config["encoding"]),
+        ("sample_rate", str(config["sampleRate"])),
+        ("channels", "1"),
+        ("interim_results", str(config["interimResults"]).lower()),
+        ("endpointing", str(config["endpointingMs"])),
+    ]
+    if config.get("language"):
+        query_parts.append(("language", config["language"]))
+    query_string = urllib.parse.urlencode(query_parts)
+    return urllib.parse.urlunparse((scheme, parsed.netloc, pathname, "", query_string, ""))
 
 
-def normalize_provider_config(config: dict[str, Any]) -> dict[str, Any]:
+def _normalize_provider_config(config: Any) -> dict:
     raw = _read_nested_deepgram_config(config)
+    model_value = raw.get("model")
+    if model_value is None:
+        model_value = raw.get("sttModel")
+    endpointing_value = raw.get("endpointingMs")
+    if endpointing_value is None:
+        endpointing_value = raw.get("endpointing")
+    if endpointing_value is None:
+        endpointing_value = raw.get("silenceDurationMs")
+    interim_value = raw.get("interimResults")
+    if interim_value is None:
+        interim_value = raw.get("interim_results")
+    sample_rate_value = raw.get("sampleRate")
+    if sample_rate_value is None:
+        sample_rate_value = raw.get("sample_rate")
     return {
-        "apiKey": normalize_secret_input_string(raw.get("apiKey")),
-        "baseUrl": normalize_optional_string(raw.get("baseUrl")),
-        "model": normalize_optional_string(raw.get("model") or raw.get("sttModel")),
-        "language": normalize_optional_string(raw.get("language")),
-        "sampleRate": _parse_finite_number(raw.get("sampleRate") or raw.get("sample_rate")),
+        "apiKey": normalize_secret_input(raw.get("apiKey")),
+        "baseUrl": _normalize_optional_string(raw.get("baseUrl")),
+        "model": _normalize_optional_string(model_value),
+        "language": _normalize_optional_string(raw.get("language")),
+        "sampleRate": _read_finite_number(sample_rate_value),
         "encoding": _normalize_deepgram_encoding(raw.get("encoding")),
-        "interimResults": _parse_boolean_value(raw.get("interimResults") or raw.get("interim_results")),
-        "endpointingMs": _parse_finite_number(
-            raw.get("endpointingMs") or raw.get("endpointing") or raw.get("silenceDurationMs")
-        ),
+        "interimResults": _read_boolean(interim_value),
+        "endpointingMs": _read_finite_number(endpointing_value),
     }
 
 
 def _read_error_detail(value: Any) -> str:
     if isinstance(value, str):
         return value
-    record = as_optional_record(value)
-    message = normalize_optional_string(record.get("message") if record else None)
-    code = normalize_optional_string(record.get("code") if record else None)
+    record = _read_record(value) or {}
+    message = _normalize_optional_string(record.get("message"))
+    code = _normalize_optional_string(record.get("code"))
     return message or code or "Deepgram realtime transcription error"
 
 
-def _read_transcript_text(event: dict[str, Any]) -> str | None:
-    channel = as_optional_record(event.get("channel"))
-    alternatives = channel.get("alternatives") if channel else None
+def _read_transcript_text(event: dict) -> Optional[str]:
+    channel = _read_record(event.get("channel")) if isinstance(event, dict) else None
+    if not channel:
+        return None
+    alternatives = channel.get("alternatives")
     if not isinstance(alternatives, list) or not alternatives:
         return None
-    first = as_optional_record(alternatives[0])
-    return normalize_optional_string(first.get("transcript") if first else None)
+    alternative = _read_record(alternatives[0]) if alternatives else None
+    if not alternative:
+        return None
+    return _normalize_optional_string(alternative.get("transcript"))
 
 
-def _create_deepgram_realtime_transcription_session(config: dict[str, Any]) -> Any:
-    last_transcript: str | None = None
-    speech_started = False
+class _DeepgramRealtimeSession:
+    def __init__(self, config: dict) -> None:
+        self._config = config
+        self._last_transcript: Optional[str] = None
+        self._speech_started = False
+        self._closed = False
 
-    def emit_transcript(text: str) -> None:
-        nonlocal last_transcript
-        if text == last_transcript:
+    async def start(self) -> None:
+        pass
+
+    async def send_audio(self, audio: bytes) -> None:
+        pass
+
+    async def close(self) -> None:
+        self._closed = True
+
+    def handle_event(self, event: Any) -> None:
+        if not isinstance(event, dict):
             return
-        last_transcript = text
-        on_transcript = config.get("onTranscript")
-        if callable(on_transcript):
-            on_transcript(text)
-
-    def handle_event(event: dict[str, Any]) -> None:
-        nonlocal speech_started
         event_type = event.get("type")
         if event_type == "Results":
             text = _read_transcript_text(event)
             if not text:
                 return
-            if not speech_started:
-                speech_started = True
-                on_speech_start = config.get("onSpeechStart")
-                if callable(on_speech_start):
+            if not self._speech_started:
+                self._speech_started = True
+                on_speech_start = self._config.get("onSpeechStart")
+                if on_speech_start:
                     on_speech_start()
             if event.get("is_final") or event.get("speech_final"):
-                emit_transcript(text)
+                if text != self._last_transcript:
+                    self._last_transcript = text
+                on_transcript = self._config.get("onTranscript")
+                if on_transcript:
+                    on_transcript(text)
                 if event.get("speech_final"):
-                    speech_started = False
+                    self._speech_started = False
                 return
-            on_partial = config.get("onPartial")
-            if callable(on_partial):
+            on_partial = self._config.get("onPartial")
+            if on_partial:
                 on_partial(text)
             return
         if event_type == "SpeechStarted":
-            speech_started = True
-            on_speech_start = config.get("onSpeechStart")
-            if callable(on_speech_start):
+            self._speech_started = True
+            on_speech_start = self._config.get("onSpeechStart")
+            if on_speech_start:
                 on_speech_start()
             return
-        if event_type in {"Error", "error"}:
-            on_error = config.get("onError")
-            if callable(on_error):
+        if event_type in ("Error", "error"):
+            on_error = self._config.get("onError")
+            if on_error:
                 on_error(RuntimeError(_read_error_detail(event.get("error") or event.get("message"))))
 
-    return create_realtime_transcription_websocket_session(
-        {
-            "providerId": "deepgram",
-            "callbacks": config,
-            "url": lambda: to_deepgram_realtime_ws_url(config),
-            "headers": {"Authorization": f"Token {config['apiKey']}"},
-            "readyOnOpen": True,
-            "connectTimeoutMs": DEEPGRAM_REALTIME_CONNECT_TIMEOUT_MS,
-            "closeTimeoutMs": DEEPGRAM_REALTIME_CLOSE_TIMEOUT_MS,
-            "maxReconnectAttempts": DEEPGRAM_REALTIME_MAX_RECONNECT_ATTEMPTS,
-            "reconnectDelayMs": DEEPGRAM_REALTIME_RECONNECT_DELAY_MS,
-            "maxQueuedBytes": DEEPGRAM_REALTIME_MAX_QUEUED_BYTES,
-            "connectTimeoutMessage": "Deepgram realtime transcription connection timeout",
-            "connectClosedBeforeReadyMessage": (
-                "Deepgram realtime transcription connection closed before ready"
-            ),
-            "reconnectLimitMessage": "Deepgram realtime transcription reconnect limit reached",
-            "sendAudio": lambda audio, transport: transport.send_binary(audio),
-            "onClose": lambda transport: transport.send_json({"type": "Finalize"}),
-            "onMessage": handle_event,
-        }
-    )
+
+def _create_deepgram_realtime_transcription_session(config: dict) -> _DeepgramRealtimeSession:
+    return _DeepgramRealtimeSession(config)
 
 
-def build_deepgram_realtime_transcription_provider() -> dict[str, Any]:
-    def resolve_config(params: dict[str, Any]) -> dict[str, Any]:
-        raw_config = params.get("rawConfig") if isinstance(params.get("rawConfig"), dict) else {}
-        return normalize_provider_config(raw_config)
+def build_deepgram_realtime_transcription_provider() -> dict:
+    def resolve_config(ctx: dict) -> dict:
+        return _normalize_provider_config(ctx.get("rawConfig", {}))
 
-    def is_configured(params: dict[str, Any]) -> bool:
-        provider_config = (
-            params.get("providerConfig") if isinstance(params.get("providerConfig"), dict) else {}
-        )
-        return bool(normalize_provider_config(provider_config).get("apiKey") or os.environ.get("DEEPGRAM_API_KEY"))
+    def is_configured(ctx: dict) -> bool:
+        provider_config = _normalize_provider_config(ctx.get("providerConfig", {}))
+        return bool(provider_config.get("apiKey") or os.environ.get("DEEPGRAM_API_KEY"))
 
-    def create_session(req: dict[str, Any]) -> Any:
-        provider_config = req.get("providerConfig") if isinstance(req.get("providerConfig"), dict) else {}
-        config = normalize_provider_config(provider_config)
+    def create_session(req: dict) -> _DeepgramRealtimeSession:
+        config = _normalize_provider_config(req.get("providerConfig", {}))
         api_key = config.get("apiKey") or os.environ.get("DEEPGRAM_API_KEY")
         if not api_key:
             raise RuntimeError("Deepgram API key missing")
-        return _create_deepgram_realtime_transcription_session(
-            {
-                **req,
-                "apiKey": api_key,
-                "baseUrl": _normalize_deepgram_realtime_base_url(config.get("baseUrl")),
-                "model": config.get("model") or DEFAULT_DEEPGRAM_AUDIO_MODEL,
-                "sampleRate": config.get("sampleRate") or DEEPGRAM_REALTIME_DEFAULT_SAMPLE_RATE,
-                "encoding": config.get("encoding") or DEEPGRAM_REALTIME_DEFAULT_ENCODING,
-                "interimResults": (
-                    config.get("interimResults")
-                    if config.get("interimResults") is not None
-                    else True
-                ),
-                "endpointingMs": config.get("endpointingMs") or DEEPGRAM_REALTIME_DEFAULT_ENDPOINTING_MS,
-                "language": config.get("language"),
-            }
-        )
+        interim_results = config.get("interimResults")
+        if interim_results is None:
+            interim_results = True
+        endpointing = config.get("endpointingMs")
+        if endpointing is None:
+            endpointing = DEEPGRAM_REALTIME_DEFAULT_ENDPOINTING_MS
+        sample_rate = config.get("sampleRate")
+        if sample_rate is None:
+            sample_rate = DEEPGRAM_REALTIME_DEFAULT_SAMPLE_RATE
+        encoding = config.get("encoding") or DEEPGRAM_REALTIME_DEFAULT_ENCODING
+        session_config = dict(req)
+        session_config.update({
+            "apiKey": api_key,
+            "baseUrl": _normalize_deepgram_realtime_base_url(config.get("baseUrl")),
+            "model": config.get("model") or DEFAULT_DEEPGRAM_AUDIO_MODEL,
+            "sampleRate": sample_rate,
+            "encoding": encoding,
+            "interimResults": interim_results,
+            "endpointingMs": endpointing,
+            "language": config.get("language"),
+        })
+        return _create_deepgram_realtime_transcription_session(session_config)
 
     return {
         "id": "deepgram",
@@ -279,7 +259,6 @@ def build_deepgram_realtime_transcription_provider() -> dict[str, Any]:
 
 
 testing = {
-    "normalizeProviderConfig": normalize_provider_config,
-    "toDeepgramRealtimeWsUrl": to_deepgram_realtime_ws_url,
+    "normalizeProviderConfig": _normalize_provider_config,
+    "toDeepgramRealtimeWsUrl": _to_deepgram_realtime_ws_url,
 }
-__testing__ = testing

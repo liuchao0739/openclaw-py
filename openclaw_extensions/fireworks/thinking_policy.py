@@ -1,18 +1,24 @@
-"""Fireworks plugin thinking policy helpers."""
+from typing import TypedDict, Optional, List
 
-from __future__ import annotations
+from .model_id import is_fireworks_kimi_model_id
 
-from typing import Any
 
-from openclaw_extensions.fireworks.model_id import is_fireworks_kimi_model_id
+class ThinkingLevel(TypedDict):
+    id: str
 
-FIREWORKS_KIMI_THINKING_PROFILE: dict[str, Any] = {
+
+class ThinkingProfile(TypedDict):
+    levels: List[ThinkingLevel]
+    defaultLevel: str
+
+
+FIREWORKS_KIMI_THINKING_PROFILE: ThinkingProfile = {
     "levels": [{"id": "off"}],
     "defaultLevel": "off",
 }
 
 
-def resolve_fireworks_thinking_profile(model_id: str) -> dict[str, Any] | None:
+def resolve_fireworks_thinking_profile(model_id: str) -> Optional[ThinkingProfile]:
     if not is_fireworks_kimi_model_id(model_id):
         return None
-    return dict(FIREWORKS_KIMI_THINKING_PROFILE)
+    return FIREWORKS_KIMI_THINKING_PROFILE

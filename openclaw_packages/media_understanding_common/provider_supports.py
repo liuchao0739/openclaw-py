@@ -1,19 +1,16 @@
-"""Capability checks for media-understanding provider objects."""
-
-from __future__ import annotations
+from typing import Optional
 
 from .types import MediaUnderstandingCapability, MediaUnderstandingProvider
 
 
 def provider_supports_capability(
-    provider: MediaUnderstandingProvider | None,
+    provider: Optional[MediaUnderstandingProvider],
     capability: MediaUnderstandingCapability,
 ) -> bool:
-    """Return true when a provider exposes the method for a media capability."""
     if not provider:
         return False
     if capability == "audio":
-        return bool(provider.get("transcribe_audio"))
+        return bool(provider.get("transcribeAudio"))
     if capability == "image":
-        return bool(provider.get("describe_image"))
-    return bool(provider.get("describe_video"))
+        return bool(provider.get("describeImage"))
+    return bool(provider.get("describeVideo"))

@@ -1,14 +1,9 @@
-"""Codex provider plugin and live app-server model catalog discovery."""
+from openclaw.plugin_sdk.core import create_subsystem_logger
+from openclaw.plugin_sdk.plugin_config_runtime import resolve_plugin_config_object
+from openclaw.plugin_sdk.provider_model_shared import normalize_model_compat
 
-from __future__ import annotations
-
-import os
-from collections.abc import Awaitable, Callable
-from typing import Any
-
-from openclaw.packages.normalization_core import is_record
-from openclaw_extensions.codex.prompt_overlay import resolve_codex_system_prompt_contribution
-from openclaw_extensions.codex.provider_catalog import (
+from .prompt_overlay import resolve_codex_system_prompt_contribution
+from .provider_catalog import (
     CODEX_APP_SERVER_AUTH_MARKER,
     CODEX_BASE_URL,
     CODEX_PROVIDER_ID,
@@ -16,228 +11,66 @@ from openclaw_extensions.codex.provider_catalog import (
     build_codex_model_definition,
     build_codex_provider_config,
 )
-from openclaw_extensions.codex.src.app_server.config import (
-    read_codex_plugin_config,
-    resolve_codex_app_server_runtime_options,
-)
-from openclaw_extensions.codex.src.app_server.rate_limits import (
-    build_codex_app_server_usage_snapshot,
-)
 
 DEFAULT_DISCOVERY_TIMEOUT_MS = 2500
 LIVE_DISCOVERY_ENV = "OPENCLAW_CODEX_DISCOVERY_LIVE"
 MODEL_DISCOVERY_PAGE_LIMIT = 100
 CODEX_APP_SERVER_SETUP_METHOD_ID = "app-server"
 CODEX_DEFAULT_MODEL_REF = f"{CODEX_PROVIDER_ID}/{FALLBACK_CODEX_MODELS[0]['id']}"
+codex_catalog_log = create_subsystem_logger("codex/catalog")
 
 
-def _resolve_plugin_config_object(config: dict[str, Any] | None, plugin_id: str) -> dict[str, Any] | None:
-    if not is_record(config):
-        return None
-    plugins = config.get("plugins")
-    if not is_record(plugins):
-        return None
-    entries = plugins.get("entries")
-    if not is_record(entries):
-        return None
-    entry = entries.get(plugin_id)
-    if not is_record(entry):
-        return None
-    plugin_config = entry.get("config")
-    return plugin_config if is_record(plugin_config) else None
-
-
-def _normalize_model_compat(model: dict[str, Any]) -> dict[str, Any]:
-    return dict(model)
-
-
-def _should_default_to_reasoning_model(model_id: str) -> bool:
-    lower = model_id.lower()
-    return lower.startswith(("gpt-5", "o1", "o3", "o4"))
-
-
-def _is_known_xhigh_codex_model(model_id: str) -> bool:
-    lower = model_id.strip().lower()
-    return lower.startswith(("gpt-5", "o3", "o4")) or "codex" in lower
-
-
-def is_modern_codex_model(model_id: str) -> bool:
-    """Return True for Codex models that use the modern reasoning effort enum."""
-    lower = model_id.strip().lower()
-    return lower in {
-        "gpt-5.5",
-        "gpt-5.4",
-        "gpt-5.4-mini",
-        "gpt-5.3-codex-spark",
-    }
-
-
-def _normalize_timeout_ms(value: Any) -> int:
-    if isinstance(value, (int, float)) and value > 0:
-        return int(value)
-    return DEFAULT_DISCOVERY_TIMEOUT_MS
-
-
-def _should_skip_live_discovery(env: dict[str, str] | None = None) -> bool:
-    env_map = env if env is not None else os.environ
-    override = (env_map.get(LIVE_DISCOVERY_ENV) or "").strip().lower()
-    if override in {"0", "false"}:
-        return True
-    return bool(env_map.get("VITEST")) and override != "1"
-
-
-def _resolve_codex_dynamic_model(model_id: str) -> dict[str, Any] | None:
-    model = model_id.strip()
-    if not model:
-        return None
-    fallback_model = next((entry for entry in FALLBACK_CODEX_MODELS if entry["id"] == model), None)
-    return _normalize_model_compat(
-        {
-            **build_codex_model_definition(
-                {
-                    "id": model,
-                    "model": model,
-                    "inputModalities": fallback_model["inputModalities"] if fallback_model else ["text"],
-                    "supportedReasoningEfforts": (
-                        fallback_model["supportedReasoningEfforts"]
-                        if fallback_model
-                        else (["medium"] if _should_default_to_reasoning_model(model) else [])
-                    ),
-                }
-            ),
-            "provider": CODEX_PROVIDER_ID,
-            "baseUrl": CODEX_BASE_URL,
-        }
-    )
-
-
-async def _list_models_best_effort(
-    *,
-    list_models: Callable[..., Awaitable[dict[str, Any]]],
-    timeout_ms: int,
-    start_options: dict[str, Any],
-    on_discovery_failure: Callable[[Any], None] | None = None,
-) -> list[dict[str, Any]]:
-    try:
-        models: list[dict[str, Any]] = []
-        cursor: str | None = None
-        while True:
-            result = await list_models(
-                timeoutMs=timeout_ms,
-                limit=MODEL_DISCOVERY_PAGE_LIMIT,
-                cursor=cursor,
-                startOptions=start_options,
-                sharedClient=False,
-            )
-            models.extend(
-                model
-                for model in result.get("models", [])
-                if is_record(model) and not model.get("hidden")
-            )
-            cursor = result.get("nextCursor")
-            if not cursor:
-                break
-        return models
-    except Exception as error:  # noqa: BLE001
-        if on_discovery_failure is not None:
-            on_discovery_failure(error)
-        return []
-
-
-async def _list_codex_app_server_models_lazy(**options: Any) -> dict[str, Any]:
-    from openclaw_extensions.codex.src.app_server.models import list_codex_app_server_models
-
-    return await list_codex_app_server_models(**options)
-
-
-async def _request_codex_app_server_rate_limits_lazy(**options: Any) -> Any:
-    from openclaw_extensions.codex.src.app_server.request import request_codex_app_server_json
-
-    return await request_codex_app_server_json(
-        method="account/rateLimits/read",
-        timeoutMs=options.get("timeoutMs"),
-        agentDir=options.get("agentDir"),
-        authProfileId=options.get("authProfileId"),
-        config=options.get("config"),
-        startOptions=options.get("startOptions"),
-        isolated=True,
-    )
-
-
-async def build_codex_provider_catalog(options: dict[str, Any] | None = None) -> dict[str, Any]:
-    """Build the Codex model catalog from live discovery with static fallback."""
+def build_codex_provider(options: dict = None) -> dict:
     options = options or {}
-    config = read_codex_plugin_config(options.get("pluginConfig"))
-    app_server = resolve_codex_app_server_runtime_options({"pluginConfig": options.get("pluginConfig")})
-    discovery = config.get("discovery") if is_record(config.get("discovery")) else {}
-    timeout_ms = _normalize_timeout_ms(discovery.get("timeoutMs"))
-    discovered: list[dict[str, Any]] = []
-    if discovery.get("enabled") is not False and not _should_skip_live_discovery(options.get("env")):
-        list_models = options.get("listModels") or _list_codex_app_server_models_lazy
-        discovered = await _list_models_best_effort(
-            list_models=list_models,
-            timeout_ms=timeout_ms,
-            start_options=app_server["start"],
-            on_discovery_failure=options.get("onDiscoveryFailure"),
-        )
-    models = discovered if discovered else FALLBACK_CODEX_MODELS
-    return {"provider": build_codex_provider_config(models)}
+    list_models = options.get("listModels")
+    read_rate_limits = options.get("readRateLimits")
 
+    async def _catalog_run(ctx):
+        runtime_plugin_config = resolve_plugin_config_object(ctx.get("config"), CODEX_PROVIDER_ID)
+        plugin_config = runtime_plugin_config if runtime_plugin_config is not None else (None if ctx.get("config") else options.get("pluginConfig"))
+        return await build_codex_provider_catalog({
+            "env": ctx.get("env"),
+            "pluginConfig": plugin_config,
+            "listModels": list_models,
+        })
 
-def build_codex_provider(options: dict[str, Any] | None = None) -> dict[str, Any]:
-    """Build the Codex provider plugin descriptor."""
-    options = options or {}
-    startup_plugin_config = options.get("pluginConfig")
-
-    async def catalog_run(ctx: dict[str, Any]) -> dict[str, Any]:
-        runtime_plugin_config = _resolve_plugin_config_object(ctx.get("config"), CODEX_PROVIDER_ID)
-        plugin_config = runtime_plugin_config if runtime_plugin_config is not None else (
-            startup_plugin_config if not ctx.get("config") else None
-        )
-        return await build_codex_provider_catalog(
-            {
-                "env": ctx.get("env"),
-                "pluginConfig": plugin_config,
-                "listModels": options.get("listModels"),
-            }
-        )
-
-    async def static_catalog_run(_ctx: dict[str, Any] | None = None) -> dict[str, Any]:
+    async def _static_catalog_run(_ctx=None):
         return {"provider": build_codex_provider_config(FALLBACK_CODEX_MODELS)}
 
-    async def fetch_usage_snapshot(ctx: dict[str, Any]) -> dict[str, Any] | None:
+    async def _fetch_usage_snapshot(ctx):
         if ctx.get("token") != CODEX_APP_SERVER_AUTH_MARKER:
             return None
-        runtime_plugin_config = _resolve_plugin_config_object(ctx.get("config"), CODEX_PROVIDER_ID)
-        plugin_config = runtime_plugin_config if runtime_plugin_config is not None else (
-            startup_plugin_config if not ctx.get("config") else None
-        )
+        from .src.app_server.config import resolve_codex_app_server_runtime_options
+
+        runtime_plugin_config = resolve_plugin_config_object(ctx.get("config"), CODEX_PROVIDER_ID)
+        plugin_config = runtime_plugin_config if runtime_plugin_config is not None else (None if ctx.get("config") else options.get("pluginConfig"))
         app_server = resolve_codex_app_server_runtime_options({"pluginConfig": plugin_config})
-        read_rate_limits = options.get("readRateLimits") or _request_codex_app_server_rate_limits_lazy
-        rate_limits = await read_rate_limits(
-            timeoutMs=ctx.get("timeoutMs"),
-            agentDir=ctx.get("agentDir"),
-            authProfileId=ctx.get("authProfileId"),
-            config=ctx.get("config"),
-            startOptions=app_server["start"],
-        )
+        rate_limit_reader = read_rate_limits or _request_codex_app_server_rate_limits_lazy
+        rate_limits = await rate_limit_reader({
+            "timeoutMs": ctx.get("timeoutMs"),
+            "agentDir": ctx.get("agentDir"),
+            **({"authProfileId": ctx["authProfileId"]} if ctx.get("authProfileId") else {}),
+            "config": ctx.get("config"),
+            "startOptions": app_server["start"],
+        })
+        from .src.app_server.rate_limits import build_codex_app_server_usage_snapshot
+
         return build_codex_app_server_usage_snapshot(rate_limits)
 
-    async def auth_run(_ctx: dict[str, Any] | None = None) -> dict[str, Any]:
-        return {"profiles": [], "defaultModel": CODEX_DEFAULT_MODEL_REF}
-
-    def resolve_thinking_profile(params: dict[str, Any]) -> dict[str, Any]:
-        model_id = str(params.get("modelId") or "")
-        levels: list[dict[str, str]] = [
+    def _resolve_thinking_profile(params):
+        levels = [
             {"id": "off"},
             {"id": "minimal"},
             {"id": "low"},
             {"id": "medium"},
             {"id": "high"},
         ]
-        if _is_known_xhigh_codex_model(model_id):
+        if _is_known_xhigh_codex_model(params["modelId"]):
             levels.append({"id": "xhigh"})
         return {"levels": levels}
+
+    def _resolve_system_prompt_contribution(params):
+        return resolve_codex_system_prompt_contribution({"config": params.get("config"), "modelId": params["modelId"]})
 
     return {
         "id": CODEX_PROVIDER_ID,
@@ -259,19 +92,152 @@ def build_codex_provider(options: dict[str, Any] | None = None) -> dict[str, Any
                     "groupHint": "Codex app-server model provider",
                     "onboardingScopes": ["text-inference"],
                 },
-                "run": auth_run,
+                "run": lambda: {"profiles": [], "defaultModel": CODEX_DEFAULT_MODEL_REF},
             }
         ],
-        "catalog": {"order": "late", "run": catalog_run},
-        "staticCatalog": {"order": "late", "run": static_catalog_run},
-        "resolveDynamicModel": lambda ctx: _resolve_codex_dynamic_model(str(ctx.get("modelId") or "")),
-        "resolveSyntheticAuth": lambda _ctx=None: {
+        "catalog": {"order": "late", "run": _catalog_run},
+        "staticCatalog": {"order": "late", "run": _static_catalog_run},
+        "resolveDynamicModel": lambda ctx: _resolve_codex_dynamic_model(ctx["modelId"]),
+        "resolveSyntheticAuth": lambda: {
             "apiKey": CODEX_APP_SERVER_AUTH_MARKER,
             "source": "codex-app-server",
             "mode": "token",
         },
-        "fetchUsageSnapshot": fetch_usage_snapshot,
-        "resolveThinkingProfile": resolve_thinking_profile,
-        "resolveSystemPromptContribution": lambda params: resolve_codex_system_prompt_contribution(params),
-        "isModernModelRef": lambda params: is_modern_codex_model(str(params.get("modelId") or "")),
+        "fetchUsageSnapshot": _fetch_usage_snapshot,
+        "resolveThinkingProfile": _resolve_thinking_profile,
+        "resolveSystemPromptContribution": _resolve_system_prompt_contribution,
+        "isModernModelRef": lambda params: _is_modern_codex_model(params["modelId"]),
     }
+
+
+async def build_codex_provider_catalog(options: dict = None):
+    import os
+
+    options = options or {}
+    from .src.app_server.config import read_codex_plugin_config, resolve_codex_app_server_runtime_options
+
+    config = read_codex_plugin_config(options.get("pluginConfig"))
+    app_server = resolve_codex_app_server_runtime_options({"pluginConfig": options.get("pluginConfig")})
+    timeout_ms = _normalize_timeout_ms((config.get("discovery") or {}).get("timeoutMs"))
+    discovered = []
+    if (config.get("discovery") or {}).get("enabled") is not False and not _should_skip_live_discovery(options.get("env") or os.environ):
+        discovered = await _list_models_best_effort({
+            "listModels": options.get("listModels") or _list_codex_app_server_models_lazy,
+            "timeoutMs": timeout_ms,
+            "startOptions": app_server["start"],
+            "onDiscoveryFailure": options.get("onDiscoveryFailure"),
+        })
+    return {
+        "provider": build_codex_provider_config(discovered if discovered else FALLBACK_CODEX_MODELS)
+    }
+
+
+def _resolve_codex_dynamic_model(model_id: str):
+    model_id = (model_id or "").strip()
+    if not model_id:
+        return None
+    fallback_model = next((model for model in FALLBACK_CODEX_MODELS if model["id"] == model_id), None)
+    return normalize_model_compat({
+        **build_codex_model_definition({
+            "id": model_id,
+            "model": model_id,
+            "inputModalities": (fallback_model or {}).get("inputModalities", ["text"]),
+            "supportedReasoningEfforts": (fallback_model or {}).get("supportedReasoningEfforts", (["medium"] if _should_default_to_reasoning_model(model_id) else [])),
+        }),
+        "provider": CODEX_PROVIDER_ID,
+        "baseUrl": CODEX_BASE_URL,
+    })
+
+
+async def _list_models_best_effort(params: dict):
+    try:
+        models = []
+        cursor = None
+        while True:
+            result = await params["listModels"]({
+                "timeoutMs": params["timeoutMs"],
+                "limit": MODEL_DISCOVERY_PAGE_LIMIT,
+                "cursor": cursor,
+                "startOptions": params["startOptions"],
+                "sharedClient": False,
+            })
+            for model in result["models"]:
+                if not model.get("hidden"):
+                    models.append(model)
+            cursor = result.get("nextCursor")
+            if not cursor:
+                break
+        return models
+    except Exception as error:
+        if params.get("onDiscoveryFailure"):
+            params["onDiscoveryFailure"](error)
+        codex_catalog_log.debug("codex model discovery failed; using fallback catalog", {
+            "error": str(error),
+        })
+        return []
+
+
+async def _list_codex_app_server_models_lazy(options: dict):
+    from .src.app_server.models import list_codex_app_server_models
+
+    return await list_codex_app_server_models(options)
+
+
+async def _request_codex_app_server_rate_limits_lazy(options: dict):
+    from .src.app_server.request import request_codex_app_server_json
+
+    return await request_codex_app_server_json({
+        "method": "account/rateLimits/read",
+        "timeoutMs": options["timeoutMs"],
+        "agentDir": options.get("agentDir"),
+        **({"authProfileId": options["authProfileId"]} if options.get("authProfileId") else {}),
+        "config": options.get("config"),
+        "startOptions": options.get("startOptions"),
+        "isolated": True,
+    })
+
+
+def _normalize_timeout_ms(value) -> int:
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        import math
+
+        if math.isfinite(value) and value > 0:
+            return value
+    return DEFAULT_DISCOVERY_TIMEOUT_MS
+
+
+def _should_skip_live_discovery(env) -> bool:
+    override = (env.get(LIVE_DISCOVERY_ENV) or "").strip().lower()
+    if override == "0" or override == "false":
+        return True
+    return bool(env.get("VITEST")) and override != "1"
+
+
+def _should_default_to_reasoning_model(model_id: str) -> bool:
+    lower = model_id.lower()
+    return (
+        lower.startswith("gpt-5")
+        or lower.startswith("o1")
+        or lower.startswith("o3")
+        or lower.startswith("o4")
+    )
+
+
+def _is_known_xhigh_codex_model(model_id: str) -> bool:
+    lower = (model_id or "").strip().lower()
+    return (
+        lower.startswith("gpt-5")
+        or lower.startswith("o3")
+        or lower.startswith("o4")
+        or "codex" in lower
+    )
+
+
+def _is_modern_codex_model(model_id: str) -> bool:
+    lower = (model_id or "").strip().lower()
+    return (
+        lower == "gpt-5.5"
+        or lower == "gpt-5.4"
+        or lower == "gpt-5.4-mini"
+        or lower == "gpt-5.3-codex-spark"
+    )

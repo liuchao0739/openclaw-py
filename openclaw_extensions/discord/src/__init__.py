@@ -1,1 +1,0 @@
-"""Discord extension implementation modules."""

@@ -1,82 +1,102 @@
-"""Discord plugin module implements target parsing behavior."""
-
-from __future__ import annotations
-
 import re
-from dataclasses import dataclass
-from typing import Literal
-
-DiscordTargetKind = Literal["user", "channel"]
+from typing import Any, Dict, Optional
 
 
-@dataclass(frozen=True)
-class DiscordTarget:
-    kind: DiscordTargetKind
-    id: str
-    raw: str
+DiscordTargetKind = str
 
 
-def _build_messaging_target(kind: DiscordTargetKind, target_id: str, raw: str) -> DiscordTarget:
-    return DiscordTarget(kind=kind, id=target_id, raw=raw)
+def build_messaging_target(kind: str, id_value: str, raw: str) -> Dict[str, Any]:
+    return {"kind": kind, "id": id_value, "raw": raw, "normalized": f"{kind}:{id_value}"}
 
 
-def _parse_discord_provider_prefixed_target(raw: str) -> DiscordTarget | None:
-    match = re.match(r"^discord:(channel|user):(.+)$", raw, flags=re.IGNORECASE)
+def parse_mention_prefix_or_at_user_target(raw: str, options: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    mention_pattern = options.get("mentionPattern")
+    if mention_pattern:
+        match = re.match(mention_pattern, raw)
+        if match:
+            return build_messaging_target("user", match.group(1), raw)
+
+    for prefix in options.get("prefixes", []):
+        prefix_str = prefix["prefix"]
+        if raw.lower().startswith(prefix_str.lower()):
+            id_value = raw[len(prefix_str):].strip()
+            if id_value:
+                return build_messaging_target(prefix["kind"], id_value, raw)
+
+    at_user_pattern = options.get("atUserPattern")
+    if at_user_pattern and re.match(at_user_pattern, raw):
+        error_message = options.get("atUserErrorMessage")
+        if error_message:
+            raise ValueError(error_message)
+
+    return None
+
+
+def parse_discord_provider_prefixed_target(raw: str) -> Optional[Dict[str, Any]]:
+    match = re.match(r"^discord:(channel|user):(.+)$", raw, re.I)
     if not match:
         return None
     kind = match.group(1).lower()
-    target_id = (match.group(2) or "").strip()
-    if kind not in ("channel", "user") or not target_id:
+    id_value = (match.group(2) or "").strip()
+    if not kind or not id_value:
         return None
-    return _build_messaging_target(kind, target_id, f"{kind}:{target_id}")
+    return build_messaging_target(kind, id_value, f"{kind}:{id_value}")
 
 
 def parse_discord_target(
     raw: str,
-    options: dict[str, object] | None = None,
-) -> DiscordTarget | None:
+    options: Optional[Dict[str, Any]] = None,
+) -> Optional[Dict[str, Any]]:
     options = options or {}
     trimmed = raw.strip()
     if not trimmed:
         return None
-    provider_prefixed = _parse_discord_provider_prefixed_target(trimmed)
-    if provider_prefixed:
-        return provider_prefixed
 
-    mention = re.match(r"^<@!?(\d+)>$", trimmed)
-    if mention:
-        target_id = mention.group(1)
-        return _build_messaging_target("user", target_id, trimmed)
+    provider_prefixed_target = parse_discord_provider_prefixed_target(trimmed)
+    if provider_prefixed_target:
+        return provider_prefixed_target
 
-    for prefix, kind in (("user:", "user"), ("channel:", "channel"), ("discord:", "user")):
-        if trimmed.lower().startswith(prefix):
-            target_id = trimmed[len(prefix) :].strip()
-            if target_id:
-                return _build_messaging_target(kind, target_id, trimmed)
+    user_target = parse_mention_prefix_or_at_user_target(
+        trimmed,
+        {
+            "mentionPattern": r"^<@!?(\d+)>$",
+            "prefixes": [
+                {"prefix": "user:", "kind": "user"},
+                {"prefix": "channel:", "kind": "channel"},
+                {"prefix": "discord:", "kind": "user"},
+            ],
+            "atUserPattern": r"^\d+$",
+            "atUserErrorMessage": "Discord DMs require a user id (use user:<id> or a <@id> mention)",
+        },
+    )
+    if user_target:
+        return user_target
 
-    if re.fullmatch(r"\d+", trimmed):
-        default_kind = options.get("defaultKind")
-        if default_kind in ("user", "channel"):
-            return _build_messaging_target(default_kind, trimmed, trimmed)
+    if re.match(r"^\d+$", trimmed):
+        if options.get("defaultKind"):
+            return build_messaging_target(options["defaultKind"], trimmed, trimmed)
         ambiguous_message = options.get("ambiguousMessage")
-        message = (
-            ambiguous_message
-            if isinstance(ambiguous_message, str)
-            else (
-                f'Ambiguous Discord recipient "{trimmed}". For DMs use "user:{trimmed}" or '
-                f'"<@{trimmed}>"; for channels use "channel:{trimmed}".'
-            )
+        if ambiguous_message:
+            raise ValueError(ambiguous_message)
+        raise ValueError(
+            f'Ambiguous Discord recipient "{trimmed}". For DMs use "user:{trimmed}" or "<@{trimmed}>"; for channels use "channel:{trimmed}".'
         )
-        raise ValueError(message)
 
-    return _build_messaging_target("channel", trimmed, trimmed)
+    return build_messaging_target("channel", trimmed, trimmed)
+
+
+def require_target_kind(params: Dict[str, Any]) -> str:
+    target = params.get("target")
+    kind = params.get("kind")
+    if not target:
+        raise ValueError(f'{params.get("platform", "Discord")} target is required')
+    if target["kind"] != kind:
+        raise ValueError(
+            f'{params.get("platform", "Discord")} target {target["normalized"]} is not a {kind}'
+        )
+    return target["id"]
 
 
 def resolve_discord_channel_id(raw: str) -> str:
     target = parse_discord_target(raw, {"defaultKind": "channel"})
-    if target is None or target.kind != "channel":
-        raise ValueError("Discord channel target is required (use channel:<id>).")
-    return target.id
-
-
-__all__ = ["DiscordTarget", "DiscordTargetKind", "parse_discord_target", "resolve_discord_channel_id"]
+    return require_target_kind({"platform": "Discord", "target": target, "kind": "channel"})

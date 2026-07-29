@@ -1,11 +1,9 @@
-"""Gradium plugin shared constants and URL normalization."""
-
-from __future__ import annotations
+import re
 
 DEFAULT_GRADIUM_BASE_URL = "https://api.gradium.ai"
 DEFAULT_GRADIUM_VOICE_ID = "YTpq7expH9539ERJ"
 
-GRADIUM_VOICES: list[dict[str, str]] = [
+GRADIUM_VOICES = [
     {"id": "YTpq7expH9539ERJ", "name": "Emma"},
     {"id": "LFZvm12tW_z0xfGo", "name": "Kent"},
     {"id": "Eu9iL_CYe8N-Gkx_", "name": "Tiffany"},
@@ -16,8 +14,9 @@ GRADIUM_VOICES: list[dict[str, str]] = [
 ]
 
 
-def normalize_gradium_base_url(base_url: str | None = None) -> str:
-    trimmed = base_url.strip() if isinstance(base_url, str) else None
-    if trimmed:
-        return trimmed.rstrip("/")
-    return DEFAULT_GRADIUM_BASE_URL
+def normalize_gradium_base_url(base_url=None):
+    if base_url is None:
+        return DEFAULT_GRADIUM_BASE_URL
+    trimmed = base_url.strip()
+    trimmed = re.sub(r"/+$", "", trimmed)
+    return trimmed or DEFAULT_GRADIUM_BASE_URL

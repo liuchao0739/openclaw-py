@@ -1,112 +1,90 @@
-"""LLM Core event stream helpers.
-
-Mirrors packages/llm-core/src/utils/event-stream.ts.
-"""
-
-from __future__ import annotations
-
 import asyncio
-from collections.abc import AsyncIterator, Callable
-from typing import Any, TypeVar
+from typing import Any, AsyncIterator, Callable, Generic, List, Optional, TypeVar
+
+from ..types import AssistantMessage, AssistantMessageEvent
 
 T = TypeVar("T")
 R = TypeVar("R")
 
+_DONE_SENTINEL = object()
 
-class EventStream:
-    """Generic async-iterable event stream with a separately awaited final result."""
 
-    def __init__(
-        self,
-        is_complete: Callable[[T], bool],
-        extract_result: Callable[[T], R],
-    ) -> None:
-        self._queue: list[T] = []
-        self._waiting: list[asyncio.Future[tuple[T | None, bool]]] = []
+class EventStream(Generic[T, R]):
+    def __init__(self, is_complete: Callable[[T], bool], extract_result: Callable[[T], R]):
+        self._queue: List[T] = []
+        self._waiting: List[Any] = []
         self._done = False
-        self._result_future: asyncio.Future[R] = asyncio.Future()
         self._is_complete = is_complete
         self._extract_result = extract_result
+        self._final_result_future: Optional[asyncio.Future] = None
+        self._final_result_value: Any = None
+        self._final_result_set = False
+
+    def _resolve_final_result(self, result: R) -> None:
+        self._final_result_value = result
+        self._final_result_set = True
+        if self._final_result_future is not None and not self._final_result_future.done():
+            self._final_result_future.set_result(result)
 
     def push(self, event: T) -> None:
         if self._done:
             return
-
         if self._is_complete(event):
             self._done = True
-            if not self._result_future.done():
-                self._result_future.set_result(self._extract_result(event))
-
+            self._resolve_final_result(self._extract_result(event))
         if self._waiting:
-            waiter = self._waiting.pop(0)
-            if not waiter.done():
-                waiter.set_result((event, False))
+            future = self._waiting.pop(0)
+            if not future.done():
+                future.set_result(event)
         else:
             self._queue.append(event)
 
-    def end(self, result: R | None = None) -> None:
+    def end(self, result: Optional[R] = None) -> None:
         self._done = True
-        if result is not None and not self._result_future.done():
-            self._result_future.set_result(result)
+        if result is not None:
+            self._resolve_final_result(result)
         while self._waiting:
-            waiter = self._waiting.pop(0)
-            if not waiter.done():
-                waiter.set_result((None, True))
+            future = self._waiting.pop(0)
+            if not future.done():
+                future.set_result(_DONE_SENTINEL)
 
-    def __aiter__(self) -> AsyncIterator[T]:
-        return self._iterate()
+    def __aiter__(self) -> "EventStream[T, R]":
+        return self
 
-    async def _iterate(self) -> AsyncIterator[T]:
-        while True:
-            if self._queue:
-                yield self._queue.pop(0)
-            elif self._done:
-                return
-            else:
-                loop = asyncio.get_running_loop()
-                waiter: asyncio.Future[tuple[T | None, bool]] = loop.create_future()
-                self._waiting.append(waiter)
-                value, done = await waiter
-                if done:
-                    return
-                if value is not None:
-                    yield value
+    async def __anext__(self) -> T:
+        if self._queue:
+            return self._queue.pop(0)
+        if self._done:
+            raise StopAsyncIteration
+        future = asyncio.get_running_loop().create_future()
+        self._waiting.append(future)
+        result = await future
+        if result is _DONE_SENTINEL:
+            raise StopAsyncIteration
+        return result
 
     async def result(self) -> R:
-        return await self._result_future
+        if self._final_result_set:
+            return self._final_result_value
+        if self._final_result_future is None:
+            self._final_result_future = asyncio.get_running_loop().create_future()
+        return await self._final_result_future
 
 
-AssistantMessageEvent = dict[str, Any]
-AssistantMessage = dict[str, Any]
+class AssistantMessageEventStream(EventStream[AssistantMessageEvent, AssistantMessage]):
+    def __init__(self):
+        def is_complete(event: AssistantMessageEvent) -> bool:
+            return event.get("type") in ("done", "error")
 
+        def extract_result(event: AssistantMessageEvent) -> AssistantMessage:
+            if event.get("type") == "done":
+                return event.get("message")
+            elif event.get("type") == "error":
+                return event.get("error")
+            raise ValueError("Unexpected event type for final result")
 
-class AssistantMessageEventStream(EventStream):
-    """Assistant-message event stream that resolves on done/error terminal events."""
-
-    def __init__(self) -> None:
-        super().__init__(
-            lambda event: event.get("type") in ("done", "error"),
-            _extract_assistant_message_result,
-        )
-
-
-def _extract_assistant_message_result(event: AssistantMessageEvent) -> AssistantMessage:
-    event_type = event.get("type")
-    if event_type == "done":
-        return event["message"]
-    if event_type == "error":
-        return event["error"]
-    raise ValueError("Unexpected event type for final result")
+        super().__init__(is_complete, extract_result)
 
 
 def create_assistant_message_event_stream() -> AssistantMessageEventStream:
-    """Create an assistant-message stream for provider and plugin adapters."""
     return AssistantMessageEventStream()
-
-
-__all__ = [
-    "AssistantMessageEvent",
-    "AssistantMessageEventStream",
-    "EventStream",
-    "create_assistant_message_event_stream",
-]

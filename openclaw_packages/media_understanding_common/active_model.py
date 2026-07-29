@@ -1,10 +1,6 @@
-"""Active media-understanding model selection contract."""
-
-from __future__ import annotations
-
-from typing import TypedDict
+from typing import Optional, TypedDict
 
 
 class ActiveMediaModel(TypedDict, total=False):
     provider: str
-    model: str
+    model: Optional[str]

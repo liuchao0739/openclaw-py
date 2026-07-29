@@ -1,21 +1,14 @@
-"""Shared media-understanding provider, attachment, output, and capability contracts."""
+from typing import Any, List, Literal, Optional, TypedDict
 
-from __future__ import annotations
-
-from typing import Any, Literal, TypedDict
-
-MediaUnderstandingKind = Literal[
-    "audio.transcription",
-    "video.description",
-    "image.description",
-]
-
+MediaUnderstandingKind = Literal["audio.transcription", "video.description", "image.description"]
 MediaUnderstandingCapability = Literal["image", "audio", "video"]
 
-MediaUnderstandingCapabilityRegistry = dict[
-    str,
-    dict[str, list[MediaUnderstandingCapability] | None],
-]
+
+class MediaUnderstandingCapabilityEntry(TypedDict, total=False):
+    capabilities: List[MediaUnderstandingCapability]
+
+
+MediaUnderstandingCapabilityRegistry = dict
 
 
 class MediaAttachment(TypedDict, total=False):
@@ -23,22 +16,21 @@ class MediaAttachment(TypedDict, total=False):
     url: str
     mime: str
     index: int
-    already_transcribed: bool
+    alreadyTranscribed: bool
 
 
-class MediaUnderstandingOutput(TypedDict, total=False):
+class MediaUnderstandingOutput(TypedDict):
     kind: MediaUnderstandingKind
-    attachment_index: int
+    attachmentIndex: int
     text: str
     provider: str
-    model: str
 
 
 class MediaUnderstandingProvider(TypedDict, total=False):
     id: str
-    capabilities: list[MediaUnderstandingCapability]
-    transcribe_audio: Any
-    describe_video: Any
-    describe_image: Any
-    describe_images: Any
-    extract_structured: Any
+    capabilities: List[MediaUnderstandingCapability]
+    transcribeAudio: Any
+    describeVideo: Any
+    describeImage: Any
+    describeImages: Any
+    extractStructured: Any

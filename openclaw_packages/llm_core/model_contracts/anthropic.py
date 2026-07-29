@@ -1,24 +1,17 @@
-"""Claude model identity and effort helpers.
-
-Mirrors packages/llm-core/src/model-contracts/anthropic.ts.
-"""
-
-from __future__ import annotations
-
 import re
-from typing import Any, TypedDict
+from typing import Any, Dict, Optional, TypedDict
 
 
 class ClaudeModelRef(TypedDict, total=False):
-    id: str
-    params: dict[str, Any]
+    id: Optional[str]
+    params: Optional[Dict[str, Any]]
 
 
 class ClaudeEffortModelRef(ClaudeModelRef, total=False):
-    thinkingLevelMap: dict[str, str | None]
+    thinkingLevelMap: Optional[Dict[str, Optional[str]]]
 
 
-CLAUDE_FABLE_5_THINKING_PROFILE: dict[str, Any] = {
+CLAUDE_FABLE_5_THINKING_PROFILE = {
     "levels": [
         {"id": "off"},
         {"id": "minimal"},
@@ -34,51 +27,40 @@ CLAUDE_FABLE_5_THINKING_PROFILE: dict[str, Any] = {
 }
 
 
-def _normalize_claude_model_id(model_id: str | None) -> str:
+def _normalize_claude_model_id(model_id: Optional[str]) -> str:
     normalized = (model_id or "").strip().lower()
-    unprefixed = normalized.removeprefix("anthropic/")
-    return re.sub(r"[._\s]+", "-", unprefixed)
+    if normalized.startswith("anthropic/"):
+        normalized = normalized[len("anthropic/"):]
+    return re.sub(r"[._\s]+", "-", normalized)
 
 
-def resolve_claude_model_identity(ref: ClaudeModelRef | dict[str, Any] | Any) -> str:
-    """Resolve the canonical normalized Claude model id for one runtime model ref."""
-    if isinstance(ref, dict):
-        params = ref.get("params") if isinstance(ref.get("params"), dict) else {}
-        configured = params.get("canonicalModelId")
-        model_id = ref.get("id")
-    else:
-        params = getattr(ref, "params", None)
-        configured = params.get("canonicalModelId") if isinstance(params, dict) else None
-        model_id = getattr(ref, "id", None)
-
-    normalized = _normalize_claude_model_id(
-        configured if isinstance(configured, str) else str(model_id or "")
+def resolve_claude_model_identity(ref: ClaudeModelRef) -> str:
+    params = ref.get("params") or {}
+    configured_canonical_model_id = (
+        params.get("canonicalModelId") if isinstance(params.get("canonicalModelId"), str) else None
     )
+    normalized = _normalize_claude_model_id(configured_canonical_model_id or ref.get("id"))
     match = re.search(r"(?:^|[-/])claude-", normalized)
-    if not match:
-        return normalized
-    start = match.start()
-    if match.group(0).startswith("claude-"):
-        return normalized[start:]
-    return normalized[start + 1 :]
+    if match:
+        start = match.start()
+        if match.group().startswith("claude-"):
+            return normalized[start:]
+        return normalized[start + 1:]
+    return normalized
 
 
-def resolve_claude_fable5_model_identity(
-    ref: ClaudeModelRef | dict[str, Any] | Any,
-) -> str | None:
-    """Resolve Claude Fable 5 through direct ids, cloud ids, or deployment metadata."""
+def resolve_claude_fable_5_model_identity(ref: ClaudeModelRef) -> Optional[str]:
     normalized = resolve_claude_model_identity(ref)
     match = re.search(r"(?:^|-)claude-fable-5(?=$|[^a-z0-9])", normalized)
     if not match:
         return None
     start = match.start()
-    if match.group(0).startswith("-"):
-        return normalized[start + 1 :]
+    if match.group().startswith("-"):
+        return normalized[start + 1:]
     return normalized[start:]
 
 
-def supports_claude_adaptive_thinking(ref: ClaudeModelRef | dict[str, Any] | Any) -> bool:
-    """Return whether a Claude model supports adaptive thinking."""
+def supports_claude_adaptive_thinking(ref: ClaudeModelRef) -> bool:
     model_id = resolve_claude_model_identity(ref)
     return bool(
         re.search(
@@ -88,8 +70,7 @@ def supports_claude_adaptive_thinking(ref: ClaudeModelRef | dict[str, Any] | Any
     )
 
 
-def supports_claude_native_max_effort(ref: ClaudeModelRef | dict[str, Any] | Any) -> bool:
-    """Return whether a Claude model supports native max effort."""
+def supports_claude_native_max_effort(ref: ClaudeModelRef) -> bool:
     model_id = resolve_claude_model_identity(ref)
     return bool(
         re.search(
@@ -99,41 +80,24 @@ def supports_claude_native_max_effort(ref: ClaudeModelRef | dict[str, Any] | Any
     )
 
 
-def supports_claude_native_xhigh_effort(ref: ClaudeModelRef | dict[str, Any] | Any) -> bool:
-    """Return whether a Claude model supports native xhigh effort."""
+def supports_claude_native_xhigh_effort(ref: ClaudeModelRef) -> bool:
     model_id = resolve_claude_model_identity(ref)
     return bool(
-        re.search(r"(?:^|-)claude-(?:fable-5|opus-4-(?:7|8))(?=$|[^a-z0-9])", model_id)
+        re.search(
+            r"(?:^|-)claude-(?:fable-5|opus-4-(?:7|8))(?=$|[^a-z0-9])",
+            model_id,
+        )
     )
 
 
 def resolve_claude_native_thinking_level_map(
-    ref: ClaudeEffortModelRef | dict[str, Any] | Any,
-) -> dict[str, str | None] | None:
-    """Fill native Claude effort mappings when no route-specific contract was published."""
-    if isinstance(ref, dict):
-        thinking_level_map = ref.get("thinkingLevelMap")
-    else:
-        thinking_level_map = getattr(ref, "thinkingLevelMap", None)
-
-    if thinking_level_map is not None:
-        return thinking_level_map if isinstance(thinking_level_map, dict) else None
+    ref: ClaudeEffortModelRef,
+) -> Optional[Dict[str, Optional[str]]]:
+    if ref.get("thinkingLevelMap") is not None:
+        return ref.get("thinkingLevelMap")
     if not supports_claude_native_max_effort(ref):
         return None
     return {
         "xhigh": "xhigh" if supports_claude_native_xhigh_effort(ref) else None,
         "max": "max",
     }
-
-
-__all__ = [
-    "CLAUDE_FABLE_5_THINKING_PROFILE",
-    "ClaudeEffortModelRef",
-    "ClaudeModelRef",
-    "resolve_claude_fable5_model_identity",
-    "resolve_claude_model_identity",
-    "resolve_claude_native_thinking_level_map",
-    "supports_claude_adaptive_thinking",
-    "supports_claude_native_max_effort",
-    "supports_claude_native_xhigh_effort",
-]

@@ -1,36 +1,12 @@
-"""Web content provider runtime helpers shared by search and fetch tools.
-
-Mirrors packages/web-content-core/src/provider-runtime-shared.ts.
-"""
-
-from __future__ import annotations
-
 import os
 import re
-from collections.abc import Callable, Mapping
-from typing import Any, Literal, TypedDict, TypeVar
+from typing import Any, Callable, Dict, List, Literal, Optional, TypedDict
 
-from openclaw.config.secrets import normalize_secret_input_string
-from openclaw.packages.normalization_core import is_record
-from openclaw.utils.normalize_secret_input import normalize_secret_input
 
-__all__ = [
-    "WebProviderConfigSource",
-    "has_web_provider_entry_credential",
-    "provider_requires_credential",
-    "read_web_provider_env_value",
-    "resolve_web_provider_config",
-    "resolve_web_provider_definition",
-]
+class WebProviderConfigSource(TypedDict, total=False):
+    tools: Dict[str, Any]
 
-DEFAULT_SECRET_PROVIDER_ALIAS = "default"
-ENV_SECRET_REF_ID_RE = re.compile(r"^[A-Z][A-Z0-9_]{0,127}$")
-LEGACY_SECRETREF_ENV_MARKER_PREFIX = "secretref-env:"
-LEGACY_DOUBLE_UNDERSCORE_ENV_MARKER_PREFIX = "__env__:"
-ENV_SECRET_TEMPLATE_RE = re.compile(r"^\$\{([A-Z][A-Z0-9_]{0,127})\}$")
-ENV_SECRET_SHORTHAND_RE = re.compile(r"^\$([A-Z][A-Z0-9_]{0,127})$")
 
-WebToolKind = Literal["search", "fetch"]
 SecretRefSource = Literal["env", "file", "exec"]
 
 
@@ -40,238 +16,206 @@ class SecretRef(TypedDict):
     id: str
 
 
-class WebProviderConfigSource(TypedDict, total=False):
-    tools: dict[str, Any]
+DEFAULT_SECRET_PROVIDER_ALIAS = "default"
+ENV_SECRET_REF_ID_RE = re.compile(r"^[A-Z][A-Z0-9_]{0,127}$")
+LEGACY_SECRETREF_ENV_MARKER_PREFIX = "secretref-env:"
+LEGACY_DOUBLE_UNDERSCORE_ENV_MARKER_PREFIX = "__env__:"
+ENV_SECRET_TEMPLATE_RE = re.compile(r"^\$\{([A-Z][A-Z0-9_]{0,127})\}$")
+ENV_SECRET_SHORTHAND_RE = re.compile(r"^\$([A-Z][A-Z0-9_]{0,127})$")
 
 
 class RuntimeWebProviderMetadata(TypedDict, total=False):
-    provider_configured: str
-    selected_provider: str
+    providerConfigured: str
+    selectedProvider: str
 
 
 class ProviderWithCredential(TypedDict, total=False):
-    env_vars: list[str]
-    auth_provider_id: str
-    requires_credential: bool
+    envVars: List[str]
+    authProviderId: str
+    requiresCredential: bool
 
 
-class WebProviderCandidate(TypedDict, total=False):
-    id: str
+WebContentProcessEnv = Dict[str, Optional[str]]
 
 
-TProvider = TypeVar("TProvider", bound=ProviderWithCredential)
-TProviderCandidate = TypeVar("TProviderCandidate", bound=WebProviderCandidate)
-TConfigSource = TypeVar("TConfigSource", bound=WebProviderConfigSource)
-TConfig = TypeVar("TConfig")
-TRuntimeMetadata = TypeVar("TRuntimeMetadata", bound=RuntimeWebProviderMetadata)
-TDefinition = TypeVar("TDefinition")
+def _is_record(value: Any) -> bool:
+    return isinstance(value, dict)
 
 
-def _is_secret_ref(value: object) -> bool:
-    if not is_record(value):
+def _normalize_secret_input_string(value: Any) -> Optional[str]:
+    if not isinstance(value, str):
+        return None
+    trimmed = value.strip()
+    return trimmed if len(trimmed) > 0 else None
+
+
+def _normalize_secret_input(value: Any) -> str:
+    if not isinstance(value, str):
+        return ""
+    collapsed = re.sub(r"[\r\n\u2028\u2029]+", "", value)
+    latin1_only = ""
+    for char in collapsed:
+        code_point = ord(char)
+        if code_point <= 0xFF:
+            latin1_only += char
+    return latin1_only.strip()
+
+
+def _is_secret_ref(value: Any) -> bool:
+    if not _is_record(value):
         return False
     if len(value) != 3:
         return False
-    source = value.get("source")
-    provider = value.get("provider")
-    ref_id = value.get("id")
     return (
-        source in ("env", "file", "exec")
-        and isinstance(provider, str)
-        and provider.strip() != ""
-        and isinstance(ref_id, str)
-        and ref_id.strip() != ""
+        value.get("source") in ("env", "file", "exec")
+        and isinstance(value.get("provider"), str)
+        and len(value["provider"].strip()) > 0
+        and isinstance(value.get("id"), str)
+        and len(value["id"].strip()) > 0
     )
 
 
-def _coerce_secret_ref(value: object) -> SecretRef | None:
+def _coerce_secret_ref(value: Any) -> Optional[SecretRef]:
     if _is_secret_ref(value):
-        return {
-            "source": value["source"],  # type: ignore[typeddict-item]
-            "provider": value["provider"],  # type: ignore[typeddict-item]
-            "id": value["id"],  # type: ignore[typeddict-item]
-        }
+        return value
     if isinstance(value, str):
         trimmed = value.strip()
-        legacy_prefix: str | None = None
+        legacy_prefix = None
         if trimmed.startswith(LEGACY_SECRETREF_ENV_MARKER_PREFIX):
             legacy_prefix = LEGACY_SECRETREF_ENV_MARKER_PREFIX
         elif trimmed.startswith(LEGACY_DOUBLE_UNDERSCORE_ENV_MARKER_PREFIX):
             legacy_prefix = LEGACY_DOUBLE_UNDERSCORE_ENV_MARKER_PREFIX
-        if legacy_prefix is not None:
-            ref_id = trimmed[len(legacy_prefix) :]
-            if ENV_SECRET_REF_ID_RE.fullmatch(ref_id):
-                return {
-                    "source": "env",
-                    "provider": DEFAULT_SECRET_PROVIDER_ALIAS,
-                    "id": ref_id,
-                }
+        if legacy_prefix:
+            id_part = trimmed[len(legacy_prefix):]
+            if ENV_SECRET_REF_ID_RE.match(id_part):
+                return {"source": "env", "provider": DEFAULT_SECRET_PROVIDER_ALIAS, "id": id_part}
             return None
-        template_match = ENV_SECRET_TEMPLATE_RE.fullmatch(trimmed)
-        shorthand_match = ENV_SECRET_SHORTHAND_RE.fullmatch(trimmed)
-        match = template_match or shorthand_match
+        match = ENV_SECRET_TEMPLATE_RE.match(trimmed) or ENV_SECRET_SHORTHAND_RE.match(trimmed)
         if match:
-            return {
-                "source": "env",
-                "provider": DEFAULT_SECRET_PROVIDER_ALIAS,
-                "id": match.group(1),
-            }
+            return {"source": "env", "provider": DEFAULT_SECRET_PROVIDER_ALIAS, "id": match.group(1)}
         return None
     if (
-        is_record(value)
+        _is_record(value)
         and value.get("source") in ("env", "file", "exec")
         and isinstance(value.get("id"), str)
-        and value["id"].strip() != ""
+        and len(value["id"].strip()) > 0
         and value.get("provider") is None
     ):
         return {
-            "source": value["source"],  # type: ignore[typeddict-item]
+            "source": value["source"],
             "provider": DEFAULT_SECRET_PROVIDER_ALIAS,
-            "id": value["id"],  # type: ignore[typeddict-item]
+            "id": value["id"],
         }
     return None
 
 
 def resolve_web_provider_config(
-    cfg: WebProviderConfigSource | None,
-    kind: WebToolKind,
-) -> dict[str, Any] | None:
+    cfg: Optional[WebProviderConfigSource],
+    kind: Literal["search", "fetch"],
+) -> Optional[Dict[str, Any]]:
     tools = cfg.get("tools") if cfg else None
-    if not is_record(tools):
+    if not tools or not isinstance(tools, dict):
         return None
     web_config = tools.get("web")
-    if not is_record(web_config):
+    if not web_config or not isinstance(web_config, dict):
         return None
     tool_config = web_config.get(kind)
-    if not is_record(tool_config):
+    if not tool_config or not isinstance(tool_config, dict):
         return None
-    return dict(tool_config)
+    return tool_config
 
 
 def read_web_provider_env_value(
-    env_vars: list[str],
-    process_env: Mapping[str, str | None] | None = None,
-) -> str | None:
-    env = process_env if process_env is not None else os.environ
+    env_vars: List[str],
+    process_env: Optional[WebContentProcessEnv] = None,
+) -> Optional[str]:
+    if process_env is None:
+        process_env = {k: os.environ.get(k) for k in os.environ}
     for env_var in env_vars:
-        value = normalize_secret_input(env.get(env_var))
+        value = _normalize_secret_input(process_env.get(env_var))
         if value:
             return value
     return None
 
 
-def provider_requires_credential(provider: ProviderWithCredential) -> bool:
-    return provider.get("requires_credential") is not False
+def provider_requirescredential(provider: ProviderWithCredential) -> bool:
+    return provider.get("requiresCredential") is not False
 
 
 def has_web_provider_entry_credential(
-    *,
-    provider: TProvider,
-    config: TConfigSource | None,
-    tool_config: TConfig,
-    resolve_raw_value: Callable[..., Any],
-    resolve_fallback_raw_value: Callable[..., Any] | None = None,
-    resolve_env_value: Callable[..., str | None],
-    resolve_provider_auth_value: Callable[[str], bool] | None = None,
+    provider: ProviderWithCredential,
+    config: Optional[WebProviderConfigSource],
+    tool_config: Optional[Dict[str, Any]],
+    resolve_raw_value: Callable[[], Any],
+    resolve_env_value: Callable[[Optional[str]], Optional[str]],
+    resolve_fallback_raw_value: Optional[Callable[[], Any]] = None,
+    resolve_provider_auth_value: Optional[Callable[[str], bool]] = None,
 ) -> bool:
-    if not provider_requires_credential(provider):
+    if not provider_requirescredential(provider):
         return True
-    raw_value = resolve_raw_value(
-        provider=provider,
-        config=config,
-        tool_config=tool_config,
-    )
+    raw_value = resolve_raw_value()
     configured_ref = _coerce_secret_ref(raw_value)
     if configured_ref and configured_ref["source"] != "env":
         return True
-    from_config = normalize_secret_input(normalize_secret_input_string(raw_value) or "")
+    from_config = _normalize_secret_input(_normalize_secret_input_string(raw_value))
     if from_config:
         return True
-    auth_provider_id = provider.get("auth_provider_id")
-    if auth_provider_id and resolve_provider_auth_value and resolve_provider_auth_value(
-        auth_provider_id
-    ):
+    if provider.get("authProviderId") and resolve_provider_auth_value:
+        if resolve_provider_auth_value(provider["authProviderId"]):
+            return True
+    configured_env_var_id = configured_ref["id"] if configured_ref and configured_ref["source"] == "env" else None
+    if resolve_env_value(configured_env_var_id):
         return True
-    configured_env_var_id = (
-        configured_ref["id"] if configured_ref and configured_ref["source"] == "env" else None
-    )
-    if resolve_env_value(
-        provider=provider,
-        configured_env_var_id=configured_env_var_id,
-    ):
-        return True
-    fallback_raw_value = (
-        resolve_fallback_raw_value(
-            provider=provider,
-            config=config,
-            tool_config=tool_config,
-        )
-        if resolve_fallback_raw_value
-        else None
-    )
-    fallback_ref = _coerce_secret_ref(fallback_raw_value)
-    if fallback_ref and fallback_ref["source"] != "env":
-        return True
-    fallback_config = normalize_secret_input(normalize_secret_input_string(fallback_raw_value) or "")
-    if fallback_config:
-        return True
-    if fallback_ref and fallback_ref["source"] == "env":
-        return bool(
-            resolve_env_value(
-                provider=provider,
-                configured_env_var_id=fallback_ref["id"],
-            )
-        )
+    if resolve_fallback_raw_value:
+        fallback_raw_value = resolve_fallback_raw_value()
+        fallback_ref = _coerce_secret_ref(fallback_raw_value)
+        if fallback_ref and fallback_ref["source"] != "env":
+            return True
+        fallback_config = _normalize_secret_input(_normalize_secret_input_string(fallback_raw_value))
+        if fallback_config:
+            return True
+        if fallback_ref and fallback_ref["source"] == "env":
+            if resolve_env_value(fallback_ref["id"]):
+                return True
     return False
 
 
 def resolve_web_provider_definition(
-    *,
-    config: TConfigSource | None,
-    tool_config: TConfig,
-    runtime_metadata: TRuntimeMetadata | None,
-    providers: list[TProviderCandidate],
-    resolve_enabled: Callable[..., bool],
+    config: Optional[WebProviderConfigSource],
+    tool_config: Optional[Dict[str, Any]],
+    runtime_metadata: Optional[RuntimeWebProviderMetadata],
+    providers: List[Any],
+    resolve_enabled: Callable[[Optional[Dict[str, Any]], Optional[bool]], bool],
     resolve_auto_provider_id: Callable[..., str],
-    create_tool: Callable[..., TDefinition | None],
-    sandboxed: bool | None = None,
-    provider_id: str | None = None,
-    resolve_fallback_provider_id: Callable[..., str | None] | None = None,
-) -> dict[str, Any] | None:
-    if not resolve_enabled(tool_config=tool_config, sandboxed=sandboxed):
+    create_tool: Callable[..., Any],
+    sandboxed: Optional[bool] = None,
+    provider_id: Optional[str] = None,
+    resolve_fallback_provider_id: Optional[Callable[..., Optional[str]]] = None,
+) -> Optional[dict]:
+    if not resolve_enabled(tool_config, sandboxed):
         return None
-    filtered_providers = [entry for entry in providers if entry]
-    if not filtered_providers:
+    filtered_providers = [p for p in providers if p]
+    if len(filtered_providers) == 0:
         return None
     auto_provider_id = resolve_auto_provider_id(
         config=config,
         tool_config=tool_config,
         providers=filtered_providers,
     )
-    selected_provider_id = (
-        provider_id
-        or (runtime_metadata.get("selected_provider") if runtime_metadata else None)
-        or auto_provider_id
-    )
-    if not selected_provider_id:
+    resolved_provider_id = provider_id or (runtime_metadata or {}).get("selectedProvider") or auto_provider_id
+    if not resolved_provider_id:
         return None
-    provider = next(
-        (entry for entry in filtered_providers if entry.get("id") == selected_provider_id),
-        None,
-    )
-    if provider is None and resolve_fallback_provider_id:
-        fallback_provider_id = resolve_fallback_provider_id(
+    provider = next((p for p in filtered_providers if p.get("id") == resolved_provider_id), None)
+    if not provider and resolve_fallback_provider_id:
+        fallback_id = resolve_fallback_provider_id(
             config=config,
             tool_config=tool_config,
             providers=filtered_providers,
-            provider_id=selected_provider_id,
+            provider_id=resolved_provider_id,
         )
-        if fallback_provider_id:
-            provider = next(
-                (entry for entry in filtered_providers if entry.get("id") == fallback_provider_id),
-                None,
-            )
-    if provider is None:
+        if fallback_id:
+            provider = next((p for p in filtered_providers if p.get("id") == fallback_id), None)
+    if not provider:
         return None
     definition = create_tool(
         provider=provider,
@@ -279,6 +223,6 @@ def resolve_web_provider_definition(
         tool_config=tool_config,
         runtime_metadata=runtime_metadata,
     )
-    if definition is None:
+    if not definition:
         return None
     return {"provider": provider, "definition": definition}

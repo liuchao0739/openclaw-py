@@ -1,23 +1,23 @@
-"""Firecrawl plugin entrypoint registers its OpenClaw integration."""
-
-from __future__ import annotations
-
-from openclaw.plugin_sdk.plugin_entry import OpenClawPluginApi, define_plugin_entry
-from openclaw_extensions.firecrawl.src.firecrawl_fetch_provider import (
-    create_firecrawl_web_fetch_provider,
-)
-from openclaw_extensions.firecrawl.src.firecrawl_scrape_tool import create_firecrawl_scrape_tool
-from openclaw_extensions.firecrawl.src.firecrawl_search_provider import (
-    create_firecrawl_web_search_provider,
-)
-from openclaw_extensions.firecrawl.src.firecrawl_search_tool import create_firecrawl_search_tool
+from .fetch_provider import create_firecrawl_web_fetch_provider
+from .scrape_tool import create_firecrawl_scrape_tool
+from .search_provider import create_firecrawl_web_search_provider
+from .search_tool import create_firecrawl_search_tool
 
 
-def _register(api: OpenClawPluginApi) -> None:
-    api.register_web_fetch_provider(create_firecrawl_web_fetch_provider())  # type: ignore[attr-defined]
-    api.register_web_search_provider(create_firecrawl_web_search_provider())
-    api.register_tool(create_firecrawl_search_tool(api))  # type: ignore[attr-defined]
-    api.register_tool(create_firecrawl_scrape_tool(api))  # type: ignore[attr-defined]
+def define_plugin_entry(*, id: str, name: str, description: str, register):
+    return {
+        "id": id,
+        "name": name,
+        "description": description,
+        "register": register,
+    }
+
+
+def _register(api):
+    api["registerWebFetchProvider"](create_firecrawl_web_fetch_provider())
+    api["registerWebSearchProvider"](create_firecrawl_web_search_provider())
+    api["registerTool"](create_firecrawl_search_tool(api))
+    api["registerTool"](create_firecrawl_scrape_tool(api))
 
 
 default = define_plugin_entry(

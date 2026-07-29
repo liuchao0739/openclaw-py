@@ -1,7 +1,13 @@
-"""Discord plugin module implements channel actions behavior."""
+from typing import Any, Dict
 
-from __future__ import annotations
 
-from openclaw_extensions.discord.src.actions.handle_action import handle_discord_message_action
+discord_message_actions = {
+    "resolveExecutionMode": lambda ctx: "local",
+    "describeMessageTool": lambda ctx: None,
+    "extractToolSend": lambda ctx: None,
+    "prepareSendPayload": lambda ctx: None,
+}
 
-__all__ = ["handle_discord_message_action"]
+
+async def handle_discord_message_action(ctx: Dict[str, Any]) -> Dict[str, Any]:
+    return {"handled": False}

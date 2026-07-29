@@ -1,15 +1,10 @@
-"""Provider id normalization helpers.
+from typing import Any, Dict, Optional, TypeVar
 
-Mirrors packages/model-catalog-core/src/provider-id.ts.
-"""
+T = TypeVar("T")
 
-from __future__ import annotations
 
-from typing import TypeVar
-
-from openclaw_packages.normalization_core import normalize_lowercase_string_or_empty
-
-_T = TypeVar("_T")
+def normalize_lowercase_string_or_empty(value: Any) -> str:
+    return value.strip().lower() if isinstance(value, str) else ""
 
 
 def normalize_provider_id(provider: str) -> str:
@@ -21,9 +16,9 @@ def normalize_provider_id_for_auth(provider: str) -> str:
 
 
 def find_normalized_provider_value(
-    entries: dict[str, _T] | None,
+    entries: Optional[Dict[str, T]],
     provider: str,
-) -> _T | None:
+) -> Optional[T]:
     if not entries:
         return None
     provider_key = normalize_provider_id(provider)
@@ -34,22 +29,13 @@ def find_normalized_provider_value(
 
 
 def find_normalized_provider_key(
-    entries: dict[str, object] | None,
+    entries: Optional[Dict[str, Any]],
     provider: str,
-) -> str | None:
+) -> Optional[str]:
     if not entries:
         return None
     provider_key = normalize_provider_id(provider)
-    for key in entries:
+    for key in entries.keys():
         if normalize_provider_id(key) == provider_key:
             return key
     return None
-
-
-__all__ = [
-    "find_normalized_provider_key",
-    "find_normalized_provider_value",
-    "normalize_lowercase_string_or_empty",
-    "normalize_provider_id",
-    "normalize_provider_id_for_auth",
-]
